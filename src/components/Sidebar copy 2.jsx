@@ -1,6 +1,7 @@
+//  dropdown animation by "mm-collapsing" class
+
 import React, { useState } from "react";
 import sidebarEvents from "../data/sidebarEvents.json";
-import "./Sidebar.css";
 
 const menuItems = [
     {
@@ -100,17 +101,70 @@ const menuItems = [
 ];
 
 const SmoothMenu = ({ isOpen, className, children }) => {
+    const contentRef = React.useRef(null);
+    const [height, setHeight] = React.useState(isOpen ? 'auto' : '0px');
+    const [isCollapsing, setIsCollapsing] = React.useState(false);
+    const [show, setShow] = React.useState(isOpen);
+    const prevIsOpen = React.useRef(isOpen);
+
+    React.useEffect(() => {
+        if (prevIsOpen.current === isOpen) return;
+        const el = contentRef.current;
+        if (!el) return;
+
+        if (isOpen) {
+            setShow(true);
+            setHeight('0px');
+            setIsCollapsing(true);
+
+            // Double requestAnimationFrame ensures the DOM updates to 0px height before transitioning to scrollHeight
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setHeight(el.scrollHeight + 'px');
+                });
+            });
+
+            const timer = setTimeout(() => {
+                setIsCollapsing(false);
+                setHeight('auto');
+            }, 350);
+            prevIsOpen.current = isOpen;
+            return () => clearTimeout(timer);
+        } else {
+            setHeight(el.scrollHeight + 'px');
+
+            // Double requestAnimationFrame ensures the DOM updates to fixed scrollHeight before transitioning to 0px
+            requestAnimationFrame(() => {
+                requestAnimationFrame(() => {
+                    setIsCollapsing(true);
+                    setHeight('0px');
+                });
+            });
+
+            const timer = setTimeout(() => {
+                setIsCollapsing(false);
+                setShow(false);
+            }, 350);
+            prevIsOpen.current = isOpen;
+            return () => clearTimeout(timer);
+        }
+    }, [isOpen]);
+
+    const stateClass = isCollapsing ? "mm-collapsing" : `mm-collapse ${show ? "mm-show" : ""}`;
+
     return (
-        <div className={`custom-dropdown-container ${isOpen ? 'is-open' : ''}`}>
-            <div className="custom-dropdown-inner">
-                <ul
-                    aria-expanded={isOpen ? "true" : "false"}
-                    className={`${className || ""} sub-menu`.trim()}
-                >
-                    {children}
-                </ul>
-            </div>
-        </div>
+        <ul
+            ref={contentRef}
+            aria-expanded={isOpen ? "true" : "false"}
+            className={`${className || ""} ${stateClass}`.trim()}
+            style={{
+                height,
+                // overflow: isCollapsing ? 'hidden' : 'visible',
+                // transition: isCollapsing ? 'height 0.35s ease' : 'none'
+            }}
+        >
+            {children}
+        </ul>
     );
 };
 

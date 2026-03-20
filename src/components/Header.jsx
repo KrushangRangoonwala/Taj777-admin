@@ -101,7 +101,7 @@ export default function Header() {
                         href="javascript:void(0)"><i className="fas fa-info-circle mr-1"></i>Rules</a></span>
                     </div>
                     <div className="dropdown d-none d-sm-inline-block ml-1"><button type="button"
-                        className="btn header-item noti-icon"><span className="balance nowrap">pts:
+                        className="btn header-item noti-icon"><span className="balance nowrap">pts:{' '}
                             <span className="balance-value"><b>58,900</b></span> </span></button></div>
 
                     <Dropdown className="btn-group" id="__BVID__18" align="end">
@@ -110,7 +110,7 @@ export default function Header() {
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                             <div className="dropdown d-sm-none ml-1 mr-1">
-                                <div className="bal-box"><span className="balance nowrap">pts:
+                                <div className="bal-box"><span className="balance nowrap">pts:{' '}
                                     <span className="balance-value"><b>58,900</b></span> </span></div>
                             </div>
                             <Dropdown.Item href="javascript: void(0);" className="d-sm-none">
