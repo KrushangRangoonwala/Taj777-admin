@@ -11,6 +11,9 @@ import './styles/responsive.css'
 import './styles/theme.css'
 
 import Dashboard from './pages/Dashboard'
+import InsertUser from './pages/users/InsertUser'
+import AccountList from './pages/users/AccountList'
+import ActiveUsers from './pages/users/ActiveUsers'
 
 function App() {
   return (
@@ -19,6 +22,9 @@ function App() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/admin/home" replace />} />
           <Route path="admin/home" element={<Dashboard />} />
+          <Route path="admin/users" element={<AccountList />} />
+          <Route path="admin/activeusers" element={<ActiveUsers />} />
+          <Route path="admin/users/insertuser" element={<InsertUser />} />
           {/* Add more routes based on your sidebar links here */}
         </Route>
       </Routes>
