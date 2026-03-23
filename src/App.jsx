@@ -5,9 +5,9 @@ import 'boxicons/css/boxicons.min.css';
 import './styles/all.css'
 import './styles/app.css'
 import './styles/custome.css'
-import './styles/responsive.css'
 import './styles/styles__ltr.css'
 import './styles/styles.css'
+import './styles/responsive.css'
 import './styles/theme.css'
 
 import Dashboard from './pages/Dashboard'
