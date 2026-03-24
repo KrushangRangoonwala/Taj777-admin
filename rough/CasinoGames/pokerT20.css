@@ -1,0 +1,249 @@
+/*! CSS Used from: https://use.fontawesome.com/releases/v5.7.0/css/all.css */
+.fas {
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    display: inline-block;
+    font-style: normal;
+    font-variant: normal;
+    text-rendering: auto;
+    line-height: 1;
+}
+
+.fa-grip-lines-vertical:before {
+    content: "\f7a5";
+}
+
+.fas {
+    font-family: "Font Awesome 5 Free";
+}
+
+.fas {
+    font-weight: 900;
+}
+
+/*! CSS Used from: https://wver.sprintstaticdata.com/v194/static/front/css/bootstrap.min.css */
+*,
+::after,
+::before {
+    box-sizing: border-box;
+}
+
+img {
+    vertical-align: middle;
+    border-style: none;
+}
+
+.d-flex {
+    display: -ms-flexbox !important;
+    display: flex !important;
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+.mb-1 {
+    margin-bottom: .25rem !important;
+}
+
+@media print {
+
+    *,
+    ::after,
+    ::before {
+        text-shadow: none !important;
+        box-shadow: none !important;
+    }
+
+    img {
+        page-break-inside: avoid;
+    }
+}
+
+/*! CSS Used from: https://wver.sprintstaticdata.com/v194/static/front/css/style.css */
+* {
+    outline: 0 !important;
+}
+
+.casino-video-cards {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    background-color: rgba(0, 0, 0, 0.6);
+    padding: 5px 20px 5px 5px;
+    display: inline-block;
+    height: 155px;
+    overflow: hidden;
+    transition: all 1s;
+    width: 195px;
+    border-radius: 0 8px 8px 0;
+    display: flex;
+    align-items: center;
+}
+
+.casino-cards-shuffle {
+    position: absolute;
+    right: 5px;
+    top: 50%;
+    width: auto !important;
+    font-size: 30px;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #b3b3b3;
+}
+
+.casino-video-cards-container {
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+}
+
+.casino-video-cards-container>div {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: nowrap;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+.casino-video-cards-container .dealer-name {
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: var(--font-small);
+    justify-content: center;
+    white-space: nowrap;
+    color: var(--text-white);
+}
+
+.casino-video-cards-container>div:last-child {
+    margin-bottom: 0;
+}
+
+.casino-video-cards span img {
+    margin-right: 8px;
+    width: 50px;
+}
+
+.poker20 .casino-video-cards {
+    width: 195px;
+    height: 145px;
+}
+
+.poker20 .casino-video-cards-container {
+    flex-direction: row;
+}
+
+.poker20 .casino-video-cards .playeracards,
+.poker20 .casino-video-cards .playerbcards {
+    width: 50%;
+}
+
+.poker20 .casino-video-cards .playerbcards {
+    text-align: right;
+    justify-content: flex-end;
+}
+
+.poker20 .casino-video-cards span img {
+    width: 27px;
+}
+
+.poker20 .casino-video-cards span:last-child img {
+    margin-right: 0;
+}
+
+.poker20 .casino-video-cards-container>div {
+    flex-wrap: wrap;
+}
+
+/*! CSS Used from: https://wver.sprintstaticdata.com/v194/static/front/css/responsive.css */
+@media only screen and (min-width: 1280px) and (max-width: 1599px) {
+    .casino-video-cards span img {
+        width: 42px;
+    }
+
+    .casino-video-cards {
+        width: 172px;
+        height: 135px;
+    }
+
+    .poker20 .casino-video-cards {
+        height: 145px;
+        width: 195px;
+    }
+}
+
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+    .casino-video-cards span img {
+        width: 22px;
+        margin-right: 5px;
+    }
+
+    .casino-video-cards span {
+        line-height: 16px;
+    }
+
+    .casino-video-cards {
+        top: 80px;
+        transform: unset;
+        width: 95px;
+        padding: 5px 10px 5px 5px;
+        height: 75px;
+    }
+
+    .casino-cards-shuffle {
+        font-size: 22px;
+        right: 2px;
+    }
+
+    .casino-video-cards-container .dealer-name {
+        font-size: var(--font-caption);
+    }
+
+    .poker20 .casino-video-cards {
+        width: 162px;
+        height: 140px;
+    }
+
+    .poker20 .casino-video-cards span img {
+        width: 22px;
+    }
+
+    .poker20 .casino-video-cards-container .dealer-name {
+        font-size: 10px;
+    }
+}
+
+@media only screen and (min-width: 320px) and (max-width: 374px) {
+    .poker20 .casino-video-cards {
+        width: 115px;
+        height: 110px;
+    }
+
+    .poker20 .casino-video-cards span img {
+        width: 15px;
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1279px) {
+    .casino-video-cards {
+        width: 172px;
+        height: 135px;
+    }
+
+    .casino-video-cards span img {
+        width: 42px;
+    }
+
+    .poker20 .casino-video-cards {
+        height: 145px;
+        width: 195px;
+    }
+}

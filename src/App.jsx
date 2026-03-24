@@ -21,6 +21,8 @@ import EventPage from './pages/game/EventPage'
 import CasinoList from './pages/casino/CasinoList'
 import AdminPage from './pages/AdminPage'
 import MarketAnalysis from './pages/reports/MarketAnalysis'
+import CasinoCenter from './pages/casino/CasinoCenter';
+import AccountStatement from './pages/reports/AccountStatement';
 
 function App() {
   return (
@@ -33,10 +35,11 @@ function App() {
           <Route path="admin/activeusers" element={<ActiveUsers />} />
           <Route path="admin/users/insertuser" element={<InsertUser />} />
           <Route path="admin/reports/bank" element={<Bank />} />
+          <Route path="admin/reports/accountstatement" element={<AccountStatement />} />
           <Route path="admin/createaccount" element={<CreateAccount />} />
           <Route path="admin/game/details" element={<EventPage />} />
           <Route path="admin/casino/list" element={<CasinoList />} />
-          <Route path="admin/casino/:casinoPath" element={<CasinoList />} />
+          <Route path="admin/casino/:casinoPath" element={<CasinoCenter />} />
           <Route path="admin/market-analysis" element={<MarketAnalysis />} />
         </Route>
         <Route path="/admin" element={<AdminPage />} />

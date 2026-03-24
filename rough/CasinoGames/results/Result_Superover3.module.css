@@ -1,0 +1,1160 @@
+/*! CSS Used from: https://wver.sprintstaticdata.com/v194/static/front/css/bootstrap.min.css */
+*,
+::after,
+::before {
+    box-sizing: border-box;
+}
+
+header {
+    display: block;
+}
+
+h4,
+h5 {
+    margin-top: 0;
+    margin-bottom: .5rem;
+}
+
+table {
+    border-collapse: collapse;
+}
+
+th {
+    text-align: inherit;
+}
+
+button {
+    border-radius: 0;
+}
+
+button:focus {
+    outline: 1px dotted;
+    outline: 5px auto -webkit-focus-ring-color;
+}
+
+button {
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+button {
+    overflow: visible;
+}
+
+button {
+    text-transform: none;
+}
+
+[type=button],
+button {
+    -webkit-appearance: button;
+}
+
+[type=button]:not(:disabled),
+button:not(:disabled) {
+    cursor: pointer;
+}
+
+h4,
+h5 {
+    margin-bottom: .5rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+h4 {
+    font-size: 1.5rem;
+}
+
+h5 {
+    font-size: 1.25rem;
+}
+
+.row {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-12 {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.col-12 {
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+.table {
+    width: 100%;
+    margin-bottom: 1rem;
+    color: #212529;
+}
+
+.table td,
+.table th {
+    padding: .75rem;
+    vertical-align: top;
+    border-top: 1px solid #dee2e6;
+}
+
+.table thead th {
+    vertical-align: bottom;
+    border-bottom: 2px solid #dee2e6;
+}
+
+.table-responsive {
+    display: block;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+.close {
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+}
+
+.close:hover {
+    color: #000;
+    text-decoration: none;
+}
+
+.close:not(:disabled):not(.disabled):focus,
+.close:not(:disabled):not(.disabled):hover {
+    opacity: .75;
+}
+
+button.close {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.modal-content {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: .3rem;
+    outline: 0;
+}
+
+.modal-header {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    padding: 1rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: calc(.3rem - 1px);
+    border-top-right-radius: calc(.3rem - 1px);
+}
+
+.modal-header .close {
+    padding: 1rem 1rem;
+    margin: -1rem -1rem -1rem auto;
+}
+
+.modal-title {
+    margin-bottom: 0;
+    line-height: 1.5;
+    font-weight: 400 !important;
+    position: relative;
+    top: 3.5px;
+    margin-bottom: 0px !important;
+}
+
+.modal-body {
+    position: relative;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 8px;
+}
+
+.mt-2 {
+    margin-top: .5rem !important;
+}
+
+.mt-3 {
+    margin-top: 1rem !important;
+}
+
+.text-right {
+    text-align: right !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+.text-success {
+    color: #28a745 !important;
+}
+
+@media print {
+
+    *,
+    ::after,
+    ::before {
+        text-shadow: none !important;
+        box-shadow: none !important;
+    }
+
+    thead {
+        display: table-header-group;
+    }
+
+    tr {
+        page-break-inside: avoid;
+    }
+
+    .table {
+        border-collapse: collapse !important;
+    }
+
+    .table td,
+    .table th {
+        background-color: #fff !important;
+    }
+}
+
+/*! CSS Used from: https://wver.sprintstaticdata.com/v194/static/front/css/control.css */
+.text-success {
+    color: var(--book-green) !important;
+}
+
+.table-responsive {
+    scrollbar-width: thin;
+    scrollbar-height: thin;
+    scrollbar-color: #666 #222;
+    margin-bottom: 4px;
+}
+
+.table-responsive::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+.table-responsive::-webkit-scrollbar-track {
+    background: #666;
+}
+
+.table-responsive::-webkit-scrollbar-thumb {
+    background-color: #222;
+}
+
+.table {
+    border: 1px solid #3c444b;
+    background-color: var(--bg-table);
+    color: var(--text-table);
+    table-layout: fixed;
+}
+
+.table thead th {
+    border: 0;
+    vertical-align: middle;
+}
+
+.table thead {
+    background-color: var(--bg-table-header-new);
+    color: var(--text-table-header-new);
+}
+
+.table td,
+.table th {
+    border: 0;
+    border-bottom: 1px solid #3c444b;
+    padding: 4px;
+}
+
+.modal-content {
+    background-color: var(--bg-table);
+    color: var(--text-table);
+    border-radius: 0;
+    border: 0;
+    max-height: calc(100vh - 50px);
+}
+
+.modal-header {
+    border: 0;
+    border-radius: 0;
+    background-color: var(--bg-table-header-new);
+    color: var(--text-table-header-new);
+    padding: 8px;
+}
+
+.modal-title {
+    color: var(--text-fancy);
+    font-size: var(--font-18);
+}
+
+.modal-header .close {
+    color: var(--text-table-header-new);
+    opacity: 1;
+    text-shadow: none;
+}
+
+.modal-body {
+    padding: 8px;
+    max-height: calc(100vh - 60px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #666 #222;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #666;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background-color: #222;
+}
+
+/*! CSS Used from: https://wver.sprintstaticdata.com/v194/static/front/css/style.css */
+
+button {
+    font-family: revert;
+}
+
+.row.row5 {
+    margin-left: -5px;
+    margin-right: -5px;
+}
+
+.row.row5>[class*="col-"],
+.row.row5>[class*="col"] {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.five-cricket-result .table {
+    table-layout: fixed;
+}
+
+.five-cricket-result h4 {
+    padding: 2px;
+    margin-bottom: 4px;
+}
+
+.score-head {
+    padding: 4px;
+}
+
+.casino-result-round {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 6px;
+}
+
+/*! CSS Used from: https://wver.sprintstaticdata.com/v194/static/front/css/responsive.css */
+@media only screen and (min-width: 320px) and (max-width: 1279px) {
+    .modal-body {
+        padding: 8px 6px;
+    }
+
+    .modal-content {
+        max-height: calc(100vh - 108px);
+    }
+
+    .modal-header {
+        padding: 8px;
+    }
+
+    .modal-title {
+        font-size: var(--font-caption);
+    }
+
+    .modal-body {
+        max-height: calc(100vh - 40px);
+    }
+
+    .table {
+        table-layout: unset;
+    }
+
+    .five-cricket-result .table {
+        table-layout: unset;
+    }
+}
+
+@media only screen and (min-width: 1280px) and (max-width: 1599px) {
+    .table thead {
+        height: auto;
+    }
+
+    .table td,
+    .table th {
+        padding: 6px;
+    }
+
+    .modal-header {
+        padding: 2px 8px;
+    }
+
+    .modal-title {
+        font-size: var(--font-body);
+    }
+}
+
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+    .modal-body {
+        max-height: calc(100vh - 146px);
+    }
+}
+
+/*! CSS Used from: Embedded */
+.table-responsive {
+    margin-bottom: 1rem;
+}
+
+.table-responsive>.table {
+    margin-bottom: 0;
+}
+
+
+/* =========== */
+
+/*! CSS Used from: https://wver.sprintstaticdata.com/v196/static/front/css/bootstrap.min.css */
+*,
+::after,
+::before {
+    box-sizing: border-box;
+}
+
+header {
+    display: block;
+}
+
+[tabindex="-1"]:focus:not(:focus-visible) {
+    outline: 0 !important;
+}
+
+h5 {
+    margin-top: 0;
+    margin-bottom: .5rem;
+}
+
+img {
+    vertical-align: middle;
+    border-style: none;
+}
+
+button {
+    border-radius: 0;
+}
+
+button:focus {
+    outline: 1px dotted;
+    outline: 5px auto -webkit-focus-ring-color;
+}
+
+button {
+    margin: 0;
+    font-family: inherit;
+    font-size: inherit;
+    line-height: inherit;
+}
+
+button {
+    overflow: visible;
+}
+
+button {
+    text-transform: none;
+}
+
+[type=button],
+button {
+    -webkit-appearance: button;
+}
+
+[type=button]:not(:disabled),
+button:not(:disabled) {
+    cursor: pointer;
+}
+
+h5 {
+    margin-bottom: .5rem;
+    font-weight: 500;
+    line-height: 1.2;
+}
+
+h5 {
+    font-size: 1.25rem;
+}
+
+.row {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-wrap: wrap;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col-12,
+.col-lg-5,
+.col-lg-7 {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.col-12 {
+    -ms-flex: 0 0 100%;
+    flex: 0 0 100%;
+    max-width: 100%;
+}
+
+@media (min-width:992px) {
+    .col-lg-5 {
+        -ms-flex: 0 0 41.666667%;
+        flex: 0 0 41.666667%;
+        max-width: 41.666667%;
+    }
+
+    .col-lg-7 {
+        -ms-flex: 0 0 58.333333%;
+        flex: 0 0 58.333333%;
+        max-width: 58.333333%;
+    }
+}
+
+.close {
+    float: right;
+    font-size: 1.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    opacity: .5;
+}
+
+.close:hover {
+    color: #000;
+    text-decoration: none;
+}
+
+.close:not(:disabled):not(.disabled):focus,
+.close:not(:disabled):not(.disabled):hover {
+    opacity: .75;
+}
+
+button.close {
+    padding: 0;
+    background-color: transparent;
+    border: 0;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+}
+
+.modal-dialog {
+    position: relative;
+    width: auto;
+    margin: .5rem;
+    pointer-events: none;
+}
+
+.modal.fade .modal-dialog {
+    transition: -webkit-transform .3s ease-out;
+    transition: transform .3s ease-out;
+    transition: transform .3s ease-out, -webkit-transform .3s ease-out;
+    -webkit-transform: translate(0, -50px);
+    transform: translate(0, -50px);
+}
+
+@media (prefers-reduced-motion:reduce) {
+    .modal.fade .modal-dialog {
+        transition: none;
+    }
+}
+
+.modal.show .modal-dialog {
+    -webkit-transform: none;
+    transform: none;
+}
+
+.modal-content {
+    position: relative;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-direction: column;
+    flex-direction: column;
+    width: 100%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: .3rem;
+    outline: 0;
+}
+
+.modal-header {
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: start;
+    align-items: flex-start;
+    -ms-flex-pack: justify;
+    justify-content: space-between;
+    padding: 1rem 1rem;
+    border-bottom: 1px solid #dee2e6;
+    border-top-left-radius: calc(.3rem - 1px);
+    border-top-right-radius: calc(.3rem - 1px);
+}
+
+.modal-header .close {
+    padding: 1rem 1rem;
+    margin: -1rem -1rem -1rem auto;
+}
+
+.modal-title {
+    margin-bottom: 0;
+    line-height: 1.5;
+}
+
+.modal-body {
+    position: relative;
+    -ms-flex: 1 1 auto;
+    flex: 1 1 auto;
+    padding: 8px;
+}
+
+@media (min-width:576px) {
+    .modal-dialog {
+        max-width: 500px;
+        margin: 1.75rem auto;
+    }
+}
+
+@media (min-width:992px) {
+    .modal-xl {
+        max-width: 800px;
+    }
+}
+
+@media (min-width:1200px) {
+    .modal-xl {
+        max-width: 1140px;
+    }
+}
+
+.align-items-center {
+    -ms-flex-align: center !important;
+    align-items: center !important;
+}
+
+.text-center {
+    text-align: center !important;
+}
+
+@media print {
+
+    *,
+    ::after,
+    ::before {
+        text-shadow: none !important;
+        box-shadow: none !important;
+    }
+
+    img {
+        page-break-inside: avoid;
+    }
+}
+
+/*! CSS Used from: https://wver.sprintstaticdata.com/v196/static/front/css/control.css */
+.modal-dialog {
+    width: 100%;
+    margin: 0 auto;
+}
+
+.modal-content {
+    background-color: var(--bg-table);
+    color: var(--text-table);
+    border-radius: 0;
+    border: 0;
+    max-height: calc(100vh - 50px);
+}
+
+.modal-header {
+    border: 0;
+    border-radius: 0;
+    background-color: var(--bg-table-header-new);
+    color: var(--text-table-header-new);
+    padding: 8px;
+}
+
+.modal-title {
+    color: var(--text-fancy);
+    font-size: var(--font-18);
+}
+
+.modal-header .close {
+    color: var(--text-table-header-new);
+    opacity: 1;
+    text-shadow: none;
+}
+
+.modal-body {
+    padding: 8px;
+    max-height: calc(100vh - 60px);
+    overflow-x: hidden;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #666 #222;
+}
+
+.modal-body::-webkit-scrollbar {
+    width: 8px;
+}
+
+.modal-body::-webkit-scrollbar-track {
+    background: #666;
+}
+
+.modal-body::-webkit-scrollbar-thumb {
+    background-color: #222;
+}
+
+/*! CSS Used from: https://wver.sprintstaticdata.com/v196/static/front/css/style.css */
+
+button {
+    font-family: revert;
+}
+
+.row.row5 {
+    margin-left: -5px;
+    margin-right: -5px;
+}
+
+.row.row5>[class*="col-"],
+.row.row5>[class*="col"] {
+    padding-left: 5px;
+    padding-right: 5px;
+}
+
+.casino-result-round {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 6px;
+}
+
+.casino-result-cards {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.casino-result-content {
+    padding: 6px;
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 4px;
+}
+
+.casino-result-content-item {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    flex-direction: column;
+    align-items: center;
+    width: 49%;
+}
+
+.casino-result-cards-item {
+    margin-right: 5px;
+    display: inline-block;
+}
+
+.casino-result-cards-item img {
+    width: 35px;
+    margin-bottom: 5px;
+}
+
+.casino-result-cards-item:last-child {
+    margin-right: 0;
+}
+
+.casino-result-desc {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    padding: 6px;
+    background-color: #444;
+    border: 1px solid #555;
+    margin-top: 4px;
+}
+
+.casino-result-desc-item {
+    display: flex;
+    display: -webkit-flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.casino-result-desc-item div:first-child {
+    width: 30%;
+    text-align: right;
+    margin-right: 2%;
+    color: var(--text-body);
+    opacity: 0.6;
+}
+
+.casino-result-desc-item div:last-child {
+    width: 68%;
+    text-align: left;
+    word-break: break-all;
+}
+
+/*! CSS Used from: https://wver.sprintstaticdata.com/v196/static/front/css/responsive.css */
+@media only screen and (min-width: 320px) and (max-width: 1279px) {
+    .modal-body {
+        padding: 8px 6px;
+    }
+
+    .modal-content {
+        max-height: calc(100vh - 108px);
+    }
+
+    .modal-header {
+        padding: 8px;
+    }
+
+    .modal-title {
+        font-size: var(--font-caption);
+    }
+
+    .modal-body {
+        max-height: calc(100vh - 40px);
+    }
+}
+
+@media only screen and (min-width: 1280px) and (max-width: 1599px) {
+    .modal-header {
+        padding: 2px 8px;
+    }
+
+    .modal-title {
+        font-size: var(--font-body);
+    }
+}
+
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+    .casino-result-cards-item img {
+        width: 25px;
+        margin-bottom: 5px;
+    }
+
+    .modal-body {
+        max-height: calc(100vh - 146px);
+    }
+}
+
+/* ===== Goal result ==== */
+img {
+    vertical-align: middle;
+    border-style: none;
+}
+
+.d-flex {
+    display: -ms-flexbox !important;
+    display: flex !important;
+}
+
+.justify-content-center {
+    -ms-flex-pack: center !important;
+    justify-content: center !important;
+}
+
+.cricket20ballpopup {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    margin-left: -50px;
+    margin-top: -50px;
+    z-index: 10;
+}
+
+.cricket20ballpopup img {
+    width: 150px;
+}
+
+.cricket20ballpopup span {
+    position: absolute;
+    top: 50%;
+    left: 40%;
+    transform: translate(-50%, -50%);
+    color: #fff;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-family: timer;
+    font-size: 26px;
+}
+
+.goal-result img {
+    height: 250px;
+    width: auto !important;
+}
+
+.goal-result span {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    text-transform: uppercase;
+    top: unset;
+    left: 58%;
+    color: #000;
+    font-weight: bold;
+    bottom: -10px;
+    font-size: 15px;
+    width: 60%;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    bottom: -10px;
+    justify-content: center;
+}
+
+.cricket20ballresult {
+    position: relative;
+    width: auto;
+    left: unset;
+    top: unset;
+    margin: 0;
+    display: inline-block;
+}
+
+/*! CSS Used from: https://wver.sprintstaticdata.com/v196/static/front/css/responsive.css */
+@media only screen and (min-width: 1280px) and (max-width: 1599px) {
+    .cricket20ballpopup img {
+        width: 100px;
+    }
+}
+
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+    .cricket20ballpopup img {
+        width: 80px;
+    }
+
+    .cricket20ballpopup img {
+        width: 100px;
+    }
+
+    .cricket20ballpopup span {
+        font-size: 24px;
+    }
+}
+
+@media only screen and (min-width: 768px) and (max-width: 1279px) {
+    .cricket20ballpopup img {
+        width: 100px;
+    }
+}
+
+.align-items-center {
+    -ms-flex-align: center !important;
+    align-items: center !important;
+}
+
+.col-10,
+.col-12,
+.col-2,
+.col-lg-3,
+.col-lg-9 {
+    position: relative;
+    width: 100%;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+.col-10 {
+    -ms-flex: 0 0 83.333333%;
+    flex: 0 0 83.333333%;
+    max-width: 83.333333%;
+}
+
+.col-2 {
+    -ms-flex: 0 0 16.666667%;
+    flex: 0 0 16.666667%;
+    max-width: 16.666667%;
+}
+
+@media (min-width:992px) {
+    .col-lg-3 {
+        -ms-flex: 0 0 25%;
+        flex: 0 0 25%;
+        max-width: 25%;
+    }
+
+    .col-lg-9 {
+        -ms-flex: 0 0 75%;
+        flex: 0 0 75%;
+        max-width: 75%;
+    }
+}
+
+.mr-2 {
+    margin-right: .5rem !important;
+}
+
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+    .casino-result-cards-item .winner-icon {
+        height: auto;
+    }
+}
+
+.casino-result-cards-item .winner-icon {
+    height: auto;
+    width: 60px;
+    transition: 1.2s ease-in;
+    animation-iteration-count: infinite;
+    -webkit-transition: 1.2s ease-in;
+    -moz-transition: 1.2s ease-in;
+    -ms-transition: 1.2s ease-in;
+    -o-transition: 1.2s ease-in;
+}
+
+.d-inline-block {
+    display: inline-block !important;
+}
+
+.casino-result-content-diveder {
+    width: 2px;
+    height: 130px;
+    background-color: #666;
+}
+
+@media only screen and (min-width: 320px) and (max-width: 767px) {
+    .dtl20-result .casino-result-cards-item .winner-icon {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+    }
+}
+
+.modal-content {
+    width: 100%;
+    margin: 0 auto;
+}
+
+@media only screen and (min-width: 576px) and (max-width: 991px) {
+    .modal-content {
+        max-width: 500px;
+        margin: 1.75rem auto;
+    }
+}
+
+@media only screen and (min-width: 992px) and (max-width: 1199px) {
+    .modal-content {
+        max-width: 800px
+    }
+}
+
+@media only screen and (min-width: 1200px) {
+    .modal-content {
+        max-width: 1140px
+    }
+}
+
+@media (min-width: 992px) {
+    .col-lg-2 {
+        -ms-flex: 0 0 16.666667%;
+        flex: 0 0 16.666667%;
+        flex-grow: 0;
+        flex-shrink: 0;
+        flex-basis: 16.6667%;
+        max-width: 16.666667%;
+    }
+}
+
+@media (min-width: 992px) {
+    .col-lg-6 {
+        -ms-flex: 0 0 50%;
+        flex: 0 0 50%;
+        max-width: 50%;
+    }
+}
+
+.w-100 {
+    width: 100% !important;
+}
+
+.casino-result-cards-item:last-child {
+    margin-right: 0;
+}
+
+/* @media only screen and (min-width: 320px) and (max-width: 1279px) {
+    .modal-body {
+        padding: 8px 6px;
+    }
+} */
+
+.fw-400 {
+    font-weight: 400 !important;
+}
+
+:root[data-theme="light"] .modal-header .modal-title {
+    color: var(--text-white);
+}
+
+:root[data-theme="light"] .book-green,
+:root[data-theme="light"] .text-success {
+    color: #128412 !important;
+    font-weight: bold !important;
+}
+
+:root[data-theme="light"] .book-red,
+:root[data-theme="light"] .text-danger {
+    color: #ac0f1c !important;
+    font-weight: bold !important;
+}
+
+:root[data-theme="light"] .casino-result-desc {
+    background: #ccc;
+    border: 1px solid #aaa;
+    color: #222;
+}

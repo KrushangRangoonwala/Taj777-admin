@@ -1,0 +1,1308 @@
+<!-- common bet popup -->
+<div id="__BVID__17456___BV_modal_content_" tabindex="-1" class="modal-content">
+    <header id="__BVID__17456___BV_modal_header_" class="modal-header">
+        <h5 id="__BVID__17456___BV_modal_title_" class="modal-title">
+            <h5 class="modal-title">
+                Place Bet
+                <span class="casino-min-max ml-2">
+                    Range:<span>100</span>-<span>25K</span></span>
+            </h5>
+        </h5><button type="button" aria-label="Close" class="close">×</button>
+    </header>
+    <div id="__BVID__17456___BV_modal_body_" class="modal-body"><!---->
+        <div class="casino-place-bet-box back">
+            <div class="bet-slip pl-0 pr-0">
+                <div class="bet-team mt-0"><span class="bet-team-name">Next Total 10 or More</span> <span
+                        class="float-right">3.06</span></div>
+            </div>
+            <div class="casino-place-bet-info">
+                <div class="bet-input ml-0 back-border"><input type="number" id="placebetAmountMobile" maxlength="9"
+                        onkeypress="return event.charCode &gt;= 48 &amp;&amp; event.charCode &lt;= 57"
+                        placeholder="Amount" class="form-control input-stake"></div>
+            </div>
+            <div class="casino-place-bet-button-container"><button class="btn btn-bet"><span>+25</span></button><button
+                    class="btn btn-bet"><span>+50</span></button><button
+                    class="btn btn-bet"><span>+100</span></button><button
+                    class="btn btn-bet"><span>+200</span></button><button
+                    class="btn btn-bet"><span>+500</span></button><button
+                    class="btn btn-bet"><span>+1000</span></button> <button
+                    class="btn btn-sm btn-link text-dark flex-fill text-right w-auto mw-auto">
+                    Clear
+                </button></div>
+            <div class="casino-place-bet-action-buttons"><button class="btn btn-primary" disabled="disabled">
+                    Submit
+                </button></div>
+        </div>
+    </div><!---->
+</div>
+
+<style>
+    /*Mobile Bet Popup*/
+    /*! CSS Used from: https://wver.sprintstaticdata.com/v198/static/front/css/bootstrap.min.css */
+    *,
+    ::after,
+    ::before {
+        box-sizing: border-box;
+    }
+
+    header {
+        display: block;
+    }
+
+    [tabindex="-1"]:focus:not(:focus-visible) {
+        outline: 0 !important;
+    }
+
+    h5 {
+        margin-top: 0;
+        margin-bottom: .5rem;
+    }
+
+    button {
+        border-radius: 0;
+    }
+
+    button:focus {
+        outline: 1px dotted;
+        outline: 5px auto -webkit-focus-ring-color;
+    }
+
+    button,
+    input {
+        margin: 0;
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+    }
+
+    button,
+    input {
+        overflow: visible;
+    }
+
+    button {
+        text-transform: none;
+    }
+
+    [type=button],
+    button {
+        -webkit-appearance: button;
+    }
+
+    [type=button]:not(:disabled),
+    button:not(:disabled) {
+        cursor: pointer;
+    }
+
+    h5 {
+        margin-bottom: .5rem;
+        font-weight: 500;
+        line-height: 1.2;
+    }
+
+    h5 {
+        font-size: 1.25rem;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        height: calc(1.5em + .75rem + 2px);
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+        .form-control {
+            transition: none;
+        }
+    }
+
+    .form-control:focus {
+        color: #495057;
+        background-color: #fff;
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 .2rem rgba(0, 123, 255, .25);
+    }
+
+    .form-control::placeholder {
+        color: #6c757d;
+        opacity: 1;
+    }
+
+    .form-control:disabled {
+        background-color: #e9ecef;
+        opacity: 1;
+    }
+
+    .btn {
+        display: inline-block;
+        font-weight: 400;
+        color: #212529;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-color: transparent;
+        border: 1px solid transparent;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: .25rem;
+        transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+        .btn {
+            transition: none;
+        }
+    }
+
+    .btn:hover {
+        color: #212529;
+        text-decoration: none;
+    }
+
+    .btn:focus {
+        outline: 0;
+        box-shadow: 0 0 0 .2rem rgba(0, 123, 255, .25);
+    }
+
+    .btn:disabled {
+        opacity: .65;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+        color: #fff;
+        background-color: #0069d9;
+        border-color: #0062cc;
+    }
+
+    .btn-primary:focus {
+        color: #fff;
+        background-color: #0069d9;
+        border-color: #0062cc;
+        box-shadow: 0 0 0 .2rem rgba(38, 143, 255, .5);
+    }
+
+    .btn-primary:disabled {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:not(:disabled):not(.disabled):active {
+        color: #fff;
+        background-color: #0062cc;
+        border-color: #005cbf;
+    }
+
+    .btn-primary:not(:disabled):not(.disabled):active:focus {
+        box-shadow: 0 0 0 .2rem rgba(38, 143, 255, .5);
+    }
+
+    .btn-link {
+        font-weight: 400;
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .btn-link:hover {
+        color: #0056b3;
+        text-decoration: underline;
+    }
+
+    .btn-link:focus {
+        text-decoration: underline;
+        box-shadow: none;
+    }
+
+    .btn-link:disabled {
+        color: #6c757d;
+        pointer-events: none;
+    }
+
+    .btn-sm {
+        padding: .25rem .5rem;
+        font-size: .875rem;
+        line-height: 1.5;
+        border-radius: .2rem;
+    }
+
+    .close {
+        float: right;
+        font-size: 1.5rem;
+        font-weight: 700;
+        line-height: 1;
+        color: #000;
+        text-shadow: 0 1px 0 #fff;
+        opacity: .5;
+    }
+
+    .close:hover {
+        color: #000;
+        text-decoration: none;
+    }
+
+    .close:not(:disabled):not(.disabled):focus,
+    .close:not(:disabled):not(.disabled):hover {
+        opacity: .75;
+    }
+
+    button.close {
+        padding: 0;
+        background-color: transparent;
+        border: 0;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+    }
+
+    .modal-content {
+        position: relative;
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-direction: column;
+        flex-direction: column;
+        width: 100%;
+        pointer-events: auto;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid rgba(0, 0, 0, .2);
+        border-radius: .3rem;
+        outline: 0;
+    }
+
+    .modal-header {
+        display: -ms-flexbox;
+        display: flex;
+        -ms-flex-align: start;
+        align-items: flex-start;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        padding: 1rem 1rem;
+        border-bottom: 1px solid #dee2e6;
+        border-top-left-radius: calc(.3rem - 1px);
+        border-top-right-radius: calc(.3rem - 1px);
+    }
+
+    .modal-header .close {
+        padding: 1rem 1rem;
+        margin: -1rem -1rem -1rem auto;
+    }
+
+    .modal-title {
+        margin-bottom: 0;
+        line-height: 1.5;
+    }
+
+    .modal-body {
+        position: relative;
+        -ms-flex: 1 1 auto;
+        flex: 1 1 auto;
+        padding: 1rem;
+    }
+
+    .flex-fill {
+        -ms-flex: 1 1 auto !important;
+        flex: 1 1 auto !important;
+    }
+
+    .float-right {
+        float: right !important;
+    }
+
+    .w-auto {
+        width: auto !important;
+    }
+
+    .mt-0 {
+        margin-top: 0 !important;
+    }
+
+    .ml-0 {
+        margin-left: 0 !important;
+    }
+
+    .ml-2 {
+        margin-left: .5rem !important;
+    }
+
+    .pr-0 {
+        padding-right: 0 !important;
+    }
+
+    .pl-0 {
+        padding-left: 0 !important;
+    }
+
+    .text-right {
+        text-align: right !important;
+    }
+
+    .text-dark {
+        color: #343a40 !important;
+    }
+
+    @media print {
+
+        *,
+        ::after,
+        ::before {
+            text-shadow: none !important;
+            box-shadow: none !important;
+        }
+    }
+
+    /*! CSS Used from: https://wver.sprintstaticdata.com/v198/static/front/css/control.css */
+    .form-control {
+        background-color: #444;
+        height: 36px;
+        border-radius: 0;
+        border: 1px solid #555;
+        color: #ddd;
+    }
+
+    .form-control::placeholder {
+        color: inherit;
+        opacity: 1;
+    }
+
+    .form-control:focus,
+    .form-control:hover {
+        box-shadow: 0 0 4px var(--text-body);
+        background-color: var(--bg-body);
+        border: 1px solid var(--text-body);
+        color: var(--text-body);
+        box-shadow: none;
+    }
+
+    .btn {
+        box-shadow: none !important;
+        height: auto;
+        color: var(--text-white);
+        border-radius: 0;
+    }
+
+    .btn-primary {
+        background-color: var(--btn-primary);
+        border-color: var(--btn-primary);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active,
+    .btn-primary:not(:disabled):not(.disabled):active {
+        box-shadow: none;
+        background-color: var(--btn-primary);
+        border-color: var(--btn-primary);
+    }
+
+    .btn-primary:disabled {
+        background-color: var(--btn-primary);
+        border-color: var(--btn-primary);
+        cursor: not-allowed;
+    }
+
+    .btn-bet {
+        height: 34px;
+        background-color: var(--btn-primary);
+        border-color: transparent;
+        color: var(--text-white);
+    }
+
+    .btn-bet:hover,
+    .btn-bet:focus,
+    .btn-bet:active {
+        background-color: var(--btn-primary);
+        border-color: transparent;
+        color: var(--text-white);
+    }
+
+    .modal-content {
+        background-color: var(--bg-table);
+        color: var(--text-table);
+        border-radius: 0;
+        border: 0;
+        max-height: calc(100vh - 50px);
+    }
+
+    .modal-header {
+        border: 0;
+        border-radius: 0;
+        background-color: var(--bg-table-header-new);
+        color: var(--text-table-header-new);
+        padding: 8px;
+    }
+
+    .modal-title {
+        color: var(--text-fancy);
+        font-size: var(--font-18);
+    }
+
+    .modal-header .close {
+        color: var(--text-table-header-new);
+        opacity: 1;
+        text-shadow: none;
+    }
+
+    .modal-body {
+        padding: 8px;
+        max-height: calc(100vh - 60px);
+        overflow-x: hidden;
+        overflow-y: auto;
+        scrollbar-width: thin;
+        scrollbar-color: #666 #222;
+    }
+
+    .modal-body::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .modal-body::-webkit-scrollbar-track {
+        background: #666;
+    }
+
+    .modal-body::-webkit-scrollbar-thumb {
+        background-color: #222;
+    }
+
+    /*! CSS Used from: https://wver.sprintstaticdata.com/v198/static/front/css/style.css */
+    * {
+        outline: 0 !important;
+    }
+
+    button,
+    input {
+        font-family: revert;
+    }
+
+    .back {
+        background-color: var(--back);
+    }
+
+    .back:hover {
+        background-color: var(--back-hover);
+    }
+
+    .back-border {
+        border-left: 5px solid var(--back);
+    }
+
+    .bet-slip {
+        border-bottom: 1px solid #666;
+        padding: 0 4px;
+        margin-bottom: 4px;
+    }
+
+    .bet-team {
+        font-size: var(--font-caption);
+        margin-top: 0;
+        font-weight: var(--font-bold);
+        display: flex;
+        display: -webkit-flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .bet-team-name {
+        max-width: calc(100% - 85px);
+        display: inline-block;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
+    }
+
+    .bet-input {
+        margin-top: 3px;
+        margin-left: 4px;
+        width: 120px;
+        display: inline-block;
+        vertical-align: top;
+        position: relative;
+        z-index: 0;
+        overflow: hidden;
+        height: 36px;
+        margin: 0;
+        margin-left: 0;
+    }
+
+    .bet-input.back-border {
+        border-left: 0;
+    }
+
+    .bet-input .form-control {
+        color: #222;
+        height: 36px;
+        border: 0;
+        background-color: #eee;
+    }
+
+    .casino-place-bet-box {
+        display: flex;
+        display: -webkit-flex;
+        justify-content: space-between;
+        padding: 6px 6px;
+        color: #000;
+        flex-wrap: wrap;
+    }
+
+    .casino-place-bet-box.back:hover {
+        background-color: var(--back);
+    }
+
+    .casino-place-bet-info {
+        display: flex;
+        display: -webkit-flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .casino-place-bet-info .bet-input {
+        width: 80px;
+    }
+
+    input.form-control:disabled {
+        cursor: not-allowed;
+    }
+
+    .input-stake {
+        background-color: transparent;
+        width: 80px;
+        height: 40px;
+    }
+
+    .casino-place-bet-button-container {
+        display: flex;
+        display: -webkit-flex;
+        width: 100%;
+        flex-wrap: wrap;
+        margin-top: 6px;
+    }
+
+    .casino-place-bet-button-container .btn {
+        margin-right: 1%;
+        margin-bottom: 1%;
+        width: 32.6%;
+        padding: 0;
+    }
+
+    .casino-place-bet-button-container .btn:nth-child(3n) {
+        margin-right: 0;
+    }
+
+    .casino-place-bet-action-buttons {
+        display: flex;
+        display: -webkit-flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .casino-place-bet-action-buttons .btn {
+        height: 40px;
+        width: 112px;
+    }
+
+    .casino-min-max {
+        font-size: var(--font-small);
+    }
+
+    /*! CSS Used from: https://wver.sprintstaticdata.com/v198/static/front/css/responsive.css */
+    @media only screen and (min-width: 320px) and (max-width: 1279px) {
+        .modal-body {
+            padding: 8px 6px;
+        }
+
+        .casino-place-bet-box {
+            padding: 0 6px;
+            color: #000;
+        }
+
+        .bet-slip {
+            width: 100%;
+        }
+
+        .casino-place-bet-info {
+            display: block;
+        }
+
+        .casino-place-bet-button-container .btn {
+            width: 31.6%;
+            margin-right: 2%;
+            color: var(--text-highlight);
+        }
+
+        .casino-place-bet-action-buttons .btn {
+            width: 100%;
+        }
+
+        .casino-min-max {
+            font-size: 11px;
+        }
+
+        .modal-content {
+            max-height: calc(100vh - 108px);
+        }
+
+        .modal-header {
+            padding: 8px;
+        }
+
+        .modal-title {
+            font-size: var(--font-caption);
+        }
+
+        .modal-title .casino-min-max {
+            color: var(--text-highlight);
+        }
+
+        .modal-body {
+            max-height: calc(100vh - 40px);
+        }
+
+        .form-control {
+            height: 32px;
+        }
+    }
+
+    @media only screen and (min-width: 1280px) and (max-width: 1365px) {
+        .bet-slip {
+            padding: 8px;
+        }
+    }
+
+    @media only screen and (min-width: 1366px) and (max-width: 1599px) {
+        .bet-slip {
+            padding: 8px;
+        }
+    }
+
+    @media only screen and (min-width: 1280px) and (max-width: 1599px) {
+        .form-control {
+            font-size: var(--font-13);
+        }
+
+        .bet-team {
+            font-size: var(--font-13);
+        }
+
+        .modal-header {
+            padding: 2px 8px;
+        }
+
+        .modal-title {
+            font-size: var(--font-body);
+        }
+    }
+
+    @media only screen and (min-width: 320px) and (max-width: 767px) {
+        .modal-body {
+            max-height: calc(100vh - 146px);
+        }
+
+        .place-modal .modal-body {
+            padding: 0;
+        }
+
+        .casino-place-bet-info .bet-input,
+        .input-stake {
+            width: 140px;
+        }
+
+        input.input-stake[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+        .bet-input {
+            margin: 0;
+        }
+    }
+</style>
+
+
+<!-- DESKTOP -->
+<span>
+    <div class="casino-place-bet">
+        <div class="casino-place-bet-title"><span>Place Bet</span> <span class="float-right casino-min-max">
+                Range:<span>100</span>-<span>25K</span></span></div>
+        <div class="casino-place-bet-header">
+            <div>(Bet For)</div>
+            <div>Odds</div>
+            <div>Stake</div>
+            <div>Profit</div>
+        </div>
+        <div class="casino-place-bet-box lay"><!---->
+            <div class="casino-place-bet-info">
+                <div class="bet-player"><span>Next Total 10 or More</span></div>
+                <div class="odds-box"><input type="text" disabled="disabled" class="form-control"> <img
+                        src="https://wver.sprintstaticdata.com/v198/static/front/img/arrow-down.svg" class="arrow-up">
+                    <img src="https://wver.sprintstaticdata.com/v198/static/front/img/arrow-down.svg"
+                        class="arrow-down">
+                </div>
+                <div class="bet-input lay-border"><input type="text" id="placebetAmountWeb"
+                        onkeypress="return event.charCode &gt;= 48 &amp;&amp; event.charCode &lt;= 57"
+                        class="form-control input-stake"></div>
+                <div>0</div>
+            </div>
+            <div class="casino-place-bet-button-container"><button class="btn btn-bet"><span>+25</span></button><button
+                    class="btn btn-bet"><span>+50</span></button><button
+                    class="btn btn-bet"><span>+100</span></button><button
+                    class="btn btn-bet"><span>+200</span></button><button
+                    class="btn btn-bet"><span>+500</span></button><button
+                    class="btn btn-bet"><span>+1000</span></button> <button
+                    class="btn btn-sm btn-link text-dark flex-fill text-right w-auto mw-auto">
+                    Clear
+                </button></div>
+            <div class="casino-place-bet-action-buttons"><button class="btn btn-reset">
+                    Reset
+                </button> <!----> <button class="btn btn-primary" disabled="disabled">
+                    Submit
+                </button></div>
+        </div>
+    </div>
+</span>
+
+<style>
+    /*! CSS Used from: https://wver.sprintstaticdata.com/v198/static/front/css/bootstrap.min.css */
+    *,
+    ::after,
+    ::before {
+        box-sizing: border-box;
+    }
+
+    img {
+        vertical-align: middle;
+        border-style: none;
+    }
+
+    button {
+        border-radius: 0;
+    }
+
+    button:focus {
+        outline: 1px dotted;
+        outline: 5px auto -webkit-focus-ring-color;
+    }
+
+    button,
+    input {
+        margin: 0;
+        font-family: inherit;
+        font-size: inherit;
+        line-height: inherit;
+    }
+
+    button,
+    input {
+        overflow: visible;
+    }
+
+    button {
+        text-transform: none;
+    }
+
+    button {
+        -webkit-appearance: button;
+    }
+
+    button:not(:disabled) {
+        cursor: pointer;
+    }
+
+    .form-control {
+        display: block;
+        width: 100%;
+        height: calc(1.5em + .75rem + 2px);
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        font-weight: 400;
+        line-height: 1.5;
+        color: #495057;
+        background-color: #fff;
+        background-clip: padding-box;
+        border: 1px solid #ced4da;
+        border-radius: .25rem;
+        transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+        .form-control {
+            transition: none;
+        }
+    }
+
+    .form-control:focus {
+        color: #495057;
+        background-color: #fff;
+        border-color: #80bdff;
+        outline: 0;
+        box-shadow: 0 0 0 .2rem rgba(0, 123, 255, .25);
+    }
+
+    .form-control::placeholder {
+        color: #6c757d;
+        opacity: 1;
+    }
+
+    .form-control:disabled {
+        background-color: #e9ecef;
+        opacity: 1;
+    }
+
+    .btn {
+        display: inline-block;
+        font-weight: 400;
+        color: #212529;
+        text-align: center;
+        vertical-align: middle;
+        cursor: pointer;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        background-color: transparent;
+        border: 1px solid transparent;
+        padding: .375rem .75rem;
+        font-size: 1rem;
+        line-height: 1.5;
+        border-radius: .25rem;
+        transition: color .15s ease-in-out, background-color .15s ease-in-out, border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+    }
+
+    @media (prefers-reduced-motion:reduce) {
+        .btn {
+            transition: none;
+        }
+    }
+
+    .btn:hover {
+        color: #212529;
+        text-decoration: none;
+    }
+
+    .btn:focus {
+        outline: 0;
+        box-shadow: 0 0 0 .2rem rgba(0, 123, 255, .25);
+    }
+
+    .btn:disabled {
+        opacity: .65;
+    }
+
+    .btn-primary {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:hover {
+        color: #fff;
+        background-color: #0069d9;
+        border-color: #0062cc;
+    }
+
+    .btn-primary:focus {
+        color: #fff;
+        background-color: #0069d9;
+        border-color: #0062cc;
+        box-shadow: 0 0 0 .2rem rgba(38, 143, 255, .5);
+    }
+
+    .btn-primary:disabled {
+        color: #fff;
+        background-color: #007bff;
+        border-color: #007bff;
+    }
+
+    .btn-primary:not(:disabled):not(.disabled):active {
+        color: #fff;
+        background-color: #0062cc;
+        border-color: #005cbf;
+    }
+
+    .btn-primary:not(:disabled):not(.disabled):active:focus {
+        box-shadow: 0 0 0 .2rem rgba(38, 143, 255, .5);
+    }
+
+    .btn-link {
+        font-weight: 400;
+        color: #007bff;
+        text-decoration: none;
+    }
+
+    .btn-link:hover {
+        color: #0056b3;
+        text-decoration: underline;
+    }
+
+    .btn-link:focus {
+        text-decoration: underline;
+        box-shadow: none;
+    }
+
+    .btn-link:disabled {
+        color: #6c757d;
+        pointer-events: none;
+    }
+
+    .btn-sm {
+        padding: .25rem .5rem;
+        font-size: .875rem;
+        line-height: 1.5;
+        border-radius: .2rem;
+    }
+
+    .flex-fill {
+        -ms-flex: 1 1 auto !important;
+        flex: 1 1 auto !important;
+    }
+
+    .float-right {
+        float: right !important;
+    }
+
+    .w-auto {
+        width: auto !important;
+    }
+
+    .text-right {
+        text-align: right !important;
+    }
+
+    .text-dark {
+        color: #343a40 !important;
+    }
+
+    @media print {
+
+        *,
+        ::after,
+        ::before {
+            text-shadow: none !important;
+            box-shadow: none !important;
+        }
+
+        img {
+            page-break-inside: avoid;
+        }
+    }
+
+    /*! CSS Used from: https://wver.sprintstaticdata.com/v198/static/front/css/control.css */
+    .form-control {
+        background-color: #444;
+        height: 36px;
+        border-radius: 0;
+        border: 1px solid #555;
+        color: #ddd;
+    }
+
+    .form-control::placeholder {
+        color: inherit;
+        opacity: 1;
+    }
+
+    .form-control:focus,
+    .form-control:hover {
+        box-shadow: 0 0 4px var(--text-body);
+        background-color: var(--bg-body);
+        border: 1px solid var(--text-body);
+        color: var(--text-body);
+        box-shadow: none;
+    }
+
+    .btn {
+        box-shadow: none !important;
+        height: auto;
+        color: var(--text-white);
+        border-radius: 0;
+    }
+
+    .btn-primary {
+        background-color: var(--btn-primary);
+        border-color: var(--btn-primary);
+    }
+
+    .btn-primary:hover,
+    .btn-primary:focus,
+    .btn-primary:active,
+    .btn-primary:not(:disabled):not(.disabled):active {
+        box-shadow: none;
+        background-color: var(--btn-primary);
+        border-color: var(--btn-primary);
+    }
+
+    .btn-primary:disabled {
+        background-color: var(--btn-primary);
+        border-color: var(--btn-primary);
+        cursor: not-allowed;
+    }
+
+
+
+    .btn-bet {
+        height: 34px;
+        background-color: var(--btn-primary);
+        border-color: transparent;
+        color: var(--text-white);
+    }
+
+    .btn-bet:hover,
+    .btn-bet:focus,
+    .btn-bet:active {
+        background-color: var(--btn-primary);
+        border-color: transparent;
+        color: var(--text-white);
+    }
+
+    /*! CSS Used from: https://wver.sprintstaticdata.com/v198/static/front/css/style.css */
+    * {
+        outline: 0 !important;
+    }
+
+    button,
+    input {
+        font-family: revert;
+    }
+
+    .lay {
+        background-color: var(--lay);
+    }
+
+    .lay:hover {
+        background-color: var(--lay-hover);
+    }
+
+    .lay-border {
+        border-left: 5px solid var(--lay);
+    }
+
+    .bet-input {
+        margin-top: 3px;
+        margin-left: 4px;
+        width: 120px;
+        display: inline-block;
+        vertical-align: top;
+        position: relative;
+        z-index: 0;
+        overflow: hidden;
+        height: 36px;
+        margin: 0;
+        margin-left: 0;
+    }
+
+    .bet-input.lay-border {
+        border-left: 0;
+    }
+
+    .bet-input .form-control {
+        color: #222;
+        height: 36px;
+        border: 0;
+        background-color: #eee;
+    }
+
+    .casino-place-bet {
+        width: 100%;
+        border-radius: 0;
+        margin-bottom: 4px;
+    }
+
+    .casino-place-bet-title {
+        padding: 4px;
+        text-transform: uppercase;
+        font-weight: var(--font-bold);
+    }
+
+    .casino-place-bet-title .casino-min-max {
+        text-transform: capitalize;
+    }
+
+    .casino-place-bet-header {
+        display: flex;
+        display: -webkit-flex;
+        justify-content: space-between;
+        padding: 8px;
+        background-color: var(--bg-table-header-new);
+        color: var(--text-table-header-new);
+    }
+
+    .casino-place-bet-box {
+        display: flex;
+        display: -webkit-flex;
+        justify-content: space-between;
+        padding: 6px 6px;
+        color: #000;
+        flex-wrap: wrap;
+    }
+
+    .casino-place-bet-box.lay:hover {
+        background-color: var(--lay);
+    }
+
+    .casino-place-bet-info {
+        display: flex;
+        display: -webkit-flex;
+        width: 100%;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .casino-place-bet-info .bet-input {
+        width: 80px;
+    }
+
+    .odds-box {
+        position: relative;
+        height: 36px;
+        width: 80px;
+        border-radius: 4px;
+        padding: 0;
+        background-color: var();
+    }
+
+    .odds-box .form-control {
+        height: 36px;
+        width: 80px;
+        background: #eee;
+        color: #222;
+        border: 0;
+    }
+
+    input.form-control:disabled {
+        cursor: not-allowed;
+    }
+
+
+
+    .input-stake {
+        background-color: transparent;
+        width: 80px;
+        height: 40px;
+    }
+
+    .casino-place-bet-button-container {
+        display: flex;
+        display: -webkit-flex;
+        width: 100%;
+        flex-wrap: wrap;
+        margin-top: 6px;
+    }
+
+    .casino-place-bet-button-container .btn {
+        margin-right: 1%;
+        margin-bottom: 1%;
+        width: 32.6%;
+        padding: 0;
+    }
+
+    .casino-place-bet-button-container .btn:nth-child(3n) {
+        margin-right: 0;
+    }
+
+    .casino-place-bet-action-buttons {
+        display: flex;
+        display: -webkit-flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .casino-place-bet-action-buttons .btn {
+        height: 40px;
+        width: 112px;
+    }
+
+    .casino-min-max {
+        font-size: var(--font-small);
+    }
+
+    /*! CSS Used from: https://wver.sprintstaticdata.com/v198/static/front/css/responsive.css */
+    @media only screen and (min-width: 320px) and (max-width: 1279px) {
+        .casino-place-bet-box {
+            padding: 0 6px;
+            color: #000;
+        }
+
+        .casino-place-bet-title {
+            padding: 16px 10px;
+        }
+
+        .casino-place-bet-info {
+            display: block;
+        }
+
+        .bet-player {
+            margin-bottom: 16px;
+            color: var(--text-white);
+        }
+
+        .casino-place-bet-button-container .btn {
+            width: 31.6%;
+            margin-right: 2%;
+            color: var(--text-highlight);
+        }
+
+        .casino-place-bet {
+            width: 100%;
+        }
+
+        .casino-place-bet-action-buttons .btn {
+            width: 100%;
+        }
+
+        .casino-min-max {
+            font-size: 11px;
+        }
+
+        .form-control {
+            height: 32px;
+        }
+    }
+
+    @media only screen and (min-width: 1280px) and (max-width: 1599px) {
+        .form-control {
+            font-size: var(--font-13);
+        }
+    }
+
+    @media only screen and (min-width: 320px) and (max-width: 767px) {
+
+        .casino-place-bet-info .bet-input,
+        .input-stake {
+            width: 140px;
+        }
+
+        .bet-input {
+            margin: 0;
+        }
+    }
+
+    /*! CSS Used from: https://wver.sprintstaticdata.com/v198/static/front/css/custom.css */
+    @media screen and (max-width: 767px) {
+        .casino-place-bet-info img {
+            height: 50px;
+        }
+    }
+</style>

@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fetchCasinoList } from '../../api/API';
 import { Link } from 'react-router-dom';
+import { format_casino_list } from '../../utilies/helpers';
+import { setAllCasinoGames } from '../../store/slices/casinoSlice';
+import { useDispatch } from 'react-redux';
 
 const gameCodeMap = {
   // IF U CHANGE GAME_PATH, ALSO CHANGE IT IN CasinoCenterContent.JS , gamePath_MapTo_gametype IN casinoDeatils_byType.js , Casinomap.js
@@ -70,7 +73,9 @@ const gameCodeMap = {
 };
 
 const CasinoList = () => {
+  const dispatch = useDispatch();
   const [casinoData, setCasinoData] = useState({});
+  const [casinoAllGames, setCasinoAllGames] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('All Casino');
   const [loading, setLoading] = useState(true);
@@ -82,7 +87,11 @@ const CasinoList = () => {
         const response = await fetchCasinoList();
         if (response.status === 'ok') {
           setCasinoData(response.data);
+          setCasinoAllGames(response.all_data);
           setCategories(['All Casino', ...Object.keys(response.data)]);
+
+          const formated_casino_list = format_casino_list(response.all_data || []);
+          dispatch(setAllCasinoGames(formated_casino_list));
         }
       } catch (error) {
         console.error('Failed to fetch casino list:', error);
@@ -103,9 +112,20 @@ const CasinoList = () => {
     }
   };
 
+  const sortGames = (games) => {
+    if (!Array.isArray(games)) return [];
+    return games.sort((a, b) => {
+      const pA = parseInt(a.priority);
+      const pB = parseInt(b.priority);
+      const valA = isNaN(pA) ? 9999 : pA;
+      const valB = isNaN(pB) ? 9999 : pB;
+      return valA - valB;
+    });
+  };
+
   const getFilteredGames = () => {
     if (selectedCategory === 'All Casino') {
-      return Object.values(casinoData).flat();
+      return sortGames(casinoAllGames) || [];
     }
     return casinoData[selectedCategory] || [];
   };

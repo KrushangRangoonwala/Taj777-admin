@@ -31,3 +31,23 @@ export const fetchCasinoList = async () => {
     throw error;
   }
 };
+
+export async function fetchCasinoExposureApi(payload) {
+  const { markettype, main_event_id, curPageName } = payload;
+  const fullPayload = {
+    markettype,
+    main_event_id: splitByDot(String(main_event_id)) || "",
+    curPageName,
+    ...getDefaultParams(),
+  };
+  try {
+    const { data } = await axiosInstance.post(
+      "get_casino_on_page_exposure",
+      fullPayload
+    );
+    return data;
+  } catch (error) {
+    console.error("Error fetching exposure:", error);
+    throw error;
+  }
+}
