@@ -3,7 +3,7 @@ import useSocket from "../../../api/Socket/useSocket";
 import { useGetFileData } from "../../../hooks/useGetFileData";
 // import { fetchCasinoExposureApi } from "../../../api/API";
 import { getImage, getMarketByNation, getValueAfterDot, getIsSuspended } from "../../../utilies/helpers";
-import OneCardVideo from "./components/OneCardVideo";
+import CasinoVideo from "./components/CasinoVideo";
 
 const OneCard1day = ({ onBetSelection, lastBetTime }) => {
     const { CODE, game_type, phpFile, game_name, iframe_url, result_image } = useGetFileData();
@@ -172,7 +172,7 @@ const OneCard1day = ({ onBetSelection, lastBetTime }) => {
     return (
         <div className="casino-container">
             <div className="casino-table poker1day">
-                <OneCardVideo
+                <CasinoVideo
                     roundId={currentGame?.mid}
                     videoSrc={iframe_url}
                     cards={boardCards}

@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { getValueAfterDot, getImage } from "../../../../utilies/helpers";
 import { useGetFileData } from "../../../../hooks/useGetFileData";
 
-const OneCardVideo = ({
+const CasinoVideo = ({
+    gameName,
     roundId,
     videoSrc,
     cards = [],
@@ -11,6 +12,8 @@ const OneCardVideo = ({
     totalTime = 30,
     isCardDrawerOpen,
     setIsCardDrawerOpen,
+    CardsComponent,
+    resultPath = "",
 }) => {
     const { result_image } = useGetFileData();
 
@@ -22,11 +25,26 @@ const OneCardVideo = ({
 
     const strokeDasharrayValue = ((timeLeft || 0) / (totalTime || 30)) * 283;
 
+    const renderResultLabel = (res) => {
+        // B (Banker/Dealer) -> D, A (Player) -> P for some games
+        if (gameName?.toLowerCase().includes("teen") || gameName?.toLowerCase().includes("one-day") || gameName?.toLowerCase().includes("1card")) {
+            if (res === "B") return "D";
+            if (res === "A") return "P";
+        }
+        return res;
+    };
+
+    const renderResultClass = (res) => {
+        if (res === "B") return "resultb";
+        if (res === "A") return "resulta";
+        return "";
+    };
+
     return (
         <div className="casino-video">
             {/* video */}
             <div className="casino-video-title">
-                <span className="casino-name">Poker 1-Day</span>
+                <span className="casino-name">{gameName}</span>
                 <div className="casino-video-rid">
                     Round ID: {getValueAfterDot(roundId) || "Loading..."}
                 </div>
@@ -47,30 +65,34 @@ const OneCardVideo = ({
                     <i className="fas fa-grip-lines-vertical"></i>
                 </div>
                 <div className="casino-video-cards-container">
-                    <div className="playerboardcards">
-                        <div className="dealer-name w-100 mb-1">Board</div>
-                        <div className="d-flex">
-                            {cards.map((card, index) => (
-                                <span key={index} data-v-b64efdfa="">
-                                    <img
-                                        data-v-b64efdfa=""
-                                        src={getImage(card, result_image)}
-                                        alt={`card-${index}`}
-                                    />
-                                </span>
-                            ))}
-                            {/* Fill up to 5 cards if less are provided initially */}
-                            {Array.from({ length: 5 - cards.length }).map((_, index) => (
-                                <span key={`empty-${index}`} data-v-b64efdfa="">
-                                    <img
-                                        data-v-b64efdfa=""
-                                        src={getImage(1, result_image)}
-                                        alt="empty-card"
-                                    />
-                                </span>
-                            ))}
+                    {CardsComponent ? (
+                        <CardsComponent />
+                    ) : (
+                        <div className="playerboardcards">
+                            <div className="dealer-name w-100 mb-1">Board</div>
+                            <div className="d-flex">
+                                {cards.map((card, index) => (
+                                    <span key={index} data-v-b64efdfa="">
+                                        <img
+                                            data-v-b64efdfa=""
+                                            src={getImage(card, result_image)}
+                                            alt={`card-${index}`}
+                                        />
+                                    </span>
+                                ))}
+                                {/* Fill up to 5 cards if less are provided initially */}
+                                {Array.from({ length: 5 - cards.length }).map((_, index) => (
+                                    <span key={`empty-${index}`} data-v-b64efdfa="">
+                                        <img
+                                            data-v-b64efdfa=""
+                                            src={getImage(1, result_image)}
+                                            alt="empty-card"
+                                        />
+                                    </span>
+                                ))}
+                            </div>
                         </div>
-                    </div>
+                    )}
                 </div>
             </div>
 
@@ -125,11 +147,11 @@ const OneCardVideo = ({
             {/* last results */}
             <div className="casino-video-last-results">
                 {results.map((result, index) => (
-                    <span key={index} className={result.res === "B" ? "resultb" : "resulta"}>
-                        {result.res === "B" ? "B" : "A"}
+                    <span key={index} className={renderResultClass(result.res)}>
+                        {renderResultLabel(result.res)}
                     </span>
                 ))}
-                <a href="/admin/reports/casinoresult/poker" className="result-more">
+                <a href={`/admin/reports/casinoresult/${resultPath || "poker"}`} className="result-more">
                     ...
                 </a>
             </div>
@@ -137,4 +159,4 @@ const OneCardVideo = ({
     );
 };
 
-export default OneCardVideo;
+export default CasinoVideo;

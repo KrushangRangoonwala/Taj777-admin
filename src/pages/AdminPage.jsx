@@ -1,9 +1,63 @@
 import React, { useEffect, useState } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { login } from '../store/slices/userSlice';
 
 const AdminPage = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { isLoggedIn } = useSelector((state) => state.user);
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      navigate('/admin/home');
+    }
+  }, [isLoggedIn, navigate]);
 
   const toggleLogin = () => setIsLoginOpen(!isLoginOpen);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    if (!username || !password) {
+      setError('Username and password are required');
+      return;
+    }
+
+    setError('');
+    setIsLoading(true);
+
+    try {
+      const params = new URLSearchParams();
+      params.append('username', username);
+      params.append('password', password);
+
+      const response = await axios.post('https://worlds777.app/ajax_adm/login.php', params, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+      });
+
+      if (response.data && response.data.status === 'ok') {
+        dispatch(login(response.data.data));
+        sessionStorage.setItem('userdata', JSON.stringify(response.data.data));
+        navigate('/admin/home');
+      } else {
+        setError(response.data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('An error occurred during login. Please try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   useEffect(() => {
     document.body.classList.add('login');
@@ -264,22 +318,54 @@ const AdminPage = () => {
                     <p data-v-019a5d71="" className="text-center text-secondary">
                       Enter your Username and Password
                     </p>
-                    <form data-v-019a5d71="" autoComplete="off" data-vv-scope="form-login" action="" method="POST" className="p-2 mt-4">
+                    <form data-v-019a5d71="" autoComplete="off" data-vv-scope="form-login" onSubmit={handleLogin} className="p-2 mt-4">
                       <div data-v-019a5d71="" id="input-group-1" role="group" className="form-group">
                         <div>
-                          <input data-v-019a5d71="" id="input-1" name="username" type="text" placeholder="Enter Username" className="form-control-lg form-control" />
-                          <span data-v-019a5d71="" className="error">
-                            The username field is required
-                          </span>
+                          <input
+                            data-v-019a5d71=""
+                            id="input-1"
+                            name="username"
+                            type="text"
+                            placeholder="Enter Username"
+                            className="form-control-lg form-control"
+                            value={username}
+                            onChange={(e) => setUsername(e.target.value)}
+                          />
+                          {!username && (
+                            <span data-v-019a5d71="" className="error">
+                              The username field is required
+                            </span>
+                          )}
                         </div>
                       </div>
                       <div data-v-019a5d71="" id="input-group-2" role="group" className="form-group">
                         <div>
-                          <input data-v-019a5d71="" id="input-2" name="password" type="password" placeholder="Enter password" className="form-control-lg form-control" />
+                          <input
+                            data-v-019a5d71=""
+                            id="input-2"
+                            name="password"
+                            type="password"
+                            placeholder="Enter password"
+                            className="form-control-lg form-control"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                          />
                         </div>
                       </div>
+                      {error && (
+                        <div className="alert alert-danger p-2" role="alert">
+                          {error}
+                        </div>
+                      )}
                       <div data-v-019a5d71="" className="mt-3">
-                        <button data-v-019a5d71="" type="submit" className="btn btn-block btn-theme1 btn-lg btn-submit btn-secondary">Sign In</button>
+                        <button
+                          data-v-019a5d71=""
+                          type="submit"
+                          className="btn btn-block btn-theme1 btn-lg btn-submit btn-secondary"
+                          disabled={isLoading}
+                        >
+                          {isLoading ? 'Signing In...' : 'Sign In'}
+                        </button>
                       </div>
                       <small data-v-019a5d71="" className="recaptchaTerms">This site is protected by reCAPTCHA and the Google
                         <a data-v-019a5d71="" href="https://policies.google.com/privacy"> Privacy Policy</a> and

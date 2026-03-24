@@ -2,6 +2,9 @@ import React from 'react';
 import SliderRaw from 'react-slick';
 import SelectRaw from 'react-select';
 import Dropdown from 'react-bootstrap/Dropdown';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logout } from '../store/slices/userSlice';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 
@@ -9,6 +12,14 @@ const Slider = SliderRaw && typeof SliderRaw === 'object' && SliderRaw.default ?
 const Select = SelectRaw && typeof SelectRaw === 'object' && SelectRaw.default ? SelectRaw.default : SelectRaw;
 
 export default function Header() {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        dispatch(logout());
+        sessionStorage.removeItem('userdata');
+        navigate('/admin');
+    };
     const sliderSettings = {
         dots: false,
         infinite: true,
@@ -123,7 +134,7 @@ export default function Header() {
                                 <i className="bx bx-wallet font-size-16 align-middle mr-1"></i> Change Password
                             </Dropdown.Item>
                             <Dropdown.Divider />
-                            <Dropdown.Item href="javascript:void(0)" className="text-danger">
+                            <Dropdown.Item href="javascript:void(0)" className="text-danger" onClick={handleLogout}>
                                 <i className="bx bx-power-off font-size-16 align-middle mr-1 text-danger"></i> Logout
                             </Dropdown.Item>
                         </Dropdown.Menu>
