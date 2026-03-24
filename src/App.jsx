@@ -2,6 +2,7 @@ import React from 'react'
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Layout from './components/Layout'
 import 'boxicons/css/boxicons.min.css';
+
 import './styles/all.css'
 import './styles/app.css'
 import './styles/custome.css'
@@ -12,8 +13,14 @@ import './styles/theme.css'
 
 import Dashboard from './pages/Dashboard'
 import InsertUser from './pages/users/InsertUser'
+import CreateAccount from './pages/users/CreateAccount'
 import AccountList from './pages/users/AccountList'
 import ActiveUsers from './pages/users/ActiveUsers'
+import Bank from './pages/reports/Bank'
+import EventPage from './pages/game/EventPage'
+import CasinoList from './pages/casino/CasinoList'
+import AdminPage from './pages/AdminPage'
+import MarketAnalysis from './pages/reports/MarketAnalysis'
 
 function App() {
   return (
@@ -25,8 +32,14 @@ function App() {
           <Route path="admin/users" element={<AccountList />} />
           <Route path="admin/activeusers" element={<ActiveUsers />} />
           <Route path="admin/users/insertuser" element={<InsertUser />} />
-          {/* Add more routes based on your sidebar links here */}
+          <Route path="admin/reports/bank" element={<Bank />} />
+          <Route path="admin/createaccount" element={<CreateAccount />} />
+          <Route path="admin/game/details" element={<EventPage />} />
+          <Route path="admin/casino/list" element={<CasinoList />} />
+          <Route path="admin/casino/:casinoPath" element={<CasinoList />} />
+          <Route path="admin/market-analysis" element={<MarketAnalysis />} />
         </Route>
+        <Route path="/admin" element={<AdminPage />} />
       </Routes>
     </BrowserRouter>
   )

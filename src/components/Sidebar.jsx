@@ -99,7 +99,17 @@ const menuItems = [
     },
 ];
 
-const SmoothMenu = ({ isOpen, className, children }) => {
+const SmoothMenu = ({ isOpen, className, children, isEvent }) => {
+    if (isEvent) {
+        return (
+            <ul
+                aria-expanded={isOpen ? "true" : "false"}
+                className={`${className || ""} sub-menu mm-collapse ${isOpen ? "mm-show" : ""}`.trim()}
+            >
+                {children}
+            </ul>
+        )
+    }
     return (
         <div className={`custom-dropdown-container ${isOpen ? 'is-open' : ''}`}>
             <div className="custom-dropdown-inner">
@@ -142,7 +152,13 @@ export default function Sidebar() {
                                     tabIndex="0"
                                     role="region"
                                     aria-label="scrollable content"
-                                    style={{ height: "100%", overflow: "hidden" }}
+                                    style={{ height: "100%", overflow: "hidden scroll" }}
+                                // style={{
+                                //     height: "100%",
+                                //     overflow: "hidden auto",
+                                //     scrollbarWidth: "thin",
+                                //     scrollbarColor: "#666666 #333333"
+                                // }}
                                 >
                                     <div className="simplebar-content" style={{ padding: "0px" }}>
                                         <div id="sidebar-menu">
@@ -199,7 +215,7 @@ export default function Sidebar() {
                                                 <li id="event-tree" className={`menu-box ${eventsOpen ? "mm-active" : ""}`}>
                                                     <a
                                                         href="javascript:void(0);"
-                                                        className={`has-arrow ${eventsOpen ? "mm-active" : ""}`}
+                                                        className={`has-arrow ${!eventsOpen ? "mm-collapsed" : ""}`}
                                                         aria-expanded={eventsOpen ? "true" : "false"}
                                                         onClick={(e) => {
                                                             e.preventDefault();
@@ -209,14 +225,14 @@ export default function Sidebar() {
                                                         <i className="bx bxs-calendar-event"></i>{" "}
                                                         <span>Events</span>
                                                     </a>
-                                                    <SmoothMenu isOpen={eventsOpen} className="sub-menu">
+                                                    <SmoothMenu isOpen={eventsOpen} className="sub-menu" isEvent={true}>
                                                         {sidebarEvents.map((sport, sIdx) => {
                                                             const isSportOpen = openSport === sIdx;
                                                             return (
-                                                                <li key={sIdx} className={isSportOpen ? "mm-active" : ""}>
+                                                                <li key={sIdx} className={isSportOpen ? "show" : ""}>
                                                                     <a
                                                                         href="javascript:void(0)"
-                                                                        className={`has-arrow ${sport.className || ""} ${isSportOpen ? "mm-active" : ""}`.trim()}
+                                                                        className={`has-arrow ${sport.className || ""}`.trim()}
                                                                         aria-expanded={isSportOpen ? "true" : "false"}
                                                                         onClick={(e) => {
                                                                             e.preventDefault();
@@ -227,15 +243,15 @@ export default function Sidebar() {
                                                                         {sport.count && <span> {sport.count}</span>}
                                                                     </a>
                                                                     {sport.leagues && sport.leagues.length > 0 && (
-                                                                        <SmoothMenu isOpen={isSportOpen} className="sub-menu">
+                                                                        <SmoothMenu isOpen={isSportOpen} className="sub-menu" isEvent={true}>
                                                                             {sport.leagues.map((league, lIdx) => {
                                                                                 const leagueKey = `${sIdx}-${lIdx}`;
                                                                                 const isLeagueOpen = openLeague === leagueKey;
                                                                                 return (
-                                                                                    <li key={lIdx} className={`text-dark ${isLeagueOpen ? "mm-active" : ""}`}>
+                                                                                    <li key={lIdx} className={`text-dark ${isLeagueOpen ? "show" : ""}`}>
                                                                                         <a
                                                                                             href="javascript:void(0)"
-                                                                                            className={`has-arrow ${isLeagueOpen ? "mm-active" : ""}`}
+                                                                                            className={`has-arrow ${isLeagueOpen ? "active" : ""}`}
                                                                                             aria-expanded={isLeagueOpen ? "true" : "false"}
                                                                                             onClick={(e) => {
                                                                                                 e.preventDefault();
@@ -249,7 +265,7 @@ export default function Sidebar() {
                                                                                         </a>
                                                                                         {league.matches &&
                                                                                             league.matches.length > 0 && (
-                                                                                                <SmoothMenu isOpen={isLeagueOpen} className="sub-menu">
+                                                                                                <SmoothMenu isOpen={isLeagueOpen} className="sub-menu" isEvent={true}>
                                                                                                     {league.matches.map(
                                                                                                         (match, mIdx) => (
                                                                                                             <li

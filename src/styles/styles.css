@@ -15233,3 +15233,307 @@ market-analysis .page-title-box h4 a {
     font-weight: 500;
     word-break: break-all;
 }
+
+/*Bet Bazar Scorecard*/
+
+
+.scorecard-bb {
+    overflow: hidden;
+    width: 100%;
+    max-width: calc(100% - 6px);
+    margin: 0 auto;
+}
+
+
+.scorecard-bb .bb-tabs {
+    display: flex;
+    justify-content: center;
+}
+
+.scorecard-bb .nav-pills {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    padding: 2px;
+    gap: 2px;
+}
+
+.scorecard-bb .nav-pills .nav-link {
+    padding: 8px;
+    border: 0;
+    background: #444;
+    color: #ddd;
+    font-weight: bold;
+    font-size: 12px;
+    cursor: pointer;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    transition: background 160ms ease, color 160ms ease;
+    width: 100%;
+    text-transform: uppercase;
+    border-radius: 0;
+}
+
+:root[data-theme="light"] .scorecard-bb .nav-pills .nav-link {
+    background: #bbb;
+    color: #222;
+}
+
+.scorecard-bb .nav-pills .nav-link:hover {
+    background: var(--bg-table-header-new);
+    color: var(--text-table-header-new);
+}
+
+.scorecard-bb .nav-pills .nav-link.active {
+    background: var(--bg-table-header-new) !important;
+    color: var(--text-table-header-new) !important;
+}
+
+/* :root[data-theme="light"] .scorecard-bb .nav-pills .nav-link.active {
+  background: #bbb;
+  color: #222;
+} */
+
+.bb-match {
+    padding: 4px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1.35fr) minmax(0, 1fr);
+    align-items: center;
+    line-height: 1.35;
+    color: #eee;
+}
+
+:root[data-theme="light"] .bb-match {
+    color: #111;
+}
+
+.bb-team {
+    display: grid;
+    gap: 6px;
+    justify-items: center;
+    align-self: flex-start;
+}
+
+.bb-avatar {
+    width: clamp(40px, 7.2vw, 60px);
+    height: clamp(40px, 7.2vw, 60px);
+    border-radius: 999px;
+    border: 2px solid rgba(255, 255, 255, 0.22);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+}
+
+:root[data-theme="light"] .bb-avatar {
+    border: 2px solid rgba(0, 0, 0, 0.22);
+}
+
+.bb-avatar.mi {
+    background: radial-gradient(28px 28px at 30% 30%, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 60%), linear-gradient(145deg, rgba(74, 163, 255, 0.85), rgba(74, 163, 255, 0.2));
+}
+
+.bb-avatar.csk {
+    background: radial-gradient(28px 28px at 30% 30%, rgba(255, 255, 255, 0.26), rgba(255, 255, 255, 0) 60%), linear-gradient(145deg, rgba(255, 214, 74, 0.85), rgba(255, 214, 74, 0.22));
+}
+
+.bb-avatar span {
+    font-weight: 900;
+    letter-spacing: 0.8px;
+    font-size: clamp(14px, 2vw, 20px);
+    color: rgba(255, 255, 255, 0.94);
+    text-shadow: 0 8px 18px rgba(0, 0, 0, 0.25);
+}
+
+.bb-team-name {
+    font-weight: 900;
+    font-size: clamp(10px, 1.7vw, 14px);
+    text-align: center;
+    line-height: 1.15;
+}
+
+.bb-team-form {
+    display: inline-flex;
+    gap: 6px;
+}
+
+.bb-team-form .dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.18);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.bb-team-form .dot.w {
+    background: rgba(36, 209, 143, 0.95);
+    border-color: rgba(36, 209, 143, 0.35);
+}
+
+.bb-team-form .dot.l {
+    background: rgba(255, 77, 109, 0.95);
+    border-color: rgba(255, 77, 109, 0.35);
+}
+
+.bb-scorebox {
+    text-align: center;
+    min-width: 0;
+}
+
+:root[data-theme="light"] .bb-score {
+    color: #222;
+}
+
+.bb-inning {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #ffb020;
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+}
+
+:root[data-theme="light"] .bb-inning {
+    color: #d97706;
+}
+
+.bb-score {
+    font-size: clamp(18px, 5.2vw, 26px);
+    font-weight: 950;
+    letter-spacing: 0.6px;
+    color: #eeee;
+}
+
+.bb-score-sub {
+    color: #ffb020;
+    font-weight: 900;
+    font-size: 12px;
+}
+
+:root[data-theme="light"] .bb-score-sub {
+    color: #d97706;
+}
+
+.bb-mini {
+    margin-top: 4px;
+    display: inline-flex;
+    gap: 16px;
+    justify-content: center;
+    color: var(--muted);
+    font-size: 12px;
+}
+
+.bb-innings-box {
+    padding: 4px;
+    background: #ffffff05;
+    border: 1px solid #ffffff26;
+}
+
+:root[data-theme="light"] .bb-innings-box {
+    background: #00000005;
+    border: 1px solid #00000026;
+}
+
+.bb-innings-head,
+.bb-innings-row {
+    display: grid;
+    grid-template-columns: 1fr 88px 64px;
+    gap: 10px;
+    align-items: center;
+    padding: 2px 4px;
+}
+
+.bb-innings-head {
+    font-weight: 950;
+    font-size: 12px;
+}
+
+.bb-teamcell {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.bb-teamtext {
+    font-weight: 900;
+    font-size: 13px;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.bb-val {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+    font-weight: 950;
+    font-size: 13px;
+}
+
+.detail-page-container .market-18 {
+    min-width: calc(100% - 6px);
+    margin-left: 3px;
+    margin-right: 3px;
+}
+
+.detail-page-container .market-18 .bet-table-row {
+    padding-left: 0;
+    padding-right: 0;
+}
+
+.detail-page-container .market-18 {
+    min-width: calc(50% - 6px);
+    max-width: calc(50% - 6px);
+    margin-left: 3px;
+    margin-right: 3px;
+    flex: 1;
+    width: 50%;
+}
+
+.detail-page-container .market-18 .bet-table-row .market-18-item {
+    padding: 2px 8px;
+    border-bottom: 1px solid #3c444b;
+    border-right: 1px solid #3c444b;
+    display: flex;
+    display: -webkit-flex;
+    flex: 1 1 auto;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 100%;
+    max-width: 100%;
+}
+
+.detail-page-container .market-18 h4 small {
+    font-size: 16px;
+}
+
+.detail-page-container .market-1 .bet-table-row .market-18-item:nth-child(2n) {
+    border-right: 0;
+}
+
+.market-18 .suspendedfull:after {
+    width: 100%;
+    right: 0;
+}
+
+.market-18 .suspendedtext:after {
+    right: 0;
+    width: 100%;
+    height: calc(100% - 2px);
+}
+
+.market-18 .suspended:after {
+    background-color: #131313c2;
+    color: var(--text-red);
+}
+
+:root[data-theme="light"] .detail-page-container .market-18 .bet-table-row .market-18-item {
+    border-bottom: 1px solid #d6dedb;
+}
+
+:root[data-theme="blue"] .detail-page-container .market-18 .bet-table-row .market-18-item {
+    border-bottom: 1px solid #d6dedb;
+}

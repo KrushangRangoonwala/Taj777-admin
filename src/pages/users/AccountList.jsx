@@ -1,6 +1,28 @@
-import React from 'react';
+import React, { useState } from 'react';
+import UserMoreModal from '../../components/UserMoreModal';
+import DepositModal from '../../components/DepositModal';
+import WithdrawModal from '../../components/WithdrawModal';
 
 const AccountList = () => {
+  const [showModal, setShowModal] = useState(false);
+  const [showDepositModal, setShowDepositModal] = useState(false);
+  const [showWithdrawModal, setShowWithdrawModal] = useState(false);
+  const [selectedUser, setSelectedUser] = useState(null);
+
+  const handleMoreClick = (user) => {
+    setSelectedUser(user);
+    setShowModal(true);
+  };
+
+  const handleDepositClick = (user) => {
+    setSelectedUser(user);
+    setShowDepositModal(true);
+  };
+
+  const handleWithdrawClick = (user) => {
+    setSelectedUser(user);
+    setShowWithdrawModal(true);
+  };
   const dummyData = [
     {
       id: '1',
@@ -87,7 +109,7 @@ const AccountList = () => {
                 <div className="row row5">
                   <div className="col-md-6 mb-2 search-form">
                     <form method="post" className="ajaxFormSubmit">
-                      <div className="d-inline-block form-group form-group-feedback form-group-feedback-right">
+                      <div className="d-inline-block form-group form-group-feedback form-group-feedback-right" style={{ marginRight: '0.2rem' }}>
                         <input type="text" name="searchKey" placeholder="Search User" className="form-control" />
                       </div>
                       <div className="d-inline-block">
@@ -102,7 +124,7 @@ const AccountList = () => {
                   </div>
                   <div className="col-md-6 text-right mb-2">
                     <div className="d-inline-block mr-2">
-                      <div id="export_1774244501791" className="d-inline-block">
+                      <div id="export_1774244501791" className="d-inline-block" style={{ marginRight: '0.2rem' }}>
                         <button type="button" className="btn mr-1 btn-success">
                           <i className="fas fa-file-excel"></i>
                         </button>
@@ -202,9 +224,9 @@ const AccountList = () => {
                             </td>
                             <td aria-colindex="7" role="cell">
                               <div role="group" className="btn-group">
-                                <button type="button" className="btn btn-success">D</button>
-                                <button type="button" className="btn btn-danger">W</button>
-                                <button type="button" className="btn btn-info">More</button>
+                                <button type="button" className="btn btn-success" onClick={() => handleDepositClick(user)}>D</button>
+                                <button type="button" className="btn btn-danger" onClick={() => handleWithdrawClick(user)}>W</button>
+                                <button type="button" className="btn btn-info" onClick={() => handleMoreClick(user)}>More</button>
                               </div>
                             </td>
                           </tr>
@@ -244,6 +266,24 @@ const AccountList = () => {
           </div>
         </div>
       </div>
+      {showModal && (
+        <UserMoreModal
+          user={selectedUser}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+      {showDepositModal && (
+        <DepositModal
+          user={selectedUser}
+          onClose={() => setShowDepositModal(false)}
+        />
+      )}
+      {showWithdrawModal && (
+        <WithdrawModal
+          user={selectedUser}
+          onClose={() => setShowWithdrawModal(false)}
+        />
+      )}
     </div>
   );
 };

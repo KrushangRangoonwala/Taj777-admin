@@ -1,0 +1,41 @@
+      /* Wrapper */
+      .casino-toast-wrapper {
+          background: transparent !important;
+          box-shadow: none !important;
+      }
+
+      /* Main toast */
+      .casino-toast {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          padding: 10px 14px 10px 9px;
+          /*min-width: 260px;*/
+          max-width: 320px;
+          border-radius: 2px;
+          font-size: 13px;
+          /*font-weight: 600;*/
+          color: #fff;
+      }
+
+      /* Success toast (GREEN) */
+      .casino-toast.success {
+          background: var(--bg-table-header-new);
+          /*border-left: 4px solid #7dffb3;*/
+      }
+
+      /* Error toast (RED) */
+      .casino-toast.error {
+          background: var(--bg-danger);
+          /* border-left: 4px solid #ff8a80;*/
+      }
+
+      /* Icon */
+      .toast-icon {
+          font-size: 16px;
+      }
+
+      /* Text */
+      .toast-text {
+          line-height: 1.2;
+      }
