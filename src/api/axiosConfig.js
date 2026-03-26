@@ -3,7 +3,8 @@ import { store } from "../store/store";
 import { logout, setIsSessionExpired } from "../store/slices/userSlice";
 
 const axiosInstance = axios.create({
-    baseURL: "https://worlds777.app/ajaxfiles/",
+    baseURL: "http://159.65.143.49/~sevennew/ajax_adm/",
+    withCredentials: true,
     headers: {
         "Content-Type": "application/x-www-form-urlencoded",
     },

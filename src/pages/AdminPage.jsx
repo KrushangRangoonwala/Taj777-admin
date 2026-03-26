@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { login } from '../store/slices/userSlice';
+import { loginAdmin } from '../api/API';
 
 const AdminPage = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -34,26 +35,19 @@ const AdminPage = () => {
     setIsLoading(true);
 
     try {
-      const params = new URLSearchParams();
-      params.append('username', username);
-      params.append('password', password);
-
-      const response = await axios.post('https://worlds777.app/ajax_adm/login.php', params, {
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      });
-
-      if (response.data && response.data.status === 'ok') {
-        dispatch(login(response.data.data));
-        sessionStorage.setItem('userdata', JSON.stringify(response.data.data));
+      const result = await loginAdmin(username, password);
+      
+      if (result.status === "ok") {
+        dispatch(login(result.data));
+        sessionStorage.setItem('userdata', JSON.stringify(result.data));
         navigate('/admin/home');
       } else {
-        setError(response.data.message || 'Login failed');
+        setError(result.message || 'Login failed');
       }
     } catch (err) {
       console.error('Login error:', err);
-      setError('An error occurred during login. Please try again.');
+      const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'An error occurred during login. Please try again.';
+      setError(errorMessage);
     } finally {
       setIsLoading(false);
     }

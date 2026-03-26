@@ -1,76 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { fetchCasinoList } from '../../api/API';
 import { Link } from 'react-router-dom';
-import { format_casino_list } from '../../utilies/helpers';
+import { format_casino_list, gameCodeMap } from '../../utilies/helpers';
 import { setAllCasinoGames } from '../../store/slices/casinoSlice';
 import { useDispatch } from 'react-redux';
-
-const gameCodeMap = {
-  // IF U CHANGE GAME_PATH, ALSO CHANGE IT IN CasinoCenterContent.JS , gamePath_MapTo_gametype IN casinoDeatils_byType.js , Casinomap.js
-
-  "casino_war": "war",
-  '32_cards-a': 'card32-A',
-  '32_cards-b': 'card32-B',
-  'ab204': 'ab4',
-  'ab202': 'andarbahar2',
-  'ab20': 'andarbahar',
-  'baccarat': 'baccarat',
-  'baccarat2': 'baccarat2',
-  'teensin': '29cardbaccarat',
-  'aaa': 'aaa',
-  'aaa2': 'aaa2',
-  '20_teenpatti': 'teenpattit20',
-  'teen20c': 'teenpatti20c',
-  'teen20b': 'teenpatti20b',
-  'teen33': 'instantteenpatti3',
-  'teen32': 'instantteenpatti2',
-  'test_teenpatti': 'teenpattitest',
-  'open_teenpatti': 'teenpattiopen',
-  'teenmuf': 'teenmuf',
-  'patti2': 'teenpatti2cards',
-  'race17': 'raceto17',
-
-  '1day_poker': 'pokeroneday',
-  '6player_poker': 'poker6player',
-  '20poker': 'pokert20',
-  'teen3': 'instantteenpatti',
-  'teen62': 'teenpattioneday62',
-
-  'cmeter1': '1cardmeter',
-  'teen1': '1card1day',
-  'teen120': '1card2020',
-
-  '20_dragon_tiger': 'dragontigert20',
-  'odi_dragon_tiger': 'dragontigeroneday',
-  'dtl20': 'dragontigerliont20',
-  'dt202': 'dragontigert202',
-
-  '5_cricket': '5fivecricket',
-  'cc20': 'cricket-match-2020',
-  'teen41': 'teenpatti41',
-  'teen42': 'teenpatti42',
-  'joker20': 'jokerteenpatti20',
-  'joker1': 'jokerteenpatti1',
-  'joker120': 'jokerteenpatti120',
-  'teenunique': 'unique_teenpatti',
-  'btable2': 'bollywoodtable2',
-  'poison20': 'poisonteenpatti20',
-  'ddb': 'bollywoodtable',
-
-  "teen20": "teenpattit20",
-  "teen20b": "teenpattit20b",
-  "teen20c": "teenpattit20c",
-
-  "ballbyball": "ball_by_ball",
-  "thetrap": "trap",
-
-  "lottcard": "lottery",
-  "3cardj": "3cardsjudgement",
-
-  "worli3": "matka_market",
-
-  // IF U CHANGE GAME_PATH, ALSO CHANGE IT IN CasinoCenterContent.JS , gamePath_MapTo_gametype IN casinoDeatils_byType.js , Casinomap.js
-};
 
 const CasinoList = () => {
   const dispatch = useDispatch();

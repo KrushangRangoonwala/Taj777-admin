@@ -1,8 +1,35 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import StatCard from '../components/StatCard';
 import ChartCard from '../components/ChartCard';
+import { fetchCasinoList } from '../api/API';
+import { gameCodeMap } from '../utilies/helpers';
+import { Link } from 'react-router-dom';
 
 const Dashboard = () => {
+    const [casinoGames, setCasinoGames] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const getCasinoGames = async () => {
+            try {
+                const response = await fetchCasinoList();
+                if (response.status === 'ok' && response.all_data) {
+                    const mappedGames = response.all_data.map(game => ({
+                        href: `/admin/casino/${gameCodeMap[game.game_code] ?? game.game_code}`,
+                        src: game.game_image,
+                        alt: game.game_name
+                    }));
+                    setCasinoGames(mappedGames);
+                }
+            } catch (error) {
+                console.error('Error fetching casino list for dashboard:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        getCasinoGames();
+    }, []);
+
     const stats = [
         { title: 'Balance', value: '58,900' },
         { title: 'Exposure', value: '0' },
@@ -110,68 +137,6 @@ const Dashboard = () => {
         { label: 'Total P/L', value: '20,140.25', colorClass: 'text-success', columnClass: 'col-4 col-sm' },
     ];
 
-    const casinoGames = [
-        { href: '/admin/casino/worli3', src: 'https://sitethemedata.com/casino_icons/lc/worli3.gif' },
-        { href: '/admin/casino/teen62', src: 'https://sitethemedata.com/casino_icons/lc/teen62.gif' },
-        { href: '/admin/casino/dolidana', src: 'https://sitethemedata.com/casino_icons/lc/dolidana.gif' },
-        { href: '/admin/casino/mogambo', src: 'https://sitethemedata.com/casino_icons/lc/mogambo.gif' },
-        { href: '/admin/casino/lucky5', src: 'https://sitethemedata.com/casino_icons/lc/lucky5.jpg' },
-        { href: '/admin/casino/roulette12', src: 'https://sitethemedata.com/casino_icons/lc/roulette12.jpg' },
-        { href: '/admin/casino/roulette13', src: 'https://sitethemedata.com/casino_icons/lc/roulette13.jpg' },
-        { href: '/admin/casino/roulette11', src: 'https://sitethemedata.com/casino_icons/lc/roulette11.jpg' },
-        { href: '/admin/casino/poison', src: 'https://sitethemedata.com/casino_icons/lc/poison.jpg' },
-        { href: '/admin/casino/teenunique', src: 'https://sitethemedata.com/casino_icons/lc/teenunique.jpg' },
-        { href: '/admin/casino/worli3', src: 'https://sitethemedata.com/casino_icons/lc/worli3.gif' },
-        { href: '/admin/casino/teen62', src: 'https://sitethemedata.com/casino_icons/lc/teen62.gif' },
-        { href: '/admin/casino/dolidana', src: 'https://sitethemedata.com/casino_icons/lc/dolidana.gif' },
-        { href: '/admin/casino/mogambo', src: 'https://sitethemedata.com/casino_icons/lc/mogambo.gif' },
-        { href: '/admin/casino/lucky5', src: 'https://sitethemedata.com/casino_icons/lc/lucky5.jpg' },
-        { href: '/admin/casino/roulette12', src: 'https://sitethemedata.com/casino_icons/lc/roulette12.jpg' },
-        { href: '/admin/casino/roulette13', src: 'https://sitethemedata.com/casino_icons/lc/roulette13.jpg' },
-        { href: '/admin/casino/roulette11', src: 'https://sitethemedata.com/casino_icons/lc/roulette11.jpg' },
-        { href: '/admin/casino/poison', src: 'https://sitethemedata.com/casino_icons/lc/poison.jpg' },
-        { href: '/admin/casino/teenunique', src: 'https://sitethemedata.com/casino_icons/lc/teenunique.jpg' },
-        { href: '/admin/casino/worli3', src: 'https://sitethemedata.com/casino_icons/lc/worli3.gif' },
-        { href: '/admin/casino/teen62', src: 'https://sitethemedata.com/casino_icons/lc/teen62.gif' },
-        { href: '/admin/casino/dolidana', src: 'https://sitethemedata.com/casino_icons/lc/dolidana.gif' },
-        { href: '/admin/casino/mogambo', src: 'https://sitethemedata.com/casino_icons/lc/mogambo.gif' },
-        { href: '/admin/casino/lucky5', src: 'https://sitethemedata.com/casino_icons/lc/lucky5.jpg' },
-        { href: '/admin/casino/roulette12', src: 'https://sitethemedata.com/casino_icons/lc/roulette12.jpg' },
-        { href: '/admin/casino/roulette13', src: 'https://sitethemedata.com/casino_icons/lc/roulette13.jpg' },
-        { href: '/admin/casino/roulette11', src: 'https://sitethemedata.com/casino_icons/lc/roulette11.jpg' },
-        { href: '/admin/casino/poison', src: 'https://sitethemedata.com/casino_icons/lc/poison.jpg' },
-        { href: '/admin/casino/teenunique', src: 'https://sitethemedata.com/casino_icons/lc/teenunique.jpg' },
-        { href: '/admin/casino/worli3', src: 'https://sitethemedata.com/casino_icons/lc/worli3.gif' },
-        { href: '/admin/casino/teen62', src: 'https://sitethemedata.com/casino_icons/lc/teen62.gif' },
-        { href: '/admin/casino/dolidana', src: 'https://sitethemedata.com/casino_icons/lc/dolidana.gif' },
-        { href: '/admin/casino/mogambo', src: 'https://sitethemedata.com/casino_icons/lc/mogambo.gif' },
-        { href: '/admin/casino/lucky5', src: 'https://sitethemedata.com/casino_icons/lc/lucky5.jpg' },
-        { href: '/admin/casino/roulette12', src: 'https://sitethemedata.com/casino_icons/lc/roulette12.jpg' },
-        { href: '/admin/casino/roulette13', src: 'https://sitethemedata.com/casino_icons/lc/roulette13.jpg' },
-        { href: '/admin/casino/roulette11', src: 'https://sitethemedata.com/casino_icons/lc/roulette11.jpg' },
-        { href: '/admin/casino/poison', src: 'https://sitethemedata.com/casino_icons/lc/poison.jpg' },
-        { href: '/admin/casino/teenunique', src: 'https://sitethemedata.com/casino_icons/lc/teenunique.jpg' },
-        { href: '/admin/casino/worli20', src: 'https://sitethemedata.com/casino_icons/lc/poison20.jpg' },
-        { href: '/admin/casino/joker120', src: 'https://sitethemedata.com/casino_icons/lc/joker120.jpg' },
-        { href: '/admin/casino/joker20', src: 'https://sitethemedata.com/casino_icons/lc/joker20.jpg' },
-        { href: '/admin/casino/joker1', src: 'https://sitethemedata.com/casino_icons/lc/joker1.jpg' },
-        { href: '/admin/casino/teen20c', src: 'https://sitethemedata.com/casino_icons/lc/teen20c.jpg' },
-        { href: '/admin/casino/btable2', src: 'https://sitethemedata.com/casino_icons/lc/btable2.jpg' },
-        { href: '/admin/casino/ourroullete', src: 'https://sitethemedata.com/casino_icons/lc/ourroullete.jpg' },
-        { href: '/admin/casino/superover3', src: 'https://sitethemedata.com/casino_icons/lc/superover3.jpg' },
-        { href: '/admin/casino/goal', src: 'https://sitethemedata.com/casino_icons/lc/goal.jpg' },
-        { href: '/admin/casino/ab4', src: 'https://sitethemedata.com/casino_icons/lc/ab4.jpg' },
-        { href: '/admin/casino/lucky15', src: 'https://sitethemedata.com/casino_icons/lc/lucky15.jpg' },
-        { href: '/admin/casino/superover2', src: 'https://sitethemedata.com/casino_icons/lc/superover2.jpg' },
-        { href: '/admin/casino/teen41', src: 'https://sitethemedata.com/casino_icons/lc/teen41.jpg' },
-        { href: '/admin/casino/teen42', src: 'https://sitethemedata.com/casino_icons/lc/teen42.jpg' },
-        { href: '/admin/casino/sicbo2', src: 'https://sitethemedata.com/casino_icons/lc/sicbo2.jpg' },
-        { href: '/admin/casino/teen33', src: 'https://sitethemedata.com/casino_icons/lc/teen33.jpg' },
-        { href: '/admin/casino/sicbo', src: 'https://sitethemedata.com/casino_icons/lc/sicbo.jpg' },
-        { href: '/admin/casino/ballbyball', src: 'https://sitethemedata.com/casino_icons/lc/ballbyball.jpg' },
-        { href: '/admin/casino/teen32', src: 'https://sitethemedata.com/casino_icons/lc/teen32.jpg' },
-        { href: '/admin/casino/teen', src: 'https://sitethemedata.com/casino_icons/lc/teen.jpg' },
-    ];
 
     return (
         <div>
@@ -218,14 +183,15 @@ const Dashboard = () => {
                                                 <div className="casino-banners">
                                                     {casinoGames.map((game, index) => (
                                                         <div key={index} className="casino-banner-item">
-                                                            <a href={game.href} className="">
+                                                            <Link to={game.href} className="">
                                                                 <img
                                                                     className="img-fluid"
+                                                                    alt={game.alt}
                                                                     data-src={game.src}
                                                                     src={game.src}
                                                                     lazy={index === 0 ? "loaded" : "loading"}
                                                                 />
-                                                            </a>
+                                                            </Link>
                                                         </div>
                                                     ))}
                                                 </div>

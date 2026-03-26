@@ -24,6 +24,7 @@ import MarketAnalysis from './pages/reports/MarketAnalysis'
 import CasinoCenter from './pages/casino/CasinoCenter';
 import AccountStatement from './pages/reports/AccountStatement';
 import AuthGuard from './components/AuthGuard';
+import ProfitLoss from './pages/reports/ProfitLoss';
 
 function App() {
   return (
@@ -38,6 +39,7 @@ function App() {
             <Route path="admin/users/insertuser" element={<InsertUser />} />
             <Route path="admin/reports/bank" element={<Bank />} />
             <Route path="admin/reports/accountstatement" element={<AccountStatement />} />
+            <Route path="admin/reports/profitloss" element={<ProfitLoss />} />
             <Route path="admin/createaccount" element={<CreateAccount />} />
             <Route path="admin/game/details" element={<EventPage />} />
             <Route path="admin/casino/list" element={<CasinoList />} />

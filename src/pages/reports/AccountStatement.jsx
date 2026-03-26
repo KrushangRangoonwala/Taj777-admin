@@ -1,85 +1,99 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { getAccountStatement, getClients } from '../../api/API';
+import { DatePicker } from "antd";
+import "antd/dist/reset.css"; // AntD 5+ reset styles
+import dayjs from "dayjs";
+const { RangePicker } = DatePicker;
 
 const AccountStatement = () => {
-  const dummyData = [
-    {
-      username: 'Arpit528',
-      fullName: 'Arpit',
-      cr: '10,000',
-      pts: '20,000',
-      clientPL: '10,000',
-      exposure: '0',
-      availablePts: '20,000',
-      accountType: 'Master',
-      status: '',
-    },
-    {
-      username: 'Ras44',
-      fullName: 'Apapap',
-      cr: '5,000',
-      pts: '1,573',
-      clientPL: '-3,427',
-      exposure: '0',
-      availablePts: '1,573',
-      accountType: 'User',
-      status: '',
-    },
-    {
-      username: 'Ras45',
-      fullName: 'Apapapp',
-      cr: '5,000',
-      pts: '5,000',
-      clientPL: '0',
-      exposure: '0',
-      availablePts: '5,000',
-      accountType: 'Agent',
-      status: '',
-    },
-    {
-      username: 'Ras46',
-      fullName: 'Ras46',
-      cr: '5,000',
-      pts: '2,128.75',
-      clientPL: '-2,871.25',
-      exposure: '0',
-      availablePts: '2,128.75',
-      accountType: 'User',
-      status: '',
-    },
-    {
-      username: 'Ras48',
-      fullName: 'Apapap',
-      cr: '5,000',
-      pts: '1,936',
-      clientPL: '-3,064',
-      exposure: '0',
-      availablePts: '1,936',
-      accountType: 'User',
-      status: '',
-    },
-    {
-      username: 'Ras49',
-      fullName: 'Rasg',
-      cr: '5,100',
-      pts: '1,518',
-      clientPL: '-3,582',
-      exposure: '0',
-      availablePts: '1,518',
-      accountType: 'User',
-      status: '',
-    },
-    {
-      username: 'Ras52',
-      fullName: 'Apapapap',
-      cr: '1,000',
-      pts: '9,295',
-      clientPL: '8,295',
-      exposure: '0',
-      availablePts: '9,295',
-      accountType: 'User',
-      status: '',
-    },
-  ];
+
+  const [data, setData] = useState([]);
+  const [filteredData, setFilteredData] = useState([]);
+
+  const [clientSearch, setClientSearch] = useState('');
+  const [clientList, setClientList] = useState([]);
+  const [selectedClient, setSelectedClient] = useState('');
+
+  const [fromDate, setFromDate] = useState(
+        new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0]
+    );
+  const [toDate, setToDate] = useState(
+      new Date().toISOString().split("T")[0]
+  );
+
+  const [search, setSearch] = useState('');
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const [perPage, setPerPage] = useState(25);
+
+  // 🔹 Fetch clients
+  const fetchClients = async (value) => {
+    try {
+      console.log("value-----",value)
+      const res = await getClients(value);
+      setClientList(res.results || []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  // 🔹 Fetch statement
+  const fetchStatement = async () => {
+    try {
+      const payload = {
+        client_name: selectedClient,
+        from_date: fromDate ? fromDate.toISOString().split("T")[0] : "",
+        to_date: toDate ? toDate.toISOString().split("T")[0] : "",
+      };
+
+      const res = await getAccountStatement(payload);
+
+      // 🔥 Handle response safely
+      const result =
+        res?.data ||   // if API returns { data: [...] }
+        res?.result || // fallback
+        res || [];     // direct array case
+
+      setData(result);
+      setFilteredData(result);
+      setCurrentPage(1);
+
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchStatement();
+  }, []);
+
+  // 🔹 Global search filter
+  useEffect(() => {
+    let temp = [...data];
+
+    if (search) {
+      temp = temp.filter((item) =>
+        Object.values(item).join(' ').toLowerCase().includes(search.toLowerCase())
+      );
+    }
+
+    setFilteredData(temp);
+    setCurrentPage(1);
+
+  }, [search, data]);
+
+  // 🔹 Pagination
+  const indexOfLast = currentPage * perPage;
+  const indexOfFirst = indexOfLast - perPage;
+  const currentData = filteredData.slice(indexOfFirst, indexOfLast);
+
+  const totalPages = Math.ceil(filteredData.length / perPage);
+
+  const changePage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
 
   return (
     <div>
@@ -94,7 +108,7 @@ const AccountStatement = () => {
                     <a href="/admin/home">Home</a>
                   </li>
                   <li className="breadcrumb-item active">
-                    <span aria-current="location">Account Statement</span>
+                    <span>Account Statement</span>
                   </li>
                 </ol>
               </div>
@@ -107,52 +121,97 @@ const AccountStatement = () => {
             <div className="card">
               <div className="card-body">
 
+                {/* 🔍 FILTER */}
                 <div className="report-form mb-3">
-                  <form method="post" className="ajaxFormSubmit">
+                  <form onSubmit={(e) => { e.preventDefault(); fetchStatement(); }}>
                     <div className="row row5">
 
+                      {/* CLIENT SEARCH */}
                       <div className="col-lg-3">
                         <div className="form-group user-lock-search" style={{ position: "relative" }}>
                           <label>Search By Client Name</label>
-                          <div className="multiselect">
-                            <div className="multiselect__select"></div>
-                            <div className="multiselect__tags">
-                              <div className="multiselect__tags-wrap" style={{ display: "none" }}></div>
-                              <div className="multiselect__spinner" style={{ display: "none" }}></div>
-                              <input
-                                type="text"
-                                autoComplete="off"
-                                spellCheck="false"
-                                placeholder="Select option"
-                                className="multiselect__input"
-                                style={{ width: "0px", position: "absolute", padding: "0px" }}
-                              />
-                              <span className="multiselect__placeholder">
-                                Select option
-                              </span>
+
+                          <input
+                            type="text"
+                            className="form-control"
+                            value={clientSearch}
+                            placeholder="Select option"
+                            onChange={(e) => {
+                              setClientSearch(e.target.value);
+                              fetchClients(e.target.value);
+                            }}
+                          />
+
+                          {clientList.length > 0 && (
+                            <div style={{
+                              position: 'absolute',
+                              background: '#fff',
+                              border: '1px solid #ddd',
+                              width: '100%',
+                              zIndex: 1000
+                            }}>
+                              {clientList.map((c, i) => (
+                                <div
+                                  key={i}
+                                  style={{ padding: '5px', cursor: 'pointer' }}
+                                  onClick={() => {
+                                    setSelectedClient(c.text);
+                                    setClientSearch(c.text);
+                                    setClientList([]);
+                                  }}
+                                >
+                                  {c.text}
+                                </div>
+                              ))}
                             </div>
-                          </div>
+                          )}
                         </div>
                       </div>
 
+                      {/* DATE RANGE */}
                       <div className="col-lg-3">
                         <label>Select Date Range</label>
-                        <div className="mb-3 mx-datepicker mx-datepicker-range">
-                          <div className="mx-input-wrapper">
-                            <input type="text" className="mx-input" />
-                          </div>
+                        <div className="mb-3">
+                          <RangePicker
+                            value={
+                              fromDate && toDate
+                                ? [dayjs(fromDate), dayjs(toDate)]
+                                : []
+                            }
+                            onChange={(dates) => {
+                              if (dates) {
+                                setFromDate(dates[0].toDate());
+                                setToDate(dates[1].toDate());
+                              } else {
+                                setFromDate(null);
+                                setToDate(null);
+                              }
+                            }}
+                            format="DD/MM/YYYY"
+                            style={{ width: "100%" }}
+                            suffixIcon={
+                              <span style={{ pointerEvents: "none" }}>
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    viewBox="0 0 1024 1024"
+                                    width="1em"
+                                    height="1em"
+                                    fill="currentColor"
+                                >
+                                    <path d="M940.218182 107.054545h-209.454546V46.545455h-65.163636v60.50909H363.054545V46.545455H297.890909v60.50909H83.781818c-18.618182 0-32.581818 13.963636-32.581818 32.581819v805.236363c0 18.618182 13.963636 32.581818 32.581818 32.581818h861.090909c18.618182 0 32.581818-13.963636 32.581818-32.581818V139.636364c-4.654545-18.618182-18.618182-32.581818-37.236363-32.581819zM297.890909 172.218182V232.727273h65.163636V172.218182h307.2V232.727273h65.163637V172.218182h176.872727v204.8H116.363636V172.218182h181.527273zM116.363636 912.290909V442.181818h795.927273v470.109091H116.363636z" />
+                                </svg>
+                              </span>
+                            }
+                          />
                         </div>
                       </div>
 
+                      {/* KEEP SAME DROPDOWNS */}
                       <div className="col-lg-2">
                         <div className="form-group">
                           <label>Type</label>
                           <select className="form-control">
-                            <option value="1">Deposit/Withdraw Report</option>
-                            <option value="2">Sports Report</option>
-                            <option value="3">Casino Report</option>
-                            <option value="4">Third Party Casino Report</option>
-                            <option value="5">Sportbook</option>
+                            <option>Deposit/Withdraw Report</option>
                           </select>
                         </div>
                       </div>
@@ -161,13 +220,7 @@ const AccountStatement = () => {
                         <div className="form-group">
                           <label>Statement</label>
                           <select className="form-control">
-                            <option value="all">All</option>
-                            <option value="allcredit">Credit - All</option>
-                            <option value="creditupper">Credit - Upper</option>
-                            <option value="creditdown">Credit - Down</option>
-                            <option value="allbalance">pts - All</option>
-                            <option value="balanceupper">pts - Upper</option>
-                            <option value="balancedown">pts - Down</option>
+                            <option>All</option>
                           </select>
                         </div>
                       </div>
@@ -177,10 +230,23 @@ const AccountStatement = () => {
                     <div className="row row5">
                       <div className="col-lg-3">
                         <button type="submit" className="btn btn-primary">Load</button>
-                        <button type="button" className="btn btn-light">Reset</button>
-                        <button type="button" className="btn btn-success">
-                          <i className="fas fa-file-excel"></i>
+                        <button type="button" className="btn btn-light"
+                          onClick={() => {
+                            setClientSearch('');
+                            setSelectedClient('');
+                            setFromDate('');
+                            setToDate('');
+                            setSearch('');
+                            fetchStatement();
+                          }}
+                        >
+                          Reset
                         </button>
+                        <div id="export_1774426765439" class="d-inline-block">
+                          <button type="button" className="btn btn-success">
+                            <i className="fas fa-file-excel"></i>
+                          </button>
+                        </div>
                         <button type="button" className="btn btn-danger">
                           <i className="fas fa-file-pdf"></i>
                         </button>
@@ -189,26 +255,40 @@ const AccountStatement = () => {
                   </form>
                 </div>
 
+                {/* TOP BAR */}
                 <div className="row">
                   <div className="col-6">
-                    <label>
-                      Show
-                      <select className="custom-select custom-select-sm">
+                    <label className="d-inline-flex align-items-center">
+                      Show&nbsp;
+                      <select
+                        className="custom-select custom-select-sm"
+                        onChange={(e) => setPerPage(Number(e.target.value))}
+                      >
                         <option>25</option>
                         <option>50</option>
                         <option>75</option>
                         <option>100</option>
-                        <option>125</option>
-                        <option>150</option>
                       </select>
-                      entries
+                      &nbsp;entries
                     </label>
                   </div>
+
                   <div className="col-6 text-right">
-                    <input type="search" placeholder="Search..." className="form-control form-control-sm" />
+                    <div id="tickets-table_filter" class="dataTables_filter text-md-right">
+                      <label class="d-inline-flex align-items-center">
+                        <input
+                          type="search"
+                          placeholder="Search..."
+                          className="form-control form-control-sm ml-2"
+                          value={search}
+                          onChange={(e) => setSearch(e.target.value)}
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
 
+                {/* TABLE */}
                 <div className="table-responsive mb-0">
                   <table className="table table-bordered">
                     <thead>
@@ -222,80 +302,62 @@ const AccountStatement = () => {
                         <th>Fromto</th>
                       </tr>
                     </thead>
+
                     <tbody>
-
-                      <tr>
-                        <td>17/03/2026 00:00:00</td>
-                        <td className="text-right">1</td>
-                        <td className="text-right text-success">62,900</td>
-                        <td className="text-right"></td>
-                        <td className="text-right text-success">62,900</td>
-                        <td>Opening pts</td>
-                        <td></td>
-                      </tr>
-
-                      <tr>
-                        <td>18/03/2026 12:39:30</td>
-                        <td className="text-right">2</td>
-                        <td></td>
-                        <td className="text-right text-danger">-2,000</td>
-                        <td className="text-right text-success">60,900</td>
-                        <td>a</td>
-                        <td>Arpit526/Ras44</td>
-                      </tr>
-
-                      <tr>
-                        <td>18/03/2026 15:20:57</td>
-                        <td className="text-right">3</td>
-                        <td></td>
-                        <td className="text-right text-danger">-2,000</td>
-                        <td className="text-right text-success">58,900</td>
-                        <td>a</td>
-                        <td>Arpit526/Ras49</td>
-                      </tr>
-
-                      <tr>
-                        <td>23/03/2026 12:21:16</td>
-                        <td className="text-right">4</td>
-                        <td></td>
-                        <td className="text-right text-danger">-10,000</td>
-                        <td className="text-right text-success">48,900</td>
-                        <td>User creation</td>
-                        <td>Arpit526/Arpit528</td>
-                      </tr>
-
-                      <tr>
-                        <td>23/03/2026 12:21:56</td>
-                        <td className="text-right">5</td>
-                        <td></td>
-                        <td className="text-right text-danger">-10,000</td>
-                        <td className="text-right text-success">38,900</td>
-                        <td>a</td>
-                        <td>Arpit526/Arpit528</td>
-                      </tr>
-
-                      <tr>
-                        <td>23/03/2026 16:29:55</td>
-                        <td className="text-right">6</td>
-                        <td></td>
-                        <td className="text-right text-danger">-10,000</td>
-                        <td className="text-right text-success">28,900</td>
-                        <td>User creation</td>
-                        <td>Arpit526/Arpit56565</td>
-                      </tr>
-
-                      <tr>
-                        <td>23/03/2026 18:57:39</td>
-                        <td className="text-right">7</td>
-                        <td></td>
-                        <td className="text-right text-danger">-2,000</td>
-                        <td className="text-right text-success">26,900</td>
-                        <td>A</td>
-                        <td>Arpit526/Ras49</td>
-                      </tr>
-
+                      {currentData.length > 0 ? (
+                        currentData.map((row, index) => (
+                          <tr key={index}>
+                            <td>{new Date(row.created_at * 1000).toLocaleString()}</td>
+                            <td className="text-right">{indexOfFirst + index + 1}</td>
+                            <td className="text-right">{row.account_entryType == 1 ? row.account_amount : '-'}</td>
+                            <td className="text-right">{row.account_entryType == 2 ? row.account_amount : '-'}</td>
+                            <td className="text-right">{row.balance}</td>
+                            <td>{row.remark}</td>
+                            <td>{row.from_to}</td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="7" className="text-center">
+                            There are no records to show
+                          </td>
+                        </tr>
+                      )}
                     </tbody>
                   </table>
+                </div>
+
+                {/* PAGINATION */}
+                <div className="row pt-3">
+                  <div className="col">
+                    <ul className="pagination pagination-rounded mb-0 float-right">
+
+                      <li className={`page-item ${currentPage === 1 && 'disabled'}`}>
+                        <button className="page-link" onClick={() => changePage(1)}>«</button>
+                      </li>
+
+                      <li className={`page-item ${currentPage === 1 && 'disabled'}`}>
+                        <button className="page-link" onClick={() => changePage(currentPage - 1)}>‹</button>
+                      </li>
+
+                      {[...Array(totalPages)].map((_, i) => (
+                        <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
+                          <button className="page-link" onClick={() => changePage(i + 1)}>
+                            {i + 1}
+                          </button>
+                        </li>
+                      ))}
+
+                      <li className={`page-item ${currentPage === totalPages && 'disabled'}`}>
+                        <button className="page-link" onClick={() => changePage(currentPage + 1)}>›</button>
+                      </li>
+
+                      <li className={`page-item ${currentPage === totalPages && 'disabled'}`}>
+                        <button className="page-link" onClick={() => changePage(totalPages)}>»</button>
+                      </li>
+
+                    </ul>
+                  </div>
                 </div>
 
               </div>
