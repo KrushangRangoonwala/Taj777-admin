@@ -10,8 +10,8 @@ export const casino_list = [
         "result_image": ""
     },
     {
-        "game_code": "teenpattioneday62",
-        "game_name": "Vip Teenpatti",
+        "game_code": "teen62",
+        "game_name": "V VIP Teenpatti 1-Day",
         "game_category": "Teenpatti",
         "game_socket": "teen62",
         "game_image": "http://159.65.143.49/~sevennew/storage/front/img/casinoicons/teen62.gif",

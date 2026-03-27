@@ -1,0 +1,362 @@
+import React, { useState, useEffect } from "react";
+import useSocket from "../../../api/Socket/useSocket";
+import { useGetFileData } from "../../../hooks/useGetFileData";
+// import { fetchCasinoExposureApi } from "../../../api/API";
+import { getImage, getMarketByNation, getValueAfterDot, getIsSuspended } from "../../../utilies/helpers";
+import CasinoVideo from "./components/CasinoVideo";
+import CasinoRightSidebar from "./components/CasinoRightSidebar";
+import LastResult from "./components/LastResult";
+
+const QueenTopOpenTeenPatti = ({ onBetSelection, lastBetTime }) => {
+    const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
+    const [gameData, setGameData] = useState(null);
+    const [lastResults, setLastResults] = useState([]);
+    // const [exposureData, setExposureData] = useState([]);
+    const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+
+    const socket = useSocket("casino");
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleData = (data) => {
+            try {
+                const payload = Array.isArray(data) ? data[0] : data;
+                if (payload) {
+                    setGameData(payload);
+                }
+            } catch (error) {
+                console.error("Error processing QueenTopOpenTeenPatti data:", error);
+            }
+        };
+
+        const handleResults = (data) => {
+            let results = [];
+            if (data && data.res && Array.isArray(data.res)) {
+                results = data.res;
+            } else if (data && data.data && Array.isArray(data.data)) {
+                results = data.data;
+            }
+            if (results.length > 0) {
+                const mappedResults = results.map(r => ({
+                    res: r.win === "1" ? "A" : r.win === "2" ? "B" : r.win,
+                    mid: r.mid
+                }));
+                setLastResults(mappedResults);
+            }
+        };
+
+        const handleConnect = () => {
+            console.log(`✅ ${game_type} Connected:`, socket.id);
+            socket.emit("Room", game_type);
+            socket.emit("gameResult");
+        };
+
+        if (socket.connected) {
+            handleConnect();
+        }
+
+        socket.on("connect", handleConnect);
+        socket.on("game", handleData);
+        socket.on(game_type, handleData);
+        socket.on("gameResult", handleResults);
+        socket.on(`${game_type}_result`, handleResults);
+
+        return () => {
+            socket.off("connect", handleConnect);
+            socket.off("game", handleData);
+            socket.off(game_type, handleData);
+            socket.off("gameResult", handleResults);
+            socket.off(`${game_type}_result`, handleResults);
+        };
+    }, [socket, game_type]);
+
+    // useEffect(() => {
+    //     const fetchExposure = async () => {
+    //         if (!gameData?.t1?.[0]?.mid) return;
+    //         try {
+    //             const response = await fetchCasinoExposureApi({
+    //                 markettype: CODE,
+    //                 main_event_id: gameData.t1[0].mid,
+    //                 curPageName: phpFile,
+    //             });
+    //             if (Array.isArray(response?.data)) {
+    //                 setExposureData(response.data);
+    //             }
+    //         } catch (error) {
+    //             console.error("Error fetching exposure:", error);
+    //         }
+    //     };
+    //     fetchExposure();
+    // }, [gameData?.t1?.[0]?.mid, lastBetTime, CODE, phpFile]);
+
+    const currentGame = gameData?.t1?.[0];
+    const marketData = gameData?.t2 || [];
+
+    const handleOddsClick = (marketName, odds, market, isBack, suspended) => {
+        if (!market || suspended || odds == 0) return;
+
+        let min = market?.min || 100;
+        let max = market?.max || 300000;
+
+        if (marketName.includes("Under 21") || marketName.includes("Over 21")) {
+            max = market?.max || 50000;
+        }
+
+        if (onBetSelection) {
+            onBetSelection({
+                teamName: marketName,
+                odds: odds,
+                minBet: min,
+                maxBet: max,
+                isBack,
+                marketId: market.sid,
+                eventId: getValueAfterDot(currentGame?.mid),
+            });
+        }
+    };
+
+    const getMarketByName = (marketName) => getMarketByNation(marketData, marketName, "nat");
+
+    const BetBox = ({ marketName, className = "", children, type = "back" }) => {
+        const market = getMarketByName(marketName);
+        const suspended = getIsSuspended(market);
+        const odds = type === "back" ? market?.b1 : market?.l1;
+
+        return (
+            <div
+                className={`${className} ${suspended ? "suspended" : ""}`}
+                onClick={() => handleOddsClick(marketName, odds, market, type === "back", suspended)}
+            >
+                {suspended ? (
+                    <img src="/assets/images/lock.svg" alt="lock" style={{ width: "15px", height: "15px", opacity: 1, zIndex: 10, position: "relative" }} />
+                ) : (
+                    children(odds)
+                )}
+            </div>
+        );
+    };
+
+    const Cards = () => (
+        <>
+            <div>
+                <span data-v-b64efdfa="">
+                    <img data-v-b64efdfa="" src={getImage(currentGame?.C1, result_image)} />
+                </span>
+                <span data-v-b64efdfa="">
+                    <img data-v-b64efdfa="" src={getImage(currentGame?.C3, result_image)} />
+                </span>
+                <span data-v-b64efdfa="">
+                    <img data-v-b64efdfa="" src={getImage(currentGame?.C5, result_image)} />
+                </span>
+            </div>
+            <div>
+                <span data-v-b64efdfa="">
+                    <img data-v-b64efdfa="" src={getImage(currentGame?.C2, result_image)} />
+                </span>
+                <span data-v-b64efdfa="">
+                    <img data-v-b64efdfa="" src={getImage(currentGame?.C4, result_image)} />
+                </span>
+                <span data-v-b64efdfa="">
+                    <img data-v-b64efdfa="" src={getImage(currentGame?.C6, result_image)} />
+                </span>
+            </div>
+        </>
+    );
+
+    return (
+        <div data-v-5a10e370="">
+            <div data-v-5a10e370="" className="detail-page-container">
+                <div className="center-main-container">
+                    <div className="center-content">
+                        <div className="casino-container">
+                            <div className="casino-table teenpatti2">
+                                <CasinoVideo
+                                    gameName={game_name}
+                                    roundId={currentGame?.mid}
+                                    videoSrc={iframe_url}
+                                    results={lastResults}
+                                    timeLeft={currentGame?.autotime || 0}
+                                    totalTime={currentGame?.ft || 30}
+                                    isCardDrawerOpen={isCardDrawerOpen}
+                                    setIsCardDrawerOpen={setIsCardDrawerOpen}
+                                    CardsComponent={Cards}
+                                    resultPath={phpFile}
+                                    showRawLabel={true}
+                                    showResults={false}
+                                />
+                                <LastResult
+                                    results={lastResults}
+                                    gameName={game_name}
+                                    resultPath={phpFile}
+                                    showRawLabel={true}
+                                    className="d-none-small"
+                                />
+                                <div className="casino-detail">
+                                    <div className="teen1daycasino-container d-none-small">
+                                        <div className="teen1dayleft">
+                                            <div className="casino-box-row">
+                                                <div className="casino-nation-name no-border casino-bl-box-title">
+                                                    <div className="playera">Player A</div>
+                                                </div>
+                                                <div className="casino-bl-box casino-bl-box-title">
+                                                    <div className="casino-bl-box-item"><b>Back</b></div>
+                                                    <div className="casino-bl-box-item"><b>Lay</b></div>
+                                                </div>
+                                            </div>
+                                            <div className="casino-box-row">
+                                                <div className="casino-nation-name"><b>Main</b>
+                                                    <div className="float-right">
+                                                        <span className="mr-2 casino-book book-black">0</span>
+                                                        <i data-toggle="collapse" data-target="#range1" aria-expanded="false" className="fas fa-info-circle collapsed"></i>
+                                                        <div id="range1" className="icon-range collapse">R:<span>100</span>-<span>2L</span></div>
+                                                    </div>
+                                                </div>
+                                                <div className="casino-bl-box">
+                                                    <BetBox marketName="Player A" className="back casino-bl-box-item" type="back">
+                                                        {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                                    </BetBox>
+                                                    <BetBox marketName="Player A" className="lay casino-bl-box-item" type="lay">
+                                                        {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                                    </BetBox>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="teen1daycenter"></div>
+                                        <div className="teen1dayright">
+                                            <div className="casino-box-row">
+                                                <div className="casino-nation-name no-border casino-bl-box-title">
+                                                    <div className="playerb">Player B</div>
+                                                </div>
+                                                <div className="casino-bl-box casino-bl-box-title">
+                                                    <div className="casino-bl-box-item"><b>Back</b></div>
+                                                    <div className="casino-bl-box-item"><b>Lay</b></div>
+                                                </div>
+                                            </div>
+                                            <div className="casino-box-row">
+                                                <div className="casino-nation-name"><b>Main</b>
+                                                    <div className="float-right">
+                                                        <span className="mr-2 casino-book book-black">0</span>
+                                                        <i data-toggle="collapse" data-target="#range7" aria-expanded="false" className="fas fa-info-circle collapsed"></i>
+                                                        <div id="range7" className="icon-range collapse">R:<span>100</span>-<span>2L</span></div>
+                                                    </div>
+                                                </div>
+                                                <div className="casino-bl-box">
+                                                    <BetBox marketName="Player B" className="back casino-bl-box-item" type="back">
+                                                        {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                                    </BetBox>
+                                                    <BetBox marketName="Player B" className="lay casino-bl-box-item" type="lay">
+                                                        {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                                    </BetBox>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* teen2uo section for desktop */}
+                                    <div className="teen2uo d-none-small">
+                                        <div className="teen1dayleft"></div>
+                                        <div className="teen1daycenter"></div>
+                                        <div className="teen1dayright">
+                                            <div className="casino-box-row">
+                                                <div className="casino-nation-name">
+                                                    <b>Player B Under 21</b>
+                                                    <div className="float-right">
+                                                        <span className="book-black">0</span>
+                                                        <i data-toggle="collapse" data-target="#range5" aria-expanded="false" className="fas fa-info-circle collapsed"></i>
+                                                        <div id="range5" className="icon-range collapse">R:<span>100</span>-<span>50K</span></div>
+                                                    </div>
+                                                </div>
+                                                <div className="casino-bl-box">
+                                                    <BetBox marketName="Player B Under 21" className="back casino-bl-box-item" type="back">
+                                                        {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                                    </BetBox>
+                                                </div>
+                                                <div className="casino-nation-name">
+                                                    <b>Player B Over 21</b>
+                                                    <div className="float-right">
+                                                        <span className="book-black">0</span>
+                                                        <i data-toggle="collapse" data-target="#range6" aria-expanded="false" className="fas fa-info-circle collapsed"></i>
+                                                        <div id="range6" className="icon-range collapse">R:<span>100</span>-<span>50K</span></div>
+                                                    </div>
+                                                </div>
+                                                <div className="casino-bl-box">
+                                                    <BetBox marketName="Player B Over 21" className="back casino-bl-box-item" type="back">
+                                                        {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                                    </BetBox>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Mobile View */}
+                                    <div className="teen1daycasino-container d-none-big">
+                                        <div className="casino-box-row">
+                                            <div className="casino-bl-box casino-bl-box-title">
+                                                <div className="casino-bl-box-item"><b>Main</b>
+                                                    <div className="float-right">
+                                                        <i data-toggle="collapse" data-target="#range1_mb" className="fas fa-info-circle float-right"></i>
+                                                        <div id="range1_mb" className="collapse icon-range">R:<span>100</span>-<span>2L</span></div>
+                                                    </div>
+                                                </div>
+                                                <div className="casino-bl-box-item"><b>Back</b></div>
+                                                <div className="casino-bl-box-item"><b>Lay</b></div>
+                                            </div>
+                                            <div className="casino-bl-box">
+                                                <div className="casino-bl-box-item casino-odds-name">
+                                                    <span>Player A</span>
+                                                    <span className="float-right book-black">0</span>
+                                                </div>
+                                                <BetBox marketName="Player A" className="back casino-bl-box-item" type="back">
+                                                    {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                                </BetBox>
+                                                <BetBox marketName="Player A" className="lay casino-bl-box-item" type="lay">
+                                                    {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                                </BetBox>
+                                            </div>
+                                            <div className="casino-bl-box">
+                                                <div className="casino-bl-box-item casino-odds-name">
+                                                    <span>Player B</span>
+                                                    <span className="float-right book-black">0</span>
+                                                </div>
+                                                <BetBox marketName="Player B" className="back casino-bl-box-item" type="back">
+                                                    {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                                </BetBox>
+                                                <BetBox marketName="Player B" className="lay casino-bl-box-item" type="lay">
+                                                    {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                                </BetBox>
+                                            </div>
+                                        </div>
+
+                                        {/* Mobile view Under/Over section removed as per user request */}
+                                    </div>
+
+                                    <div className="casino-remark mt-3">
+                                        <div className="remark-icon">
+                                            <img src="https://wver.sprintstaticdata.com/v209/static/front/img/icons/remark.png" />
+                                        </div>
+                                        <marquee>{currentGame?.remark || "Play Our New Game Premium Teenpatti 1 Day"}</marquee>
+                                    </div>
+
+                                    {/* Last Results on Mobile */}
+                                    <LastResult
+                                        results={lastResults}
+                                        gameName={game_name}
+                                        resultPath={phpFile}
+                                        showRawLabel={true}
+                                        className="d-none-big"
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div className="right-sidebar">
+                        <CasinoRightSidebar />
+                    </div>
+                </div>
+            </div>
+        </div>
+    );
+
+};
+
+export default QueenTopOpenTeenPatti;

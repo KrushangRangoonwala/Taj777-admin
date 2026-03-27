@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { getValueAfterDot, getImage } from "../../../../utilies/helpers";
 import { useGetFileData } from "../../../../hooks/useGetFileData";
+import LastResult from "./LastResult";
 
 const CasinoVideo = ({
     gameName,
@@ -14,6 +15,8 @@ const CasinoVideo = ({
     setIsCardDrawerOpen,
     CardsComponent,
     resultPath = "",
+    showResults = true,
+    showRawLabel = false,
 }) => {
     const { result_image } = useGetFileData();
 
@@ -25,29 +28,15 @@ const CasinoVideo = ({
 
     const strokeDasharrayValue = ((timeLeft || 0) / (totalTime || 30)) * 283;
 
-    const renderResultLabel = (res) => {
-        // B (Banker/Dealer) -> D, A (Player) -> P for some games
-        if (gameName?.toLowerCase().includes("teen") || gameName?.toLowerCase().includes("one-day") || gameName?.toLowerCase().includes("1card")) {
-            if (res === "B") return "D";
-            if (res === "A") return "P";
-        }
-        return res;
-    };
-
-    const renderResultClass = (res) => {
-        if (res === "B") return "resultb";
-        if (res === "A") return "resulta";
-        return "";
-    };
 
     return (
         <div className="casino-video">
             {/* video */}
             <div className="casino-video-title">
                 <span className="casino-name">{gameName}</span>
-                <div className="casino-video-rid">
+                <span className="casino-video-rid">
                     Round ID: {getValueAfterDot(roundId) || "Loading..."}
-                </div>
+                </span>
             </div>
 
             <div className="video-box-container">
@@ -145,16 +134,14 @@ const CasinoVideo = ({
             <div></div>
 
             {/* last results */}
-            <div className="casino-video-last-results">
-                {results.map((result, index) => (
-                    <span key={index} className={renderResultClass(result.res)}>
-                        {renderResultLabel(result.res)}
-                    </span>
-                ))}
-                <a href={`/admin/reports/casinoresult/${resultPath || "poker"}`} className="result-more">
-                    ...
-                </a>
-            </div>
+            {showResults && (
+                <LastResult
+                    results={results}
+                    gameName={gameName}
+                    resultPath={resultPath}
+                    showRawLabel={showRawLabel}
+                />
+            )}
         </div>
     );
 };

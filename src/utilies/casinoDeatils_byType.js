@@ -59,7 +59,7 @@ export const gamePath_MapTo_gametype = {
     "card32-B": "card32eu",
     "aaa": "aaa",
     "aaa2": "aaa2",
-    "teenpattioneday62": "teen62",
+    "teen62": "teen62",
     "instantteenpatti": "teen3",
     "instantteenpatti2": "teen32",
     "instantteenpatti3": "teen33",

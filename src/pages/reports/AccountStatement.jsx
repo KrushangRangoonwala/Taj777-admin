@@ -4,6 +4,10 @@ import { DatePicker } from "antd";
 import "antd/dist/reset.css"; // AntD 5+ reset styles
 import dayjs from "dayjs";
 const { RangePicker } = DatePicker;
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const AccountStatement = () => {
 
@@ -13,6 +17,9 @@ const AccountStatement = () => {
   const [clientSearch, setClientSearch] = useState('');
   const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState('');
+
+  const [totalRecords, setTotalRecords] = useState(0);
+  const [loading, setLoading] = useState(false);
 
   const [fromDate, setFromDate] = useState(
         new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0]
@@ -26,6 +33,8 @@ const AccountStatement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
 
+  const isDataAvailable = data && data.length > 0;
+
   // 🔹 Fetch clients
   const fetchClients = async (value) => {
     try {
@@ -38,12 +47,17 @@ const AccountStatement = () => {
   };
 
   // 🔹 Fetch statement
-  const fetchStatement = async () => {
+  const fetchStatement = async (page = currentPage) => {
     try {
+       setLoading(true);
+
       const payload = {
         client_name: selectedClient,
-        from_date: fromDate ? fromDate.toISOString().split("T")[0] : "",
-        to_date: toDate ? toDate.toISOString().split("T")[0] : "",
+        from_date: fromDate ? new Date(fromDate).toISOString().split("T")[0] : "",
+        to_date: toDate ? new Date(toDate).toISOString().split("T")[0] : "",
+        search: search,
+        page: page,
+        per_page: perPage
       };
 
       const res = await getAccountStatement(payload);
@@ -56,19 +70,22 @@ const AccountStatement = () => {
 
       setData(result);
       setFilteredData(result);
-      setCurrentPage(1);
+      setTotalRecords(res?.total || 0);
+      setCurrentPage(page);
 
     } catch (err) {
       console.log(err);
+    } finally {
+      setLoading(false);
     }
   };
 
-  useEffect(() => {
+  /* useEffect(() => {
     fetchStatement();
-  }, []);
+  }, []); */
 
   // 🔹 Global search filter
-  useEffect(() => {
+  /* useEffect(() => {
     let temp = [...data];
 
     if (search) {
@@ -80,19 +97,80 @@ const AccountStatement = () => {
     setFilteredData(temp);
     setCurrentPage(1);
 
-  }, [search, data]);
+  }, [search, data]); */
 
   // 🔹 Pagination
   const indexOfLast = currentPage * perPage;
   const indexOfFirst = indexOfLast - perPage;
   const currentData = filteredData.slice(indexOfFirst, indexOfLast);
 
-  const totalPages = Math.ceil(filteredData.length / perPage);
+  const totalPages = Math.ceil(totalRecords / perPage);
 
   const changePage = (page) => {
     if (page >= 1 && page <= totalPages) {
-      setCurrentPage(page);
+      fetchStatement(page);
     }
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+
+    let start = Math.max(1, currentPage - 2);
+    let end = Math.min(totalPages, start + maxVisible - 1);
+
+    // adjust start if near end
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
+
+  const exportToExcel = () => {
+    const formattedData = data.map((row, index) => ({
+      Date: new Date(row.created_at * 1000).toLocaleString(),
+      "Sr No": index + 1,
+      Credit: row.account_entryType == 1 ? row.account_amount : '',
+      Debit: row.account_entryType == 2 ? row.account_amount : '',
+      Balance: row.balance,
+      Remark: row.remark,
+      FromTo: row.from_to
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Statement");
+
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+
+    const file = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(file, "Account_Statement.xlsx");
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    const tableData = data.map((row, index) => ([
+      new Date(row.created_at * 1000).toLocaleString(),
+      index + 1,
+      row.account_entryType == 1 ? row.account_amount : '',
+      row.account_entryType == 2 ? row.account_amount : '',
+      row.balance,
+      row.remark,
+      row.from_to
+    ]));
+
+    autoTable(doc, {
+      head: [['Date', 'Sr No', 'Credit', 'Debit', 'Balance', 'Remark', 'FromTo']],
+      body: tableData,
+    });
+
+    doc.save("Account_Statement.pdf");
   };
 
   return (
@@ -155,7 +233,7 @@ const AccountStatement = () => {
                                   key={i}
                                   style={{ padding: '5px', cursor: 'pointer' }}
                                   onClick={() => {
-                                    setSelectedClient(c.text);
+                                    setSelectedClient(c.id);
                                     setClientSearch(c.text);
                                     setClientList([]);
                                   }}
@@ -234,20 +312,33 @@ const AccountStatement = () => {
                           onClick={() => {
                             setClientSearch('');
                             setSelectedClient('');
-                            setFromDate('');
-                            setToDate('');
+                            setFromDate(null);
+                            setToDate(null);
                             setSearch('');
-                            fetchStatement();
+                            setData([]);
+                            setFilteredData([]);
+                            setTotalRecords(0);
+                            setCurrentPage(1);
                           }}
                         >
                           Reset
                         </button>
-                        <div id="export_1774426765439" class="d-inline-block">
-                          <button type="button" className="btn btn-success">
+                        <div id="export_1774426765439" className="d-inline-block">
+                          <button 
+                            type="button" 
+                            className="btn btn-success"
+                            disabled={!isDataAvailable}
+                            onClick={exportToExcel}
+                          >
                             <i className="fas fa-file-excel"></i>
                           </button>
                         </div>
-                        <button type="button" className="btn btn-danger">
+                        <button 
+                          type="button" 
+                          className="btn btn-danger"
+                          disabled={!isDataAvailable}
+                          onClick={exportToPDF}
+                        >
                           <i className="fas fa-file-pdf"></i>
                         </button>
                       </div>
@@ -274,14 +365,15 @@ const AccountStatement = () => {
                   </div>
 
                   <div className="col-6 text-right">
-                    <div id="tickets-table_filter" class="dataTables_filter text-md-right">
-                      <label class="d-inline-flex align-items-center">
+                    <div id="tickets-table_filter" className="dataTables_filter text-md-right">
+                      <label className="d-inline-flex align-items-center">
                         <input
                           type="search"
                           placeholder="Search..."
                           className="form-control form-control-sm ml-2"
                           value={search}
                           onChange={(e) => setSearch(e.target.value)}
+                          onKeyUp={(e) => {fetchStatement(1)}}
                         />
                       </label>
                     </div>
@@ -304,8 +396,8 @@ const AccountStatement = () => {
                     </thead>
 
                     <tbody>
-                      {currentData.length > 0 ? (
-                        currentData.map((row, index) => (
+                      {data.length > 0 ? (
+                        data.map((row, index) => (
                           <tr key={index}>
                             <td>{new Date(row.created_at * 1000).toLocaleString()}</td>
                             <td className="text-right">{indexOfFirst + index + 1}</td>
@@ -340,10 +432,18 @@ const AccountStatement = () => {
                         <button className="page-link" onClick={() => changePage(currentPage - 1)}>‹</button>
                       </li>
 
-                      {[...Array(totalPages)].map((_, i) => (
+                     {/*  {[...Array(totalPages)].map((_, i) => (
                         <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
                           <button className="page-link" onClick={() => changePage(i + 1)}>
                             {i + 1}
+                          </button>
+                        </li>
+                      ))} */}
+
+                      {getPageNumbers().map((page) => (
+                        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                          <button className="page-link" onClick={() => changePage(page)}>
+                            {page}
                           </button>
                         </li>
                       ))}

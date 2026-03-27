@@ -29,13 +29,7 @@ export const loginAdmin = async (email, password) => {
     if (response.data.status === "ok") {
       return {
         status: "ok",
-        data: {
-          user_name: response.data.user_name || email,
-          role: response.data.role || "admin",
-          login_auth_key: response.data.login_auth_key,
-          user_id: response.data.login_id,
-          ...response.data
-        }
+        data: response.data
       };
     } else {
       const errorMessage = response.data?.message || response.data?.error || "Login failed";
@@ -47,6 +41,7 @@ export const loginAdmin = async (email, password) => {
     console.error('Error status:', error.response?.status);
     throw error;
   }
+ 
 };
 
 export const fetchCasinoList = async () => {
@@ -115,6 +110,20 @@ export async function getProfitLoss(payload) {
       ...getDefaultParams(),
     };
     const { data } = await axiosInstance.post("profit_loss", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching profit loss:", error);
+    throw error;
+  }
+}
+
+export async function getCurrentBets(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await axiosInstance.post("current_bets", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching profit loss:", error);

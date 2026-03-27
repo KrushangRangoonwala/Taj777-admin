@@ -1,0 +1,28 @@
+.custom-dropdown-container {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.35s ease-out;
+}
+
+.custom-dropdown-container.is-open {
+    grid-template-rows: 1fr;
+}
+
+.custom-dropdown-inner {
+    overflow: hidden;
+    min-height: 0;
+}
+
+.custom-dropdown-inner>.sub-menu {
+    /* Ensure no margins are leaking out and causing jumping during animation */
+    margin: 0;
+}
+
+.event-page {
+    position: relative;
+}
+
+.main-content.event-page .footer {
+    right: auto;
+    left: auto;
+}

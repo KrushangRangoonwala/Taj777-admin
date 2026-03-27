@@ -54,8 +54,9 @@ const Cards = ({ currentGame, result_image }) => (
     </div>
 );
 
-const TeenPatti1Day = ({ onBetSelection }) => {
-    const { game_type, phpFile, game_name, iframe_url, result_image } = useGetFileData();
+const VIPTeenPatti1Day = ({ onBetSelection }) => {
+    const { game_type: raw_game_type, phpFile, game_name, iframe_url, result_image } = useGetFileData();
+    const game_type = raw_game_type || "teen62";
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
@@ -186,7 +187,7 @@ const TeenPatti1Day = ({ onBetSelection }) => {
                         <div className="casino-container">
                             <div className="casino-table teenpatti1day">
                                 <CasinoVideo
-                                    gameName={game_name || "Teenpatti 1-day"}
+                                    gameName={"V VIP Teenpatti 1-Day"}
                                     roundId={currentGame?.mid}
                                     videoSrc={iframe_url}
                                     results={lastResults}
@@ -472,5 +473,5 @@ const TeenPatti1Day = ({ onBetSelection }) => {
     );
 };
 
-export default TeenPatti1Day;
+export default VIPTeenPatti1Day;
 

@@ -1,6 +1,9 @@
 import React, { useState } from "react";
-import sidebarEvents from "../data/sidebarEvents.json";
-import "./Sidebar.css";
+import SmoothMenu from "./SmoothMenu";
+import SidebarEventsTree from "./SidebarEventsTree";
+import { Link } from "react-router-dom";
+
+const EVENT_IDX = 20; // JUST RANDOM NUMBER 
 
 const menuItems = [
     {
@@ -99,34 +102,9 @@ const menuItems = [
     },
 ];
 
-const SmoothMenu = ({ isOpen, className, children, isEvent }) => {
-    if (isEvent) {
-        return (
-            <ul
-                aria-expanded={isOpen ? "true" : "false"}
-                className={`${className || ""} sub-menu mm-collapse ${isOpen ? "mm-show" : ""}`.trim()}
-            >
-                {children}
-            </ul>
-        )
-    }
-    return (
-        <div className={`custom-dropdown-container ${isOpen ? 'is-open' : ''}`}>
-            <div className="custom-dropdown-inner">
-                <ul
-                    aria-expanded={isOpen ? "true" : "false"}
-                    className={`${className || ""} sub-menu`.trim()}
-                >
-                    {children}
-                </ul>
-            </div>
-        </div>
-    );
-};
 
 export default function Sidebar() {
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
-    const [eventsOpen, setEventsOpen] = useState(false);
     const [openSport, setOpenSport] = useState(null);
     const [openLeague, setOpenLeague] = useState(null);
 
@@ -134,6 +112,7 @@ export default function Sidebar() {
         setOpenMenuIndex(openMenuIndex === index ? null : index);
     };
 
+    const isEventopen = openMenuIndex === EVENT_IDX;
     return (
         <>
             <div data-v-5a10e370="" className="vertical-menu">
@@ -169,7 +148,7 @@ export default function Sidebar() {
                                                         <li key={index} className={`${item.liClassName || ""} ${isOpen ? "mm-active" : ""}`.trim()}>
                                                             {item.subItems ? (
                                                                 <>
-                                                                    <a
+                                                                    <Link
                                                                         href="javascript:void(0);"
                                                                         className={`has-arrow ${isOpen ? "mm-active" : ""}`}
                                                                         aria-expanded={isOpen ? "true" : "false"}
@@ -180,23 +159,23 @@ export default function Sidebar() {
                                                                     >
                                                                         <i className={item.icon}></i>
                                                                         <span>{item.label}</span>
-                                                                    </a>
+                                                                    </Link>
                                                                     <SmoothMenu isOpen={isOpen} className="sub-menu">
                                                                         {item.subItems.map((subItem, subIndex) => (
                                                                             <li key={subIndex}>
-                                                                                <a
-                                                                                    href={subItem.href}
+                                                                                <Link
+                                                                                    to={subItem.href}
                                                                                     className="side-nav-link-ref"
                                                                                 >
                                                                                     {subItem.label}
-                                                                                </a>
+                                                                                </Link>
                                                                             </li>
                                                                         ))}
                                                                     </SmoothMenu>
                                                                 </>
                                                             ) : (
-                                                                <a
-                                                                    href={item.href}
+                                                                <Link
+                                                                    to={item.href}
                                                                     aria-current={item.ariaCurrent}
                                                                     className={item.linkClasses}
                                                                 >
@@ -207,94 +186,22 @@ export default function Sidebar() {
                                                                     )}
                                                                     <i className={item.icon}></i>{" "}
                                                                     <span>{item.label}</span>
-                                                                </a>
+                                                                </Link>
                                                             )}
                                                         </li>
                                                     )
                                                 })}
-                                                <li id="event-tree" className={`menu-box ${eventsOpen ? "mm-active" : ""}`}>
-                                                    <a
-                                                        href="javascript:void(0);"
-                                                        className={`has-arrow ${!eventsOpen ? "mm-collapsed" : ""}`}
-                                                        aria-expanded={eventsOpen ? "true" : "false"}
-                                                        onClick={(e) => {
-                                                            e.preventDefault();
-                                                            setEventsOpen(!eventsOpen);
-                                                        }}
-                                                    >
-                                                        <i className="bx bxs-calendar-event"></i>{" "}
-                                                        <span>Events</span>
-                                                    </a>
-                                                    <SmoothMenu isOpen={eventsOpen} className="sub-menu" isEvent={true}>
-                                                        {sidebarEvents.map((sport, sIdx) => {
-                                                            const isSportOpen = openSport === sIdx;
-                                                            return (
-                                                                <li key={sIdx} className={isSportOpen ? "show" : ""}>
-                                                                    <a
-                                                                        href="javascript:void(0)"
-                                                                        className={`has-arrow ${sport.className || ""}`.trim()}
-                                                                        aria-expanded={isSportOpen ? "true" : "false"}
-                                                                        onClick={(e) => {
-                                                                            e.preventDefault();
-                                                                            setOpenSport(isSportOpen ? null : sIdx);
-                                                                        }}
-                                                                    >
-                                                                        <span>{sport.sportName}</span>{" "}
-                                                                        {sport.count && <span> {sport.count}</span>}
-                                                                    </a>
-                                                                    {sport.leagues && sport.leagues.length > 0 && (
-                                                                        <SmoothMenu isOpen={isSportOpen} className="sub-menu" isEvent={true}>
-                                                                            {sport.leagues.map((league, lIdx) => {
-                                                                                const leagueKey = `${sIdx}-${lIdx}`;
-                                                                                const isLeagueOpen = openLeague === leagueKey;
-                                                                                return (
-                                                                                    <li key={lIdx} className={`text-dark ${isLeagueOpen ? "show" : ""}`}>
-                                                                                        <a
-                                                                                            href="javascript:void(0)"
-                                                                                            className={`has-arrow ${isLeagueOpen ? "active" : ""}`}
-                                                                                            aria-expanded={isLeagueOpen ? "true" : "false"}
-                                                                                            onClick={(e) => {
-                                                                                                e.preventDefault();
-                                                                                                setOpenLeague(isLeagueOpen ? null : leagueKey);
-                                                                                            }}
-                                                                                        >
-                                                                                            <span>{league.leagueName}</span>{" "}
-                                                                                            {league.count && (
-                                                                                                <span> {league.count}</span>
-                                                                                            )}
-                                                                                        </a>
-                                                                                        {league.matches &&
-                                                                                            league.matches.length > 0 && (
-                                                                                                <SmoothMenu isOpen={isLeagueOpen} className="sub-menu" isEvent={true}>
-                                                                                                    {league.matches.map(
-                                                                                                        (match, mIdx) => (
-                                                                                                            <li
-                                                                                                                key={mIdx}
-                                                                                                                className="text-dark"
-                                                                                                            >
-                                                                                                                <a
-                                                                                                                    href={match.href}
-                                                                                                                    className="side-nav-link-ref"
-                                                                                                                >
-                                                                                                                    <span>
-                                                                                                                        {match.matchName}
-                                                                                                                    </span>
-                                                                                                                </a>
-                                                                                                            </li>
-                                                                                                        ),
-                                                                                                    )}
-                                                                                                </SmoothMenu>
-                                                                                            )}
-                                                                                    </li>
-                                                                                )
-                                                                            })}
-                                                                        </SmoothMenu>
-                                                                    )}
-                                                                </li>
-                                                            )
-                                                        })}
-                                                    </SmoothMenu>
-                                                </li>
+
+                                                {/* EVENT GAMES */}
+                                                <SidebarEventsTree
+                                                    isEventopen={isEventopen}
+                                                    toggleMenu={toggleMenu}
+                                                    eventIdx={EVENT_IDX}
+                                                    openSport={openSport}
+                                                    setOpenSport={setOpenSport}
+                                                    openLeague={openLeague}
+                                                    setOpenLeague={setOpenLeague}
+                                                />
                                             </ul>
                                         </div>
                                     </div>

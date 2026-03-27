@@ -244,7 +244,7 @@ export const gameCodeMap = {
     '6player_poker': 'poker6player',
     '20poker': 'pokert20',
     'teen3': 'instantteenpatti',
-    'teen62': 'teenpattioneday62',
+    'teen62': 'teen62',
     'cmeter1': '1cardmeter',
     'teen1': '1card1day',
     'teen120': '1card2020',
@@ -287,3 +287,7 @@ export const gameCodeMap = {
     "sicbo": "sicbo",
     "teen": "odi_teenpatti",
 };
+
+export function sanitizeNumber(val) {
+    return isNaN(val) || val === null ? 0 : Number(val);
+}

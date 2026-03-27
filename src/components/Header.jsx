@@ -2,7 +2,7 @@ import React from 'react';
 import SliderRaw from 'react-slick';
 import SelectRaw from 'react-select';
 import Dropdown from 'react-bootstrap/Dropdown';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logout } from '../store/slices/userSlice';
 import "slick-carousel/slick/slick.css";
@@ -14,6 +14,7 @@ const Select = SelectRaw && typeof SelectRaw === 'object' && SelectRaw.default ?
 export default function Header() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const { name } = useSelector((state) => state.user);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -117,7 +118,7 @@ export default function Header() {
 
                     <Dropdown className="btn-group" id="__BVID__18" align="end">
                         <Dropdown.Toggle variant="black" className="header-item" id="__BVID__18__BV_toggle_">
-                            <span className="ml-1">Arpit526</span> <i className="mdi mdi-chevron-down"></i>
+                            <span className="ml-1">{name || "Admin"}</span> <i className="mdi mdi-chevron-down"></i>
                         </Dropdown.Toggle>
                         <Dropdown.Menu>
                             <div className="dropdown d-sm-none ml-1 mr-1">

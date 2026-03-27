@@ -28,6 +28,7 @@ const AdminPage = () => {
     e.preventDefault();
     if (!username || !password) {
       setError('Username and password are required');
+      setIsLoading(false);
       return;
     }
 
@@ -325,11 +326,11 @@ const AdminPage = () => {
                             value={username}
                             onChange={(e) => setUsername(e.target.value)}
                           />
-                          {!username && (
+                          {/* {!username && (
                             <span data-v-019a5d71="" className="error">
                               The username field is required
                             </span>
-                          )}
+                          )} */}
                         </div>
                       </div>
                       <div data-v-019a5d71="" id="input-group-2" role="group" className="form-group">

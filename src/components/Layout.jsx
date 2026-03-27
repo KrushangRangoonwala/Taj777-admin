@@ -10,7 +10,7 @@ export default function Layout() {
       <div id="layout-wrapper">
         <Header />
         <Sidebar />
-        <div className="main-content">
+        <div className="main-content event-page">
           <div className="page-content">
             <Outlet />
           </div>
