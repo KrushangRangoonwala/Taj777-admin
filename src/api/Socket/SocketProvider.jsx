@@ -20,28 +20,28 @@ const SocketProvider = ({ children }) => {
         });
 
         // ⛏ Mining Socket
-        socketsRef.current.mining = io(SOCKETS.MINING, {
-            transports: ["websocket", "polling"],
-            auth: {
-                token: "Token1234",
-                userId: "7",
-                userType: "",
-            },
-            autoConnect: true,
-            reconnection: true,
-            reconnectionAttempts: 10,
-            reconnectionDelay: 1000,
-            reconnectionDelayMax: 5000,
-            timeout: 20000,
-        });
+        // socketsRef.current.mining = io(SOCKETS.MINING, {
+        //     transports: ["websocket", "polling"],
+        //     auth: {
+        //         token: "Token1234",
+        //         userId: "7",
+        //         userType: "",
+        //     },
+        //     autoConnect: true,
+        //     reconnection: true,
+        //     reconnectionAttempts: 10,
+        //     reconnectionDelay: 1000,
+        //     reconnectionDelayMax: 5000,
+        //     timeout: 20000,
+        // });
         setReady(true);
 
         Object.entries(socketsRef.current).forEach(([key, socket]) => {
-            socket.on("connect", () => {
+            socket?.on("connect", () => {
                 console.log(`✅ ${key} socket connected`, socket.id);
             });
 
-            socket.on("disconnect", (reason) => {
+            socket?.on("disconnect", (reason) => {
                 console.log(`⚠️ ${key} socket disconnected`, reason);
             });
         });

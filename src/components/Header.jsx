@@ -3,7 +3,7 @@ import SliderRaw from 'react-slick';
 import SelectRaw from 'react-select';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../store/slices/userSlice';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -20,6 +20,11 @@ export default function Header() {
         dispatch(logout());
         sessionStorage.removeItem('userdata');
         navigate('/admin');
+    };
+
+    const toggleSidebar = () => {
+        document.body.classList.toggle('sidebar-enable');
+        document.body.classList.toggle('vertical-collpsed');
     };
     const sliderSettings = {
         dots: false,
@@ -43,19 +48,33 @@ export default function Header() {
         { title: "Jiangsu Dragons - Guangdong Southern Tigers", date: "20/03/2026 04:35:00", icon: "icon-15" }
     ];
 
+    const toggleFullscreen = () => {
+        if (!document.fullscreenElement) {
+            document.documentElement.requestFullscreen();
+        } else {
+            document.exitFullscreen();
+        }
+    };
+
     return (
         <header data-v-5a10e370="" id="page-topbar">
             <div className="navbar-header">
                 <div className="d-flex">
-                    <div className="navbar-brand-box"><a href="/admin/home" aria-current="page"
+                    <div className="navbar-brand-box"><Link to="/admin/home" aria-current="page"
                         className="logo logo-light router-link-exact-active router-link-active"><span
                             className="logo-sm"><img
                                 src="https://wver.sprintstaticdata.com/v207/static/admin/img/icon.png" alt=""
                                 height="22" /></span> <span className="logo-lg"><img
                                     src="https://sitethemedata.com/sitethemes/world777.com/front/logo.png" alt=""
-                                    className="site-logo" /></span></a></div>
-                    <button id="vertical-menu-btn" type="button"
-                        className="btn btn-sm px-3 font-size-16 header-item"><i className="fa fa-fw fa-bars"></i></button>
+                                    className="site-logo" /></span></Link></div>
+                    <button
+                        id="vertical-menu-btn"
+                        type="button"
+                        className="btn btn-sm px-3 font-size-16 header-item"
+                        onClick={toggleSidebar}
+                    >
+                        <i className="fa fa-fw fa-bars"></i>
+                    </button>
 
                     <div className="site-searchbox mt-3 d-none d-lg-inline-block" style={{ width: '250px' }}>
                         <Select
@@ -107,8 +126,9 @@ export default function Header() {
                         </Dropdown>
                     </div>
 
-                    <div className="dropdown d-none d-lg-inline-block ml-1"><button type="button"
-                        className="btn header-item noti-icon"><i className="bx bx-fullscreen"></i></button></div>
+                    <div className="dropdown d-none d-lg-inline-block ml-1" onClick={toggleFullscreen}>
+                        <button type="button" className="btn header-item noti-icon"><i className="bx bx-fullscreen"></i></button>
+                    </div>
                     <div className="d-none d-sm-inline-block rules-icon nowrap"><span className="main-rules"><a
                         href="javascript:void(0)"><i className="fas fa-info-circle mr-1"></i>Rules</a></span>
                     </div>

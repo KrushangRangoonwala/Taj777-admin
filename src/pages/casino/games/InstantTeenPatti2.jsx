@@ -6,13 +6,22 @@ import { getImage, getMarketByNation, getValueAfterDot, getIsSuspended } from ".
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import BetLimitInfo from "./components/BetLimitInfo";
 
-const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
+const InstantTeenPatti2 = ({ onBetSelection, lastBetTime }) => {
     const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     // const [exposureData, setExposureData] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+    const [openRanges, setOpenRanges] = useState({});
+
+    const toggleRange = (id) => {
+        setOpenRanges((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
+    };
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -140,7 +149,7 @@ const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
                 onClick={() => handleOddsClick(marketName, odds, market, type === "back", suspended)}
             >
                 {suspended ? (
-                    <img src="/assets/images/lock.svg" alt="lock" style={{ width: "15px", height: "15px", opacity: 1, zIndex: 10, position: "relative" }} />
+                    <img src="/admin/assets/images/lock.svg" alt="lock" style={{ width: "15px", height: "15px", opacity: 1, zIndex: 10, position: "relative" }} />
                 ) : (
                     children(odds)
                 )}
@@ -194,15 +203,8 @@ const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
                                     CardsComponent={Cards}
                                     resultPath={phpFile}
                                     showRawLabel={true}
-                                    showResults={false} // Handle results manually
                                 />
-                                <LastResult
-                                    results={lastResults}
-                                    gameName={game_name}
-                                    resultPath={phpFile}
-                                    showRawLabel={true}
-                                    className="d-none-small" // Hidden on mobile, shown on desktop
-                                />
+
                                 <div className="casino-detail">
                                     {/* Desktop View */}
                                     <div className="teen1daycasino-container d-none-small">
@@ -220,8 +222,14 @@ const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
                                                 <div className="casino-nation-name"><b>Main</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <i data-toggle="collapse" data-target="#range1" aria-expanded="false" className="fas fa-info-circle collapsed"></i>
-                                                        <div id="range1" className="icon-range collapse">R:<span>100</span>-<span>2L</span></div>
+                                                        <BetLimitInfo
+                                                            id="range1"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketByName("Player A")?.min}
+                                                            max={getMarketByName("Player A")?.max}
+                                                            fallbackMax={300000}
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="casino-bl-box">
@@ -249,8 +257,14 @@ const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
                                                 <div className="casino-nation-name"><b>Main</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <i data-toggle="collapse" data-target="#range7" aria-expanded="false" className="fas fa-info-circle collapsed"></i>
-                                                        <div id="range7" className="icon-range collapse">R:<span>100</span>-<span>2L</span></div>
+                                                        <BetLimitInfo
+                                                            id="range7"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketByName("Player B")?.min}
+                                                            max={getMarketByName("Player B")?.max}
+                                                            fallbackMax={300000}
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="casino-bl-box">
@@ -271,8 +285,15 @@ const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
                                             <div className="casino-bl-box casino-bl-box-title">
                                                 <div className="casino-bl-box-item"><b>Main</b>
                                                     <div className="float-right">
-                                                        <i data-toggle="collapse" data-target="#range1_mb" className="fas fa-info-circle float-right"></i>
-                                                        <div id="range1_mb" className="collapse icon-range">R:<span>100</span>-<span>2L</span></div>
+                                                        <BetLimitInfo
+                                                            id="range1_mb"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketByName("Player A")?.min}
+                                                            max={getMarketByName("Player A")?.max}
+                                                            iconClass="float-right"
+                                                            fallbackMax={300000}
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="casino-bl-box-item"><b>Back</b></div>
@@ -309,17 +330,7 @@ const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
                                         <div className="remark-icon">
                                             <img src="https://wver.sprintstaticdata.com/v209/static/front/img/icons/remark.png" />
                                         </div>
-                                        <marquee>{currentGame?.remark || "Play Our New Game Premium Teenpatti 1 Day"}</marquee>
                                     </div>
-
-                                    {/* Last Results (conditionally placed or hidden for desktop via CSS if necessary) */}
-                                    <LastResult
-                                        results={lastResults}
-                                        gameName={game_name}
-                                        resultPath={phpFile}
-                                        showRawLabel={true}
-                                        className="d-none-big" // Visible only on mobile
-                                    />
                                 </div>
                             </div>
                         </div>
@@ -334,4 +345,4 @@ const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
 
 };
 
-export default InstantTeenPatti3;
+export default InstantTeenPatti2;

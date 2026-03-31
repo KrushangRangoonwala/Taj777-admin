@@ -20,7 +20,18 @@ export const OddsBox = ({ type, level, odds, size, noVal, suspended, animateColo
     );
 };
 
-export const MarketTable = ({ title, id, children, showBetLock = true, showUserBook = false, min, max, remark, marketClass = "market-6", columnHeader_1 = false, columnHeader_2 = false, isLayFirst }) => {
+export const MarketTable = ({
+    title,
+    id,
+    children,
+    showBetLock = true,
+    showUserBook = false,
+    min,
+    max,
+    remark,
+    marketClass = "market-6",
+    column = [{ type: "back", title: "Back" }, { type: "lay", title: "Lay" }]
+}) => {
     const [isOpen, setIsOpen] = useState(true);
 
     return (
@@ -60,15 +71,9 @@ export const MarketTable = ({ title, id, children, showBetLock = true, showUserB
                                         </span>
                                     )}
                                 </div>
-                                {isLayFirst ?
-                                    <>
-                                        {columnHeader_2 && <div className={`${columnHeader_2.type} bl-title d-none-mobile`}>{columnHeader_2.title}</div>}
-                                        {columnHeader_1 && <div className={`${columnHeader_1.type} bl-title d-none-mobile`}>{columnHeader_1.title}</div>}
-                                    </>
-                                    : <>
-                                        {columnHeader_1 && <div className={`${columnHeader_1.type} bl-title d-none-mobile`}>{columnHeader_1.title}</div>}
-                                        {columnHeader_2 && <div className={`${columnHeader_2.type} bl-title d-none-mobile`}>{columnHeader_2.title}</div>}
-                                    </>}
+                                {column?.map((col, i) => (
+                                    <div key={i} className={`${col.type} bl-title d-none-mobile`}>{col.title}</div>
+                                ))}
                             </div>
                             {children}
                         </div>

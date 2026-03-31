@@ -322,7 +322,7 @@ export const gameType_To_details = {
         phpFile: "live_joker1.php",
         placeBetApi: "bet_place_joker1.php",
     },
-    "teen20c": {
+    "teenunique": {
         CODE: "UNIQUE_TEENPATTI",
         phpFile: "live_teenpatti_unique.php",
         placeBetApi: "bet_place_unique_teenpatti.php",

@@ -55,7 +55,7 @@ const menuItems = [
             { label: "Party Win Loss", href: "/admin/reports/profitloss" },
             { label: "Current Bets", href: "/admin/reports/currentbets" },
             { label: "User History", href: "/admin/reports/userhistory" },
-            { label: "General Lock", href: "/admin/settings/userlock" },
+            { label: "General Lock", href: "/admin/reports/userlock" },
             { label: "Our Casino Result", href: "/admin/reports/casinoresult" },
             { label: "Live Casino Result", href: "/admin/reports/livecasinoreport" },
             { label: "Sportbook Report", href: "/admin/reports/sportbookreport" },

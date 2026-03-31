@@ -31,6 +31,10 @@ import ProfitLoss from './pages/reports/ProfitLoss';
 import CurrentBets from './pages/reports/CurrentBets';
 import useSocket from './api/Socket/useSocket'
 import { setLiveDataBySport } from './store/slices/matchSlice'
+import UserHistory from './pages/reports/UserHistory'
+import GeneralLock from './pages/reports/GeneralLock'
+import CasinoResult from './pages/reports/CasinoResult'
+import LiveCasinoResult from './pages/reports/LiveCasinoResult'
 
 function putLiveFirst(arr) {
   if (arr && Array.isArray(arr)) {
@@ -153,7 +157,11 @@ function AppContent() {
           <Route path="admin/reports/bank" element={<Bank />} />
           <Route path="admin/reports/accountstatement" element={<AccountStatement />} />
           <Route path="admin/reports/profitloss" element={<ProfitLoss />} />
+          <Route path="admin/reports/userhistory" element={<UserHistory />} />
           <Route path="admin/reports/currentbets" element={<CurrentBets />} />
+          <Route path="admin/reports/userlock" element={<GeneralLock />} />
+          <Route path="admin/reports/casinoresult" element={<CasinoResult />} />
+          <Route path="admin/reports/livecasinoreport" element={<LiveCasinoResult />} />
           <Route path="admin/createaccount" element={<CreateAccount />} />
           <Route path="admin/game/details" element={
             <EventPage

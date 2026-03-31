@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import useSocket from "../../../api/Socket/useSocket";
 import { useGetFileData } from "../../../hooks/useGetFileData";
-import { getImage, getValueAfterDot, getIsSuspended } from "../../../utilies/helpers";
+import { getImage, getValueAfterDot, getIsSuspended, formatNumber } from "../../../utilies/helpers";
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import BetLimitInfo from "./components/BetLimitInfo";
 
 const BetBox = ({ market, marketName, nation, className = "", children, type = "back", handleOddsClick }) => {
     const suspended = getIsSuspended(market);
@@ -59,6 +60,14 @@ const TeenPatti1Day = ({ onBetSelection }) => {
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+    const [openRanges, setOpenRanges] = useState({});
+
+    const toggleRange = (id) => {
+        setOpenRanges((prev) => ({
+            ...prev,
+            [id]: !prev[id],
+        }));
+    };
 
     const socket = useSocket("casino");
 
@@ -196,7 +205,7 @@ const TeenPatti1Day = ({ onBetSelection }) => {
                                     setIsCardDrawerOpen={setIsCardDrawerOpen}
                                     CardsComponent={() => <Cards currentGame={currentGame} result_image={result_image} />}
                                     resultPath={phpFile}
-                                    showResults={false}
+                                    showRawLabel={true}
                                 />
 
                                 <div className="casino-detail">
@@ -216,10 +225,13 @@ const TeenPatti1Day = ({ onBetSelection }) => {
                                                     <b>Main</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <i data-toggle="collapse" data-target="#range1" aria-expanded="false" className="fas fa-info-circle collapsed"></i>
-                                                        <div id="range1" className="icon-range collapse">
-                                                            R:<span>100</span>-<span>5L</span>
-                                                        </div>
+                                                        <BetLimitInfo 
+                                                            id="range1" 
+                                                            openRanges={openRanges} 
+                                                            toggleRange={toggleRange} 
+                                                            min={getMarketBySid("1")?.min} 
+                                                            max={getMarketBySid("1")?.max} 
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="casino-bl-box">
@@ -236,10 +248,14 @@ const TeenPatti1Day = ({ onBetSelection }) => {
                                                     <b>Consecutive</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <i data-toggle="collapse" data-target="#range6" aria-expanded="false" className="fas fa-info-circle collapsed"></i>
-                                                        <div id="range6" className="icon-range collapse">
-                                                            R:<span>100</span>-<span>1L</span>
-                                                        </div>
+                                                        <BetLimitInfo 
+                                                            id="range6" 
+                                                            openRanges={openRanges} 
+                                                            toggleRange={toggleRange} 
+                                                            min={getMarketBySid("17")?.min} 
+                                                            max={getMarketBySid("17")?.max} 
+                                                            fallbackMax={100000}
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="casino-bl-box">
@@ -268,10 +284,13 @@ const TeenPatti1Day = ({ onBetSelection }) => {
                                                     <b>Main</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <i data-toggle="collapse" data-target="#range7" aria-expanded="false" className="fas fa-info-circle collapsed"></i>
-                                                        <div id="range7" className="icon-range collapse">
-                                                            R:<span>100</span>-<span>5L</span>
-                                                        </div>
+                                                        <BetLimitInfo 
+                                                            id="range7" 
+                                                            openRanges={openRanges} 
+                                                            toggleRange={toggleRange} 
+                                                            min={getMarketBySid("2")?.min} 
+                                                            max={getMarketBySid("2")?.max} 
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="casino-bl-box">
@@ -288,10 +307,14 @@ const TeenPatti1Day = ({ onBetSelection }) => {
                                                     <b>Consecutive</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <i data-toggle="collapse" data-target="#range12" aria-expanded="false" className="fas fa-info-circle collapsed"></i>
-                                                        <div id="range12" className="icon-range collapse">
-                                                            R:<span>100</span>-<span>1L</span>
-                                                        </div>
+                                                        <BetLimitInfo 
+                                                            id="range12" 
+                                                            openRanges={openRanges} 
+                                                            toggleRange={toggleRange} 
+                                                            min={getMarketBySid("18")?.min} 
+                                                            max={getMarketBySid("18")?.max} 
+                                                            fallbackMax={100000}
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="casino-bl-box">
@@ -317,10 +340,14 @@ const TeenPatti1Day = ({ onBetSelection }) => {
                                                 <div className="casino-nation-name mb-4">
                                                     <b>Odd</b>
                                                     <div className="float-right">
-                                                        <i data-toggle="collapse" data-target="#range13" className="fas fa-info-circle"></i>
-                                                        <div id="range13" className="collapse icon-range">
-                                                            R:<span>100</span>-<span>25K</span>
-                                                        </div>
+                                                        <BetLimitInfo 
+                                                            id="range13" 
+                                                            openRanges={openRanges} 
+                                                            toggleRange={toggleRange} 
+                                                            min={getMarketBySid("11")?.min} 
+                                                            max={getMarketBySid("11")?.max} 
+                                                            fallbackMax={25000}
+                                                        />
                                                     </div>
                                                 </div>
                                                 {[11, 12, 13, 14, 15, 16].map((sid, index) => (
@@ -336,10 +363,14 @@ const TeenPatti1Day = ({ onBetSelection }) => {
                                                 <div className="casino-nation-name mb-4">
                                                     <b>Even</b>
                                                     <div className="float-right">
-                                                        <i data-toggle="collapse" data-target="#range14" className="fas fa-info-circle"></i>
-                                                        <div id="range14" className="collapse icon-range">
-                                                            R:<span>100</span>-<span>25K</span>
-                                                        </div>
+                                                        <BetLimitInfo 
+                                                            id="range14" 
+                                                            openRanges={openRanges} 
+                                                            toggleRange={toggleRange} 
+                                                            min={getMarketBySid("11")?.min} 
+                                                            max={getMarketBySid("11")?.max} 
+                                                            fallbackMax={25000}
+                                                        />
                                                     </div>
                                                 </div>
                                                 {[11, 12, 13, 14, 15, 16].map((sid, index) => (
@@ -361,10 +392,14 @@ const TeenPatti1Day = ({ onBetSelection }) => {
                                                 <div className="casino-bl-box-item">
                                                     <b>Main</b>
                                                     <div className="float-right">
-                                                        <i data-toggle="collapse" data-target="#range1" className="fas fa-info-circle float-right"></i>
-                                                        <div id="range1" className="collapse icon-range">
-                                                            R:<span>100</span>-<span>5L</span>
-                                                        </div>
+                                                        <BetLimitInfo 
+                                                            id="range1_m" 
+                                                            openRanges={openRanges} 
+                                                            toggleRange={toggleRange} 
+                                                            min={getMarketBySid("1")?.min} 
+                                                            max={getMarketBySid("1")?.max} 
+                                                            iconClass="float-right"
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="casino-bl-box-item"><b>Back</b></div>
@@ -394,10 +429,15 @@ const TeenPatti1Day = ({ onBetSelection }) => {
                                                 <div className="casino-bl-box-item casino-card-img">
                                                     <b>Consecutive</b>
                                                     <div className="float-right">
-                                                        <i data-toggle="collapse" data-target="#range6" className="fas fa-info-circle float-right"></i>
-                                                        <div id="range6" className="collapse icon-range">
-                                                            R:<span>100</span>-<span>1L</span>
-                                                        </div>
+                                                        <BetLimitInfo 
+                                                            id="range6_m" 
+                                                            openRanges={openRanges} 
+                                                            toggleRange={toggleRange} 
+                                                            min={getMarketBySid("17")?.min} 
+                                                            max={getMarketBySid("17")?.max} 
+                                                            iconClass="float-right"
+                                                            fallbackMax={100000}
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="casino-bl-box-item"><b>Back</b></div>
@@ -427,10 +467,15 @@ const TeenPatti1Day = ({ onBetSelection }) => {
                                                 <div className="casino-bl-box-item casino-card-img">
                                                     <b>Cards</b>
                                                     <div className="float-right">
-                                                        <i data-toggle="collapse" data-target="#range7" className="fas fa-info-circle float-right"></i>
-                                                        <div id="range7" className="collapse icon-range">
-                                                            R:<span>100</span>-<span>25K</span>
-                                                        </div>
+                                                        <BetLimitInfo 
+                                                            id="range7_m" 
+                                                            openRanges={openRanges} 
+                                                            toggleRange={toggleRange} 
+                                                            min={getMarketBySid("11")?.min} 
+                                                            max={getMarketBySid("11")?.max} 
+                                                            iconClass="float-right"
+                                                            fallbackMax={25000}
+                                                        />
                                                     </div>
                                                 </div>
                                                 <div className="casino-bl-box-item"><b>Odd</b></div>

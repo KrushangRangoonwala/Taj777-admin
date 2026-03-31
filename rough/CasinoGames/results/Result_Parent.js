@@ -148,11 +148,10 @@ const RadioFilter = ({ id, label, value, checked, onChange, name = "example" }) 
 
 const Result_Parent = memo(({ mid, type, setMid }) => {
     console.log('### type', type); // output : goal
+    const midToPass = getValueAfterDot(mid);
     const [isLoading, setIsLoading] = useState(false);
-    const isMobile = useIsMobile();
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [resultData, setResultData] = useState();
-    const [roundDetails, setRoundDetails] = useState();
     const Component = ResultComponentMap[type];
     const casino_list = useSelector(state => state.casino.casino_list);
     const [time, setTime] = useState('');
@@ -180,13 +179,10 @@ const Result_Parent = memo(({ mid, type, setMid }) => {
 
     const isMatchTimeDown = useIsMobile(470) && !type.includes("superover") && !type.includes("cricketv3");
 
-    const roundId__ = roundDetails?.rid || roundDetails?.roundId || roundDetails?.mid;
+    const roundId__ = midToPass;
     const roundId = getValueAfterDot(roundId__);
 
-    const matchTime = roundDetails?.mtime || roundDetails?.matchTime || roundDetails?.time;
-
     async function getResultDataApi() {
-        const midToPass = getValueAfterDot(mid);
         setIsLoading(true);
         try {
             const response = await fetchResultById(midToPass, type);
@@ -195,10 +191,7 @@ const Result_Parent = memo(({ mid, type, setMid }) => {
             setTime(data?.result_time);
             if (data) {
                 setResultData(data);
-                const parsed = JSON.parse(data.data);
-                console.log('parsed', parsed);
-                setRoundDetails(parsed?.t1 || parsed?.[0]);
-                setBetData(response.betdata || []);
+                setBetData(response?.betdata || []);
             } else {
                 showToast({ isSuccess: false, message: response.message || "Details not available" })
             }

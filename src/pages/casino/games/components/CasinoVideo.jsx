@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { getValueAfterDot, getImage } from "../../../../utilies/helpers";
 import { useGetFileData } from "../../../../hooks/useGetFileData";
 import LastResult from "./LastResult";
+import Result_parent from "./Result_parent";
 
 const CasinoVideo = ({
     gameName,
@@ -17,8 +18,22 @@ const CasinoVideo = ({
     resultPath = "",
     showResults = true,
     showRawLabel = false,
+    showImage = false,
+    imagePath = "cards",
+    showCardDrawer = true,
+    titleExtra = null,
+    timerClassName = "",
+    isLastResultOpen: isLastResultOpenProp,
+    setIsLastResultOpen: setIsLastResultOpenProp,
 }) => {
-    const { result_image } = useGetFileData();
+    // const [isLastResultOpen, setIsLastResultOpen] = useState(false);
+    const [isResultModalOpen, setIsResultModalOpen] = useState(false);
+    const { game_type, result_image } = useGetFileData();
+    const [isLastResultOpenInternal, setIsLastResultOpenInternal] = useState(true);
+
+    console.log('isLastResultOpenProp !== undefined', isLastResultOpenProp !== undefined);
+    const isLastResultOpen = isLastResultOpenProp !== undefined ? isLastResultOpenProp : isLastResultOpenInternal;
+    const setIsLastResultOpen = setIsLastResultOpenProp !== undefined ? setIsLastResultOpenProp : setIsLastResultOpenInternal;
 
     const getTimerColorClass = () => {
         if (timeLeft <= 5) return "red";
@@ -32,12 +47,17 @@ const CasinoVideo = ({
     return (
         <div className="casino-video">
             {/* video */}
-            <div className="casino-video-title">
-                <span className="casino-name">{gameName}</span>
-                <span className="casino-video-rid">
-                    Round ID: {getValueAfterDot(roundId) || "Loading..."}
-                </span>
-            </div>
+            {(gameName || roundId || titleExtra) && (
+                <div className="casino-video-title">
+                    {gameName && <span className="casino-name">{gameName}</span>}
+                    {/* {roundId && ( */}
+                    <div className="casino-video-rid">
+                        Round ID: {getValueAfterDot(roundId) || "Loading..."}
+                    </div>
+                    {/* )} */}
+                    {titleExtra}
+                </div>
+            )}
 
             <div className="video-box-container">
                 <div className="video-box">
@@ -45,48 +65,50 @@ const CasinoVideo = ({
                 </div>
             </div>
 
-            <div className={`casino-video-cards ${isCardDrawerOpen ? "" : "hide-cards"}`}>
-                {/* cards */}
-                <div
-                    className="casino-cards-shuffle"
-                    onClick={() => setIsCardDrawerOpen(!isCardDrawerOpen)}
-                >
-                    <i className="fas fa-grip-lines-vertical"></i>
-                </div>
-                <div className="casino-video-cards-container">
-                    {CardsComponent ? (
-                        <CardsComponent />
-                    ) : (
-                        <div className="playerboardcards">
-                            <div className="dealer-name w-100 mb-1">Board</div>
-                            <div className="d-flex">
-                                {cards.map((card, index) => (
-                                    <span key={index} data-v-b64efdfa="">
-                                        <img
-                                            data-v-b64efdfa=""
-                                            src={getImage(card, result_image)}
-                                            alt={`card-${index}`}
-                                        />
-                                    </span>
-                                ))}
-                                {/* Fill up to 5 cards if less are provided initially */}
-                                {Array.from({ length: 5 - cards.length }).map((_, index) => (
-                                    <span key={`empty-${index}`} data-v-b64efdfa="">
-                                        <img
-                                            data-v-b64efdfa=""
-                                            src={getImage(1, result_image)}
-                                            alt="empty-card"
-                                        />
-                                    </span>
-                                ))}
+            {showCardDrawer && (
+                <div className={`casino-video-cards ${isCardDrawerOpen ? "" : "hide-cards"}`}>
+                    {/* cards */}
+                    <div
+                        className="casino-cards-shuffle"
+                        onClick={() => setIsCardDrawerOpen(!isCardDrawerOpen)}
+                    >
+                        <i className="fas fa-grip-lines-vertical"></i>
+                    </div>
+                    <div className="casino-video-cards-container">
+                        {CardsComponent ? (
+                            <CardsComponent />
+                        ) : (
+                            <div className="playerboardcards">
+                                <div className="dealer-name w-100 mb-1">Board</div>
+                                <div className="d-flex">
+                                    {cards.map((card, index) => (
+                                        <span key={index} data-v-b64efdfa="">
+                                            <img
+                                                data-v-b64efdfa=""
+                                                src={getImage(card, result_image)}
+                                                alt={`card-${index}`}
+                                            />
+                                        </span>
+                                    ))}
+                                    {/* Fill up to 5 cards if less are provided initially */}
+                                    {Array.from({ length: 5 - cards.length }).map((_, index) => (
+                                        <span key={`empty-${index}`} data-v-b64efdfa="">
+                                            <img
+                                                data-v-b64efdfa=""
+                                                src={getImage(1, result_image)}
+                                                alt="empty-card"
+                                            />
+                                        </span>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* timer */}
-            <div className="casino-timer">
+            <div className={`casino-timer ${timerClassName}`}>
                 <div data-v-07e7cfbb="" className="base-timer">
                     <svg
                         data-v-07e7cfbb=""
@@ -117,7 +139,6 @@ const CasinoVideo = ({
             </div>
 
             <div className="casino-video-right-icons">
-                {/* icons */}
                 <div title="Home" className="casino-video-home-icon">
                     <a href="/admin/casino/list" className="" style={{ color: "var(--text-highlight)" }}>
                         <i className="fas fa-home"></i>
@@ -126,8 +147,12 @@ const CasinoVideo = ({
                 <div title="Rules" className="casino-video-rules-icon">
                     <i className="fas fa-info-circle"></i>
                 </div>
-                <div title="Last Results" className="casino-video-lr-icon">
-                    <i className="fas fa-chevron-circle-up"></i>
+                <div
+                    title="Last Results"
+                    className="casino-video-lr-icon"
+                    onClick={() => setIsLastResultOpen(!isLastResultOpen)}
+                >
+                    <i className={`fas fa-chevron-circle-${isLastResultOpen ? "up" : "down"}`}></i>
                 </div>
             </div>
 
@@ -140,8 +165,15 @@ const CasinoVideo = ({
                     gameName={gameName}
                     resultPath={resultPath}
                     showRawLabel={showRawLabel}
+                    showImage={showImage}
+                    imagePath={imagePath}
+                    className={isLastResultOpen ? "" : "hide-lr"}
+                    isResultModalOpen={isResultModalOpen}
+                    setIsResultModalOpen={setIsResultModalOpen}
                 />
             )}
+
+            <Result_parent show={isResultModalOpen} onClose={() => setIsResultModalOpen(false)} result={[]} game_type={game_type} />
         </div>
     );
 };

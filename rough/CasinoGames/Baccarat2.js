@@ -365,7 +365,7 @@ img {
 .baccarat .tie .baccarat-bets-name {
     background-color: #11b24b;
     border-radius: 50%;
-    border: 2px solid #000;
+    border: 0px solid #000;
 }
 
 .baccarat .tie .baccarat-bets-name:hover {

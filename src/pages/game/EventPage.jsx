@@ -3,11 +3,33 @@ import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from 'react-router-dom';
 import { formatNumber, formatToUTCMinus8, getSportName } from "../../utilies/helpers";
 import { MarketTable, OddsBox } from './components/MarketComponents';
-import { MyBetsSidebar } from './components/Sidebars';
+import EventRightSidebar from './components/EventRightSidebar';
 import './blink.css';
 import useSocket from '../../api/Socket/useSocket';
 
 const format = (num) => Number(parseFloat(num).toFixed(2)).toString();
+
+function getExposureColor(exposure = 0) {
+    return exposure < 0 ? "red" : exposure > 0 ? "green" : "rgb(153, 153, 153)";
+}
+
+function Exposure({ exposure = 0, pr }) {
+    return (
+        <p className="mb-0" style={{ color: getExposureColor(exposure) }}>
+            {exposure}
+            {pr && <span className="badge badge-dark book-per">{pr}</span>}
+        </p>
+    )
+}
+
+function ExposureMob({ exposure = 0, pr }) {
+    return (
+        <span className="mb-0" style={{ color: getExposureColor(exposure) }}>
+            {exposure}
+            {pr && <span className="badge badge-dark book-per">{pr}</span>}
+        </span>
+    )
+}
 
 function normalizeBookmakerSmall(session = []) {
     return session
@@ -154,14 +176,14 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
 
     useEffect(() => {
         if (socketData) {
-            setNormalData(filterRecord(socketData?.body?.session[0]?.value?.session, false));
-            setFancy1(filterRecord(socketData?.body?.session1[0]?.value?.session, false));
-            setOddEven(filterRecord(socketData?.body?.oddEven[0]?.value?.session));
-            setOverByOver(filterRecord(socketData?.body?.overByOver[0]?.value?.session));
-            setBallByBall(filterRecord(socketData?.body?.ballByBall[0]?.value?.session));
-            setKhado(filterRecord(socketData?.body?.khado[0]?.value?.session, false));
-            setMeter(filterRecord(socketData?.body?.meter[0]?.value?.session));
-            setCricketcasino(socketData?.body?.cricketcasino[0]?.value?.session);
+            setNormalData(filterRecord(socketData?.body?.session?.[0]?.value?.session, false));
+            setFancy1(filterRecord(socketData?.body?.session1?.[0]?.value?.session, false));
+            setOddEven(filterRecord(socketData?.body?.oddEven?.[0]?.value?.session));
+            setOverByOver(filterRecord(socketData?.body?.overByOver?.[0]?.value?.session));
+            setBallByBall(filterRecord(socketData?.body?.ballByBall?.[0]?.value?.session));
+            setKhado(filterRecord(socketData?.body?.khado?.[0]?.value?.session, false));
+            setMeter(filterRecord(socketData?.body?.meter?.[0]?.value?.session));
+            setCricketcasino(socketData?.body?.cricketcasino?.[0]?.value?.session);
 
             const bmSession = socketData?.body?.bm1?.[0]?.value?.session;
             if (bmSession) {
@@ -351,7 +373,19 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
         );
     }
 
-    function Double_Column_Section({ title, sectionId, data, isAllBackBox, bet_market_type, isLayFirst, is_1_OddBox, min, max, marketClass = "market-6" }) {
+    function Double_Column_Section({
+        title,
+        sectionId,
+        data,
+        isAllBackBox,
+        bet_market_type,
+        isLayFirst,
+        is_1_OddBox,
+        min,
+        max,
+        marketClass = "market-6",
+        column = [{ type: "back", title: "Back" }, { type: "lay", title: "Lay" }]
+    }) {
         addSectionIfNotExist(sectionId);
         if (!data?.length) return null;
 
@@ -362,9 +396,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                 min={min}
                 max={max}
                 marketClass={marketClass}
-                isLayFirst={isLayFirst}
-                columnHeader_1={{ type: "back", title: isAllBackBox ? "Odd" : "Back" }}
-                columnHeader_2={is_1_OddBox ? null : { type: isAllBackBox ? "back" : "lay", title: isAllBackBox ? "Even" : "Lay" }}
+                column={column}
             >
                 {data.map((item, index) => {
                     let exposure = getExposureByMarketId({ data: openedBetPoint, marketId: item.marketId, key: bet_market_type }) || getExposureByMarketId({ data: livePoints, marketId: item.marketId, key: bet_market_type });
@@ -375,13 +407,13 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                             <div className="bet-table-mobile-row d-none-desktop">
                                 <div className="bet-table-mobile-team-name">
                                     <span>{item.RunnerName}</span>
+                                    <ExposureMob />
                                 </div>
                             </div>
                             <div className="bet-table-row">
                                 <div className="nation-name d-none-mobile">
                                     <p className="two-line-text">{item.RunnerName}</p>
-                                    <p className="mb-0" style={{ color: "rgb(153, 153, 153)" }}>0</p>
-                                    <div style={getExposureCss(exposure)}>{exposure}</div>
+                                    <Exposure />
                                 </div>
                                 {isSuspendedMarker ? (
                                     <div data-title={item.Active} className="suspendedtext2">
@@ -415,8 +447,6 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                 min={min}
                 max={max}
                 marketClass="market-4"
-                columnHeader_1={{ type: "back", title: "Back" }}
-                columnHeader_2={{ type: "lay", title: "Lay" }}
             >
                 {data2.map((d, idx) => {
                     let exposure = getExposureByMarketId({ data: openedBetPoint, marketId: d.id, key: bet_market_type }) || getExposureByMarketId({ data: livePoints, marketId: d.id, key: bet_market_type });
@@ -426,14 +456,13 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                         <React.Fragment key={idx}>
                             <div className="bet-table-mobile-row d-none-desktop">
                                 <div className="bet-table-mobile-team-name">
-                                    <span>{d.name}</span> <span style={getExposureCss(exposure)}>{exposure}</span>
+                                    <span>{d.name}</span> <ExposureMob />
                                 </div>
                             </div>
                             <div className="bet-table-row">
                                 <div className="nation-name d-none-mobile">
                                     <p>{d.name}</p>
-                                    <p className="mb-0" style={{ color: "rgb(153, 153, 153)" }}>0</p>
-                                    <div style={getExposureCss(exposure)}>{exposure}</div>
+                                    <Exposure />
                                 </div>
                                 {isSuspendedMarker ? (
                                     <div data-title={d.status} className="suspendedtext2 w-100">
@@ -462,8 +491,6 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                 min={min}
                 max={max}
                 marketClass="market-2"
-                columnHeader_1={{ type: "back", title: "Back" }}
-                columnHeader_2={{ type: "lay", title: "Lay" }}
             >
                 {data.map((b, idx) => {
                     const status = b.status || b.Active;
@@ -494,14 +521,13 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                             <div className="bet-table-mobile-row d-none-desktop">
                                 <div className="bet-table-mobile-team-name">
                                     <span>{item.RunnerName}</span>
-                                    <span style={getExposureCss(exposure)}>{exposure}</span>
+                                    <ExposureMob />
                                 </div>
                             </div>
                             <div className="bet-table-row">
                                 <div className="nation-name d-none-mobile">
                                     <p>{item.RunnerName}</p>
-                                    <p className="mb-0" style={{ color: "rgb(153, 153, 153)" }}>0</p>
-                                    <div style={getExposureCss(exposure)}>{exposure}</div>
+                                    <Exposure />
                                 </div>
                                 {isSuspendedMarker ? (
                                     <div data-title={status} className="suspendedtext2 w-100">
@@ -565,42 +591,142 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                             <>
                                 {selectedMatch?.SportId != 4 && <CricketMarkets isTied={false} />}
 
-                                <Single_Column_Section isDisplay={selectedMatch?.SportId == 4} sectionId="match_odds" title={match_Odds?.marketName} data={match_Odds} isCommonMinMax={true} bet_market_type={getTitle(match_Odds?.marketName)} min={match_Odds?.minBet} max={match_Odds?.maxBet} />
+                                <Single_Column_Section
+                                    isDisplay={selectedMatch?.SportId == 4}
+                                    sectionId="match_odds"
+                                    title={match_Odds?.marketName}
+                                    data={match_Odds}
+                                    isCommonMinMax={true}
+                                    bet_market_type={getTitle(match_Odds?.marketName)}
+                                    min={match_Odds?.minBet}
+                                    max={match_Odds?.maxBet}
+                                />
 
-                                <Single_Column_Section isDisplay={selectedMatch?.SportId == 4} sectionId="bookmaker_odds" title="Bookmaker" data={bookmaker_odds} bet_market_type="BOOKMAKER_ODDS" min={match_Odds?.min} max={match_Odds?.max} />
+                                <Single_Column_Section
+                                    isDisplay={selectedMatch?.SportId == 4}
+                                    sectionId="bookmaker_odds"
+                                    title="Bookmaker"
+                                    data={bookmaker_odds}
+                                    bet_market_type="BOOKMAKER_ODDS"
+                                    min={match_Odds?.min}
+                                    max={match_Odds?.max}
+                                />
 
-                                <Bookmaker isDisplay={selectedMatch?.SportId == 4} sectionId="bookmaker_tied_odds" title="Tied Match" data={bookmaker_tied_odds} bet_market_type="BOOKMAKER_TIED_ODDS" min={match_Odds?.min_tied} max={match_Odds?.max_tied} />
+                                <Bookmaker
+                                    isDisplay={selectedMatch?.SportId == 4}
+                                    sectionId="bookmaker_tied_odds"
+                                    title="Tied Match"
+                                    data={bookmaker_tied_odds}
+                                    bet_market_type="BOOKMAKER_TIED_ODDS"
+                                    min={match_Odds?.min_tied}
+                                    max={match_Odds?.max_tied}
+                                />
 
-                                <Bookmaker title="Bookmaker 2" data={bookmakerSmall} sectionId="market6" min={bookmakerSmall?.[0]?.Min} max={bookmakerSmall?.[0]?.Max} isSmall={true} bet_market_type="BOOKMAKERSMALL_ODDS" isDisplay={true} />
+                                <Bookmaker
+                                    title="Bookmaker 2"
+                                    data={bookmakerSmall}
+                                    sectionId="market6"
+                                    min={bookmakerSmall?.[0]?.Min}
+                                    max={bookmakerSmall?.[0]?.Max}
+                                    isSmall={true}
+                                    bet_market_type="BOOKMAKERSMALL_ODDS"
+                                    isDisplay={true}
+                                />
 
-                                <Double_Column_Section title="Normal" sectionId="market2" data={normalData} isAllBackBox={false} bet_market_type="FANCY_ODDS" isLayFirst={true} />
+                                <Double_Column_Section
+                                    title="Normal"
+                                    sectionId="market2"
+                                    data={normalData}
+                                    isAllBackBox={false}
+                                    bet_market_type="FANCY_ODDS"
+                                    isLayFirst={true}
+                                    column={[{ type: "lay", title: "No" }, { type: "back", title: "Yes" }]}
+                                />
 
-                                <Double_Column_Section title="Oddeven" sectionId="market3" data={oddEven} isAllBackBox={true} bet_market_type="FANCY_ODDS" />
+                                <Double_Column_Section
+                                    title="Oddeven"
+                                    sectionId="market3"
+                                    data={oddEven}
+                                    isAllBackBox={true}
+                                    bet_market_type="FANCY_ODDS"
+                                    column={[{ type: "back", title: "Odd" }, { type: "back", title: "Even" }]}
+                                />
 
-                                <Double_Column_Section title="OverByOver" sectionId="market33" data={overByOver} isAllBackBox={true} bet_market_type="FANCY_ODDS" />
+                                <Double_Column_Section
+                                    title="OverByOver"
+                                    sectionId="market33"
+                                    data={overByOver}
+                                    isAllBackBox={true}
+                                    bet_market_type="FANCY_ODDS"
+                                />
 
-                                <Double_Column_Section title="BallByBall" sectionId="market333" data={ballByBall} isAllBackBox={true} bet_market_type="FANCY_ODDS" />
+                                <Double_Column_Section
+                                    title="BallByBall"
+                                    sectionId="market333"
+                                    data={ballByBall}
+                                    isAllBackBox={true}
+                                    bet_market_type="FANCY_ODDS"
+                                />
 
-                                <Double_Column_Section title="Fancy1" sectionId="market3334" data={fancy1} isAllBackBox={false} bet_market_type="FANCY_ODDS" />
+                                <Double_Column_Section
+                                    title="Fancy1"
+                                    sectionId="market3334"
+                                    data={fancy1}
+                                    isAllBackBox={false}
+                                    bet_market_type="FANCY_ODDS"
+                                    column={[{ type: "back", title: "Back" }, { type: "lay", title: "Lay" }]}
+                                />
 
-                                <Double_Column_Section title="Khado" sectionId="market3333" data={khado} isAllBackBox={true} bet_market_type="KHADO_ODDS" is_1_OddBox={true} />
+                                <Double_Column_Section
+                                    title="Khado"
+                                    sectionId="market3333"
+                                    data={khado}
+                                    isAllBackBox={true}
+                                    bet_market_type="KHADO_ODDS"
+                                    is_1_OddBox={true}
+                                    column={[{ type: "back", title: "Back" }]}
+                                />
 
-                                <Double_Column_Section title="Meter" sectionId="market33333" data={meter} bet_market_type="METER_ODDS" isLayFirst={true} />
+                                <Double_Column_Section
+                                    title="Meter"
+                                    sectionId="market33333"
+                                    data={meter}
+                                    bet_market_type="METER_ODDS"
+                                    isLayFirst={true}
+                                    column={[{ type: "lay", title: "No" }, { type: "back", title: "Yes" }]}
+                                />
 
                                 {selectedMatch?.SportId != 4 && <CricketMarkets isTied={true} />}
 
                                 {cricketcasino?.map((section, idx) => (
-                                    <Double_Column_Section key={idx} title={section?.[0].header} sectionId={getTitle(section?.[0].header)} data={section} bet_market_type={getTitle(section?.[0].header)} is_1_OddBox={true} marketClass="market-9" />
+                                    <Double_Column_Section
+                                        key={idx}
+                                        title={section?.[0].header}
+                                        sectionId={getTitle(section?.[0].header)}
+                                        data={section}
+                                        bet_market_type={getTitle(section?.[0].header)}
+                                        is_1_OddBox={true}
+                                        marketClass="market-9"
+                                    />
                                 ))}
 
-                                <Single_Column_Section isDisplay={selectedMatch?.SportId == 4} sectionId="tied_match" title={tied_match?.marketName} data={tied_match} isCommonMinMax={true} bet_market_type="TIED_MATCH" min={tied_match?.minBet} max={tied_match?.maxBet} />
+                                <Single_Column_Section
+                                    isDisplay={selectedMatch?.SportId == 4}
+                                    sectionId="tied_match"
+                                    title={tied_match?.marketName}
+                                    data={tied_match}
+                                    isCommonMinMax={true}
+                                    bet_market_type="TIED_MATCH"
+                                    min={tied_match?.minBet}
+                                    max={tied_match?.maxBet}
+                                />
                             </>
                         ) : (
                             <div style={{ color: 'white', textAlign: 'center', padding: '20px' }}>Loading live data...</div>
                         )}
                     </div>
                 </div>
-                <MyBetsSidebar />
+                <EventRightSidebar />
             </div>
         </div>
     );

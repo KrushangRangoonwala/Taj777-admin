@@ -4,6 +4,7 @@ import { useGetFileData } from "../../../hooks/useGetFileData";
 // import { fetchCasinoExposureApi } from "../../../api/API";
 import { getImage, getMarketByNation, getValueAfterDot, getIsSuspended } from "../../../utilies/helpers";
 import CasinoVideo from "./components/CasinoVideo";
+import CasinoRightSidebar from "./components/CasinoRightSidebar";
 
 const OneCard1day = ({ onBetSelection, lastBetTime }) => {
     const { CODE, game_type, phpFile, game_name, iframe_url, result_image } = useGetFileData();
@@ -170,204 +171,212 @@ const OneCard1day = ({ onBetSelection, lastBetTime }) => {
     const playerBCards = [currentGame?.C3, currentGame?.C4].filter(Boolean);
 
     return (
-        <div className="casino-container">
-            <div className="casino-table poker1day">
-                <CasinoVideo
-                    roundId={currentGame?.mid}
-                    videoSrc={iframe_url}
-                    cards={boardCards}
-                    results={gameData?.last_results || []}
-                    timeLeft={currentGame?.autotime || 0}
-                    totalTime={currentGame?.ft || 30}
-                    isCardDrawerOpen={isCardDrawerOpen}
-                    setIsCardDrawerOpen={setIsCardDrawerOpen}
-                />
+        <div data-v-5a10e370="" className="detail-page-container">
+            <div className="center-main-container">
+                <div className="center-content">
+                    <div className="casino-container">
+                        <div className="casino-table poker1day">
+                            <CasinoVideo
+                                roundId={currentGame?.mid}
+                                videoSrc={iframe_url}
+                                cards={boardCards}
+                                results={gameData?.last_results || []}
+                                timeLeft={currentGame?.autotime || 0}
+                                totalTime={currentGame?.ft || 30}
+                                isCardDrawerOpen={isCardDrawerOpen}
+                                setIsCardDrawerOpen={setIsCardDrawerOpen}
+                            />
 
-                <div className="casino-detail">
-                    {/* Player A Box */}
-                    <div className="playerabox">
-                        <div className="casino-box-row playerafabcy">
-                            <div className="casino-nation-name">
-                                <div className="float-left mr-2">
-                                    <i data-toggle="collapse" data-target="#demo1" className="fas fa-info-circle"></i>
-                                    <div id="demo1" class="collapse icon-range">
-                                        R:<span>100</span>-<span>3L</span>
+                            <div className="casino-detail">
+                                {/* Player A Box */}
+                                <div className="playerabox">
+                                    <div className="casino-box-row playerafabcy">
+                                        <div className="casino-nation-name">
+                                            <div className="float-left mr-2">
+                                                <i data-toggle="collapse" data-target="#demo1" className="fas fa-info-circle"></i>
+                                                <div id="demo1" class="collapse icon-range">
+                                                    R:<span>100</span>-<span>3L</span>
+                                                </div>
+                                            </div>
+                                            <b>Player A</b>
+                                        </div>
+                                        <div className="casino-bl-box">
+                                            <BetBox marketName="Player A" className="back casino-bl-box-item" type="back">
+                                                {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                            </BetBox>
+                                            <BetBox marketName="Player A" className="lay casino-bl-box-item" type="lay">
+                                                {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                            </BetBox>
+                                        </div>
+                                    </div>
+                                    <div className="casino-nation-name text-center w-100">
+                                        {/* {renderExposure(getMarketByName("Player A")?.sid)} */}
+                                    </div>
+
+                                    {/* Bonus Section for Player A */}
+                                    <div className="casino-box poker1dayother mt-2">
+                                        <div className="casino-bl-box">
+                                            <div className="odds-min-max">
+                                                <span className="float-right casino-min-max pr-2">
+                                                    <i data-toggle="collapse" data-target="#demo2" className="fas fa-info-circle"></i>
+                                                    <div id="demo2" className="collapse icon-range">
+                                                        R:<span>100</span>-<span>50K</span>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <div className="odds-min-max pl-2">
+                                                <span className="float-right casino-min-max">
+                                                    <i data-toggle="collapse" data-target="#demo3" className="fas fa-info-circle"></i>
+                                                    <div id="demo3" className="collapse icon-range">
+                                                        R:<span>100</span>-<span>50K</span>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="casino-bl-box">
+                                            <BetBox marketName="2 Cards Bonus A" className="casino-bl-box-item back" type="back">
+                                                {() => <span className="casino-box-odd">
+                                                    2 Cards Bonus
+                                                </span>}
+                                            </BetBox>
+                                            <BetBox marketName="7 Cards Bonus A" className="casino-bl-box-item back" type="back">
+                                                {() => <span className="casino-box-odd">7 Cards Bonus</span>}
+                                            </BetBox>
+                                        </div>
+                                        <div className="casino-bl-box">
+                                            <div className="odds-min-max">
+                                                {/* {renderExposure(getMarketByName("2 Cards Bonus A")?.sid)} */}
+                                            </div>
+                                            <div className="odds-min-max">
+                                                {/* {renderExposure(getMarketByName("7 Cards Bonus A")?.sid)} */}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <b>Player A</b>
-                            </div>
-                            <div className="casino-bl-box">
-                                <BetBox marketName="Player A" className="back casino-bl-box-item" type="back">
-                                    {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
-                                </BetBox>
-                                <BetBox marketName="Player A" className="lay casino-bl-box-item" type="lay">
-                                    {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
-                                </BetBox>
-                            </div>
-                        </div>
-                        <div className="casino-nation-name text-center w-100">
-                            {/* {renderExposure(getMarketByName("Player A")?.sid)} */}
-                        </div>
 
-                        {/* Bonus Section for Player A */}
-                        <div className="casino-box poker1dayother mt-2">
-                            <div className="casino-bl-box">
-                                <div className="odds-min-max">
-                                    <span className="float-right casino-min-max pr-2">
-                                        <i data-toggle="collapse" data-target="#demo2" className="fas fa-info-circle"></i>
-                                        <div id="demo2" className="collapse icon-range">
-                                            R:<span>100</span>-<span>50K</span>
+                                {/* Card box between Player A and B */}
+                                <div className="playerabcardbox">
+                                    <div className="poker-icon">
+                                        <img src="https://wver.sprintstaticdata.com/v208/static/front/img/poker.png" alt="poker-icon" />
+                                    </div>
+                                    <div className="row row5 w-100">
+                                        <div className="col-12 col-md-6">
+                                            <div className="dealer-name playera">Player A</div>
+                                            <div className="mt-1">
+                                                {playerACards.map((card, index) => (
+                                                    <span key={index} data-v-b64efdfa="">
+                                                        <img
+                                                            data-v-b64efdfa=""
+                                                            src={getImage(card, result_image)}
+                                                            alt={`player-a-card-${index}`}
+                                                        />
+                                                    </span>
+                                                ))}
+                                                {Array.from({ length: Math.max(0, 2 - playerACards.length) }).map((_, index) => (
+                                                    <span key={`empty-a-${index}`} data-v-b64efdfa="">
+                                                        <img data-v-b64efdfa="" src={getImage(1, result_image)} alt="empty" />
+                                                    </span>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </span>
-                                </div>
-                                <div className="odds-min-max pl-2">
-                                    <span className="float-right casino-min-max">
-                                        <i data-toggle="collapse" data-target="#demo3" className="fas fa-info-circle"></i>
-                                        <div id="demo3" className="collapse icon-range">
-                                            R:<span>100</span>-<span>50K</span>
+                                        <div className="col-12 col-md-6 text-right">
+                                            <div className="dealer-name playerb">Player B</div>
+                                            <div className="mt-1">
+                                                {playerBCards.map((card, index) => (
+                                                    <span key={index} data-v-b64efdfa="">
+                                                        <img
+                                                            data-v-b64efdfa=""
+                                                            src={getImage(card, result_image)}
+                                                            alt={`player-b-card-${index}`}
+                                                        />
+                                                    </span>
+                                                ))}
+                                                {Array.from({ length: Math.max(0, 2 - playerBCards.length) }).map((_, index) => (
+                                                    <span key={`empty-b-${index}`} data-v-b64efdfa="">
+                                                        <img data-v-b64efdfa="" src={getImage(1, result_image)} alt="empty" />
+                                                    </span>
+                                                ))}
+                                            </div>
                                         </div>
-                                    </span>
-                                </div>
-                            </div>
-                            <div className="casino-bl-box">
-                                <BetBox marketName="2 Cards Bonus A" className="casino-bl-box-item back" type="back">
-                                    {() => <span className="casino-box-odd">
-                                        2 Cards Bonus
-                                    </span>}
-                                </BetBox>
-                                <BetBox marketName="7 Cards Bonus A" className="casino-bl-box-item back" type="back">
-                                    {() => <span className="casino-box-odd">7 Cards Bonus</span>}
-                                </BetBox>
-                            </div>
-                            <div className="casino-bl-box">
-                                <div className="odds-min-max">
-                                    {/* {renderExposure(getMarketByName("2 Cards Bonus A")?.sid)} */}
-                                </div>
-                                <div className="odds-min-max">
-                                    {/* {renderExposure(getMarketByName("7 Cards Bonus A")?.sid)} */}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Card box between Player A and B */}
-                    <div className="playerabcardbox">
-                        <div className="poker-icon">
-                            <img src="https://wver.sprintstaticdata.com/v208/static/front/img/poker.png" alt="poker-icon" />
-                        </div>
-                        <div className="row row5 w-100">
-                            <div className="col-12 col-md-6">
-                                <div className="dealer-name playera">Player A</div>
-                                <div className="mt-1">
-                                    {playerACards.map((card, index) => (
-                                        <span key={index} data-v-b64efdfa="">
-                                            <img
-                                                data-v-b64efdfa=""
-                                                src={getImage(card, result_image)}
-                                                alt={`player-a-card-${index}`}
-                                            />
-                                        </span>
-                                    ))}
-                                    {Array.from({ length: Math.max(0, 2 - playerACards.length) }).map((_, index) => (
-                                        <span key={`empty-a-${index}`} data-v-b64efdfa="">
-                                            <img data-v-b64efdfa="" src={getImage(1, result_image)} alt="empty" />
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className="col-12 col-md-6 text-right">
-                                <div className="dealer-name playerb">Player B</div>
-                                <div className="mt-1">
-                                    {playerBCards.map((card, index) => (
-                                        <span key={index} data-v-b64efdfa="">
-                                            <img
-                                                data-v-b64efdfa=""
-                                                src={getImage(card, result_image)}
-                                                alt={`player-b-card-${index}`}
-                                            />
-                                        </span>
-                                    ))}
-                                    {Array.from({ length: Math.max(0, 2 - playerBCards.length) }).map((_, index) => (
-                                        <span key={`empty-b-${index}`} data-v-b64efdfa="">
-                                            <img data-v-b64efdfa="" src={getImage(1, result_image)} alt="empty" />
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Player B Box */}
-                    <div className="playerbbox">
-                        <div className="casino-box-row playerbfabcy">
-                            <div className="casino-nation-name">
-                                <div className="float-left mr-2">
-                                    <i data-toggle="collapse" data-target="#demo4" className="fas fa-info-circle"></i>
-                                    <div id="demo4" className="collapse icon-range">
-                                        R:<span>100</span>-<span>3L</span>
                                     </div>
                                 </div>
-                                <b>Player B</b>
-                            </div>
-                            <div className="casino-bl-box">
-                                <BetBox marketName="Player B" className="back casino-bl-box-item" type="back">
-                                    {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
-                                </BetBox>
-                                <BetBox marketName="Player B" className="lay casino-bl-box-item" type="lay">
-                                    {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
-                                </BetBox>
-                            </div>
-                        </div>
-                        <div className="casino-nation-name text-center w-100">
-                            {/* {renderExposure(getMarketByName("Player B")?.sid)} */}
-                        </div>
 
-                        {/* Bonus Section for Player B */}
-                        <div className="casino-box poker1dayother mt-2">
-                            <div className="casino-bl-box">
-                                <div className="odds-min-max">
-                                    <span className="float-right casino-min-max pr-2">
-                                        <i data-toggle="collapse" data-target="#demo5" className="fas fa-info-circle"></i>
-                                        <div id="demo5" className="collapse icon-range">
-                                            R:<span>100</span>-<span>50K</span>
+                                {/* Player B Box */}
+                                <div className="playerbbox">
+                                    <div className="casino-box-row playerbfabcy">
+                                        <div className="casino-nation-name">
+                                            <div className="float-left mr-2">
+                                                <i data-toggle="collapse" data-target="#demo4" className="fas fa-info-circle"></i>
+                                                <div id="demo4" className="collapse icon-range">
+                                                    R:<span>100</span>-<span>3L</span>
+                                                </div>
+                                            </div>
+                                            <b>Player B</b>
                                         </div>
-                                    </span>
-                                </div>
-                                <div className="odds-min-max pl-2">
-                                    <span className="float-right casino-min-max">
-                                        <i data-toggle="collapse" data-target="#demo6" className="fas fa-info-circle"></i>
-                                        <div id="demo6" className="collapse icon-range">
-                                            R:<span>100</span>-<span>50K</span>
+                                        <div className="casino-bl-box">
+                                            <BetBox marketName="Player B" className="back casino-bl-box-item" type="back">
+                                                {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                            </BetBox>
+                                            <BetBox marketName="Player B" className="lay casino-bl-box-item" type="lay">
+                                                {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
+                                            </BetBox>
                                         </div>
-                                    </span>
+                                    </div>
+                                    <div className="casino-nation-name text-center w-100">
+                                        {/* {renderExposure(getMarketByName("Player B")?.sid)} */}
+                                    </div>
+
+                                    {/* Bonus Section for Player B */}
+                                    <div className="casino-box poker1dayother mt-2">
+                                        <div className="casino-bl-box">
+                                            <div className="odds-min-max">
+                                                <span className="float-right casino-min-max pr-2">
+                                                    <i data-toggle="collapse" data-target="#demo5" className="fas fa-info-circle"></i>
+                                                    <div id="demo5" className="collapse icon-range">
+                                                        R:<span>100</span>-<span>50K</span>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                            <div className="odds-min-max pl-2">
+                                                <span className="float-right casino-min-max">
+                                                    <i data-toggle="collapse" data-target="#demo6" className="fas fa-info-circle"></i>
+                                                    <div id="demo6" className="collapse icon-range">
+                                                        R:<span>100</span>-<span>50K</span>
+                                                    </div>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="casino-bl-box">
+                                            <BetBox marketName="2 Cards Bonus B" className="casino-bl-box-item back" type="back">
+                                                {() => <span className="casino-box-odd">2 Cards Bonus</span>}
+                                            </BetBox>
+                                            <BetBox marketName="7 Cards Bonus B" className="casino-bl-box-item back" type="back">
+                                                {() => <span className="casino-box-odd">7 Cards Bonus</span>}
+                                            </BetBox>
+                                        </div>
+                                        <div className="casino-bl-box">
+                                            <div className="odds-min-max">
+                                                {/* {renderExposure(getMarketByName("2 Cards Bonus B")?.sid)} */}
+                                            </div>
+                                            <div className="odds-min-max">
+                                                {/* {renderExposure(getMarketByName("7 Cards Bonus B")?.sid)} */}
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="casino-bl-box">
-                                <BetBox marketName="2 Cards Bonus B" className="casino-bl-box-item back" type="back">
-                                    {() => <span className="casino-box-odd">2 Cards Bonus</span>}
-                                </BetBox>
-                                <BetBox marketName="7 Cards Bonus B" className="casino-bl-box-item back" type="back">
-                                    {() => <span className="casino-box-odd">7 Cards Bonus</span>}
-                                </BetBox>
-                            </div>
-                            <div className="casino-bl-box">
-                                <div className="odds-min-max">
-                                    {/* {renderExposure(getMarketByName("2 Cards Bonus B")?.sid)} */}
-                                </div>
-                                <div className="odds-min-max">
-                                    {/* {renderExposure(getMarketByName("7 Cards Bonus B")?.sid)} */}
+
+                                <div className="casino-remark mt-3">
+                                    <div className="remark-icon">
+                                        <img src="https://wver.sprintstaticdata.com/v208/static/front/img/icons/remark.png" alt="remark-icon" />
+                                    </div>
+                                    <marquee>Play Our New Game Premium Teenpatti 1 Day</marquee>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                    <div className="casino-remark mt-3">
-                        <div className="remark-icon">
-                            <img src="https://wver.sprintstaticdata.com/v208/static/front/img/icons/remark.png" alt="remark-icon" />
-                        </div>
-                        <marquee>Play Our New Game Premium Teenpatti 1 Day</marquee>
-                    </div>
                 </div>
+                <CasinoRightSidebar />
             </div>
         </div>
     );

@@ -14277,6 +14277,18 @@ market-analysis .page-title-box h4 a {
     top: 50%;
 }
 
+.super-over .casino-timer {
+    right: 15px !important;
+    bottom: 15px !important;
+    left: unset !important;
+    top: unset !important;
+    transform: unset !important;
+}
+
+.super-over .casino-video {
+    margin-top: 0 !important;
+}
+
 /*Roulette*/
 .roulette-box-container {
     width: 100%;

@@ -25,7 +25,7 @@ export const loginAdmin = async (email, password) => {
 
   try {
     const response = await axiosInstance.post('login.php', params);
-    
+
     if (response.data.status === "ok") {
       return {
         status: "ok",
@@ -41,7 +41,7 @@ export const loginAdmin = async (email, password) => {
     console.error('Error status:', error.response?.status);
     throw error;
   }
- 
+
 };
 
 export const fetchCasinoList = async () => {
@@ -128,5 +128,69 @@ export async function getCurrentBets(payload) {
   } catch (error) {
     console.error("Error fetching profit loss:", error);
     throw error;
+  }
+}
+
+export async function getUserHistory(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await axiosInstance.post("user_history", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching history:", error);
+    throw error;
+  }
+}
+export async function getCasinoResult(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await axiosInstance.post("casino_result", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching history:", error);
+    throw error;
+  }
+}
+export async function fetchDashboardData() {
+  try {
+    const payload = { ...getDefaultParams() };
+    const { data } = await axiosInstance.post("get_dashboard_data.php", payload);  // DUMMY URL
+    return data;
+  } catch (error) {
+    console.error("Error fetching dashboard data:", error);
+    throw error;
+  }
+}
+
+export async function fetchTeenpattiResult(mid) {
+  try {
+    const response = await axiosInstance.get(`https://worlds777.app/ajaxfiles/teenpatti_result?mid=${mid}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching teenpatti result:", error);
+    throw error;
+  }
+}
+
+export async function fetchResultById(eventId, gameType) {
+  try {
+    const requestBody = {
+      event_id: eventId || "",
+      game_type: gameType || "teen",
+      ...getDefaultParams(),
+    };
+
+    const { data } = await axiosInstance.post("teenpatti_result", requestBody);
+    isApiSuccess(data);
+    return data;
+  } catch (error) {
+    console.error("Error fetching teenpatti results:", error);
+    return null;
   }
 }

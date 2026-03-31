@@ -30,7 +30,6 @@ export function formatToUTCMinus8(dateString) {
 
 // console.log("@@@@@@@@@@@@@@@@@@", formatToUTCMinus8("2/12/2026 2:00:17 AM"));
 
-
 export function formatNumber(num) {
     if (num >= 100000) {
         // Convert to Lakhs
@@ -96,14 +95,14 @@ export const getImage = (cardCode, folders, extension_) => {
     const bb = aa.split('/').filter(val => val !== '').join('/');
 
     if (!cardCode || cardCode === "1")
-        return `/assets/${bb}/1.png`;
-    return `/assets/${bb}/${cardCode}.${extension}`
+        return `/admin/assets/${bb}/1.png`;
+    return `/admin/assets/${bb}/${cardCode}.${extension}`
 };
 
 export function getCardImage(cardCode, folders_) {
     const folders = folders_ ? folders_ : 'cards_new';
     if (!cardCode || cardCode === "1") return getImage(cardCode, folders);
-    let formattedCode = cardCode.toUpperCase();
+    let formattedCode = String(cardCode).toUpperCase();
     if (formattedCode.length > 1) {
         const lastChar = formattedCode.slice(-1);
         const secondLastChar = formattedCode.slice(-2, -1);
