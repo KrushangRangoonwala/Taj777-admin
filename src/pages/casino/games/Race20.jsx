@@ -185,7 +185,7 @@ const Race20 = ({ onBetSelection }) => {
                                     setIsCardDrawerOpen={setIsCardDrawerOpen}
                                     CardsComponent={VideoCards}
                                     resultPath={phpFile}
-                                    showResults={false}
+                                    showLastResults={false}
                                     showImage={false}
                                 />
                                 <div className="casino-detail">
@@ -362,11 +362,11 @@ const Race20 = ({ onBetSelection }) => {
                                 <div className="casino-video-last-results">
                                     {(gameData?.last_results || []).map((res, idx) => {
                                         const winVal = res.win || (res.result ? (suits.find(s => res.result.includes(s)) === 'S' ? '1' : res.result.includes('H') ? '2' : res.result.includes('C') ? '3' : '4') : '1');
-                                        const resultSuitName = { 
-                                            "1": 'spade', 
-                                            "2": 'heart', 
-                                            "3": 'club', 
-                                            "4": 'diamond' 
+                                        const resultSuitName = {
+                                            "1": 'spade',
+                                            "2": 'heart',
+                                            "3": 'club',
+                                            "4": 'diamond'
                                         }[winVal] || 'spade';
                                         return (
                                             <span key={idx}>

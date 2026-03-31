@@ -162,12 +162,12 @@ const Baccarat = ({ onBetSelection, lastBetTime }) => {
                 </div>
                 <div className={`baccarat-odd-val ${getExposureClass(exposure) || "book-black"}`}>{exposure || 0}</div>
                 <div className="casino-min-max">
-                    <BetLimitInfo 
-                        id={`range${rangeId}`} 
-                        openRanges={openRanges} 
-                        toggleRange={toggleRange} 
-                        min={market?.min} 
-                        max={market?.max} 
+                    <BetLimitInfo
+                        id={`range${rangeId}`}
+                        openRanges={openRanges}
+                        toggleRange={toggleRange}
+                        min={market?.min}
+                        max={market?.max}
                         iconClass="float-right"
                         fallbackMax={100000}
                     />
@@ -228,12 +228,12 @@ const Baccarat = ({ onBetSelection, lastBetTime }) => {
                 </div>
                 <div className={`baccarat-bets-val ${getExposureClass(exposure) || "book-black"}`}>{exposure || 0}</div>
                 <div className="casino-min-max">
-                    <BetLimitInfo 
-                        id={`range${rangeId}`} 
-                        openRanges={openRanges} 
-                        toggleRange={toggleRange} 
-                        min={market?.min} 
-                        max={market?.max} 
+                    <BetLimitInfo
+                        id={`range${rangeId}`}
+                        openRanges={openRanges}
+                        toggleRange={toggleRange}
+                        min={market?.min}
+                        max={market?.max}
                         fallbackMax={100000}
                     />
                 </div>
@@ -292,7 +292,7 @@ const Baccarat = ({ onBetSelection, lastBetTime }) => {
                                 CardsComponent={Cards}
                                 resultPath="baccarat"
                                 showCardDrawer={false}
-                                showResults={false}
+                                showLastResults={false}
                             />
 
                             <div className="casino-detail">

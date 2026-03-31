@@ -10,7 +10,7 @@ import autoTable from "jspdf-autotable";
 
 const { RangePicker } = DatePicker;
 
-const LiveCasinoResult = () => {
+const SportBookReport = () => {
   const [activeTab, setActiveTab] = useState("login");
   const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
@@ -254,10 +254,7 @@ const LiveCasinoResult = () => {
                       <div className="col-xl-2">
                         <select className="form-control">
                           <option value="">Select</option>
-                          <option value="ezugi">Ezugi</option>
-                          <option value="ss">Super Spade</option>
-                          <option value="qt">Slot 3 | Holi</option>
-                          <option value="evo">Evolution</option>
+                          <option value="sportbook1">Sport Book1</option>
                         </select>
                       </div>
 
@@ -303,13 +300,12 @@ const LiveCasinoResult = () => {
                     <table className="table b-table table-bordered">
                       <thead>
                         <tr>
-                          <th>Game Name</th>
+                          <th>Round Id</th>
                           <th>Type</th>
                           <th className="text-right">Amount</th>
                           <th className="text-right">Total</th>
+                          <th>Bet Id</th>
                           <th>Date</th>
-                          <th>Round Id</th>
-                          <th>Transaction Id</th>
                         </tr>
                       </thead>
 
@@ -317,13 +313,12 @@ const LiveCasinoResult = () => {
                         {data.length > 0 ? (
                           data.map((row, i) => (
                             <tr key={i}>
-                              <td>{row.game_name || "-"}</td>
+                              <td>{row.round_id || "-"}</td>
                               <td>{row.type || "-"}</td>
                               <td className="text-right">{row.amount || "-"}</td>
                               <td className="text-right">{row.total || "-"}</td>
+                              <td>{row.bet_id || "-"}</td>
                               <td>{row.date || "-"}</td>
-                              <td>{row.round_id || "-"}</td>
-                              <td>{row.transaction_id || "-"}</td>
                             </tr>
                           ))
                         ) : (
@@ -355,11 +350,7 @@ const LiveCasinoResult = () => {
                       <div className="col-xl-2">
                         <select className="form-control">
                           <option value="">Select</option>
-                          <option value="ezugi">Ezugi</option>
-                          <option value="ss">Super Spade</option>
-                          <option value="qt">Slot 3 | Holi</option>
-                          <option value="evo">Evolution</option>
-                          <option value="cockfight">CockFight</option>
+                          <option value="sportbook1">Sport Book1</option>
                         </select>
                       </div>
 
@@ -375,12 +366,11 @@ const LiveCasinoResult = () => {
                     <table className="table b-table table-bordered">
                       <thead>
                         <tr>
+                          <th>Round Id</th>
                           <th>Type</th>
                           <th className="text-right">Amount</th>
-                          <th className="text-right">Total</th>
+                          <th>Bet Id</th>
                           <th>Date</th>
-                          <th>Round Id</th>
-                          <th>Transaction Id</th>
                         </tr>
                       </thead>
 
@@ -405,4 +395,4 @@ const LiveCasinoResult = () => {
   );
 };
 
-export default LiveCasinoResult;
+export default SportBookReport;

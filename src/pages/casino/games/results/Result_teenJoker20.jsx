@@ -1,5 +1,5 @@
 import React from 'react';
-import ResultDesc from '../components/ResultDesc';
+import ResultDesc from '../components/Result_details';
 
 const Result_teenJoker20 = ({ resultData }) => {
     // For now, we are using static data as requested, ignoring resultData

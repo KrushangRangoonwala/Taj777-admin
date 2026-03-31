@@ -54,6 +54,10 @@ export const fetchCasinoList = async () => {
   }
 };
 
+export function splitByDot(value, idx = 1) {
+  return value.includes(".") ? value.split(".")[idx] : value;
+}
+
 export async function fetchCasinoExposureApi(payload) {
   const { markettype, main_event_id, curPageName } = payload;
   const fullPayload = {
@@ -151,6 +155,32 @@ export async function getCasinoResult(payload) {
       ...getDefaultParams(),
     };
     const { data } = await axiosInstance.post("casino_result", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching history:", error);
+    throw error;
+  }
+}
+export async function checkUserLockPwd(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await axiosInstance.post("check_pwd", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching history:", error);
+    throw error;
+  }
+}
+export async function updateUserLockStatus(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await axiosInstance.post("update_status", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching history:", error);

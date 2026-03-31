@@ -246,6 +246,7 @@ export const gameType_To_details = {
         CODE: "RACE_20",
         phpFile: "live_race20.php",
         placeBetApi: "bet_place_race20.php",
+        isBgTransparent: true, // FOR LAST_RESULT
     },
     "race17": {
         CODE: "RACE17",

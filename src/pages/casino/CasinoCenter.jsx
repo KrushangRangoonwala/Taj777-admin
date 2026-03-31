@@ -1,8 +1,13 @@
-import React, { lazy, Suspense } from 'react'
+import React, { lazy, Suspense, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
+import { fetchCasinoExposureApi } from '../../api/API';
+import { useGetFileData } from '../../hooks/useGetFileData';
+import useSocket from '../../api/Socket/useSocket';
 
 const Poker1day = lazy(() => import('./games/Poker1day'));
+const Poker20 = lazy(() => import('./games/Poker20'));
 const OneCard1day = lazy(() => import('./games/OneCard1day'));
+
 const TeenPatti1Day = lazy(() => import('./games/TeenPatti1Day'));
 const VIPTeenPatti1Day = lazy(() => import('./games/VIPTeenPatti1Day'));
 const InstantTeenPatti3 = lazy(() => import('./games/InstantTeenPatti3'));
@@ -40,6 +45,7 @@ const SuperOver = lazy(() => import('./games/SuperOver'));
 
 const gamePath_To_Component = {
     "pokeroneday": Poker1day,
+    "pokert20": Poker20,
     "1card1day": OneCard1day,
     "odi_teenpatti": TeenPatti1Day,
     "teen62": VIPTeenPatti1Day,
@@ -78,16 +84,102 @@ const gamePath_To_Component = {
 }
 
 const CasinoCenter = () => {
+    const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
     const path = useParams().casinoPath;
     const Component = gamePath_To_Component[path];
+    const [gameData, setGameData] = useState(null);
+    const [exposureData, setExposureData] = useState([]);
+    const [lastResults, setLastResults] = useState([]);
+
     if (!Component) {
         return <div>Game not found</div>
     }
+
+    const socket = useSocket("casino");
+    useEffect(() => {
+        if (!socket) return;
+
+        const handleData = (data) => {
+            try {
+                const payload = Array.isArray(data) ? data[0] : data;
+                if (payload) {
+                    setGameData(payload);
+                }
+            } catch (error) {
+                console.error("Error processing OneCard1day data:", error);
+            }
+        };
+
+        const handleConnect = () => {
+            console.log(`✅ ${game_type} Connected:`, socket.id);
+            socket.emit("Room", game_type);
+        };
+
+        const handleLastResults = (data) => {
+            const payload = data?.res || data?.data || [];
+            setLastResults(payload);
+        };
+
+        if (socket.connected) {
+            handleConnect();
+        }
+
+        socket.on("connect", handleConnect);
+        socket.on("game", handleData);
+        socket.on("gameResult", handleLastResults);
+        socket.on(game_type, handleData);
+
+        return () => {
+            socket.off("connect", handleConnect);
+            socket.off("game", handleData);
+            socket.off("gameResult", handleLastResults);
+            socket.off(game_type, handleData);
+        };
+    }, [socket, game_type]);
+
+    useEffect(() => {
+        const fetchExposure = async () => {
+            if (!gameData?.t1?.[0]?.mid) return;
+            try {
+                const response = await fetchCasinoExposureApi({
+                    markettype: CODE,
+                    main_event_id: gameData.t1[0].mid,
+                    curPageName: phpFile,
+                });
+                if (Array.isArray(response?.data)) {
+                    setExposureData(response.data);
+                }
+            } catch (error) {
+                console.error("Error fetching exposure:", error);
+            }
+        };
+        fetchExposure();
+    }, [gameData?.t1?.[0]?.mid, CODE, phpFile]);
+
     return (
         <Suspense fallback={<div>Loading...</div>}>
-            <Component />
+            <Component gameData={gameData} exposureData={exposureData} lastResults={lastResults} />
         </Suspense>
     )
 }
 
 export default CasinoCenter
+
+
+// -------------------------------------------------------------------
+
+
+export function getExposure(exposureData, marketId) {
+    if (!Array.isArray(exposureData)) return 0;
+    const market = exposureData.find((item) => item.market_id == marketId);
+    return market ? Number(market.win_loss) || Number(market.total_exposure) : 0;
+}
+
+export function Exposure({ className = "", data, id }) {
+    const exposure = getExposure(data, id);
+    const exposureClass = exposure > 0 ? "book-red" : exposure < 0 ? "book-green" : "book-black";
+
+    return (
+        <span className={`${className} ${exposureClass}`}>{exposure}</span>
+    )
+}

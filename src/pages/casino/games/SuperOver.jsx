@@ -7,19 +7,19 @@ import CasinoRightSidebar from "./components/CasinoRightSidebar";
 // import { fetchCasinoExposureApi } from "../../../api/api";
 
 const getCardImage = (cardCode) => {
-    if (!cardCode) return "/assets/cards_new/1.png";
-    const code = cardCode.toString().replace(/DD/g, "");
-    if (code === "1") return "/assets/cards_new/1.png";
-    if (["A", "K", "W", "2", "3", "4", "6", "10"].includes(code)) return `/assets/cards_new/cricket/${code === "0" ? "10" : code === "W" ? "wicket" : code}.png`;
-    return `/assets/cards_new/${code}.png`;
+    if (!cardCode) return "admin/assets/cards_new/1.png";
+    const code = cardCode.toString().replace(/(SS|CC|DD|HH)/g, "");
+    if (code === "1") return "admin/assets/cards_new/1.png";
+    if (["A", "K", "W", "2", "3", "4", "6", "10", "0"].includes(code)) return `/admin/assets/cards_new/cricket/${code === "0" ? "10" : code === "W" ? "wicket" : code}.png`;
+    return `admin/assets/cards_new/${cardCode}.png`;
 };
 
 const getBallImage = (ballCode) => {
-    if (!ballCode) return "/assets/cards_new/1.png";
-    const code = ballCode.toString().replace(/DD/g, "");
-    if (code === "1") return "/assets/cards_new/1.png";
+    if (!ballCode) return "admin/assets/cards_new/1.png";
+    const code = ballCode.toString().replace(/(SS|CC|DD|HH)/g, "");
+    if (code === "1") return "admin/assets/cards_new/1.png";
     const ballName = code === "0" ? "10" : code === "W" ? "wicket" : code;
-    return `/assets/cards_new/cricket/${ballName}.png`;
+    return `/admin/assets/cards_new/cricket/${ballName}.png`;
 };
 
 const SuperOver = ({ onBetSelection, lastBetTime }) => {
@@ -53,8 +53,9 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
         };
 
         const handleLiveScoreData = (data) => {
-            if (data) {
-                setLiveScoreData(data);
+            const payload = Array.isArray(data) ? data[0] : data;
+            if (payload) {
+                setLiveScoreData(payload);
             }
         };
 
@@ -124,28 +125,32 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
 
     const Cards = () => (
         <>
-            {isCricket5 ? (
+            {cards && cards.length > 0 ? (
                 <>
                     {cards.map((card, i) => (
-                        <div key={i}>
-                            <span>
-                                <img
-                                    style={{ width: "30px" }}
-                                    src={getCardImage(card)}
-                                    alt={card}
-                                />
-                            </span>
-                        </div>
+                        card && card !== "1" && card !== 1 ? (
+                            <div key={i}>
+                                <span>
+                                    <img
+                                        style={{ width: "30px" }}
+                                        src={getBallImage(card)}
+                                        alt={card}
+                                    />
+                                </span>
+                            </div>
+                        ) : null
                     ))}
                 </>
             ) : (
                 <>
                     {balls.map((ball, idx) => (
-                        <div key={idx}>
-                            <span>
-                                {ball ? (<img src={getBallImage(ball)} alt={`ball-${idx}`} />) : null}
-                            </span>
-                        </div>
+                        ball && ball !== "1" && ball !== 1 ? (
+                            <div key={idx}>
+                                <span>
+                                    <img src={getBallImage(ball)} alt={`ball-${idx}`} />
+                                </span>
+                            </div>
+                        ) : null
                     ))}
                 </>
             )}
@@ -205,9 +210,11 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
                                                             <div></div>
                                                             <div className="score-message">
                                                                 {liveScoreData?.data?.spnmessage && <span className="mr-2">{liveScoreData.data.spnmessage}</span>}
-                                                                {liveScoreData?.balls?.filter(b => b !== "").map((ball, bidx) => (
-                                                                    <span key={bidx} className="ball-runs mr-1">{ball}</span>
-                                                                ))}
+                                                                <div>
+                                                                    {(liveScoreData?.balls || liveScoreData?.data?.balls || [])?.filter(b => b !== "").map((ball, bidx) => (
+                                                                        <span key={bidx} className={`ball-runs mr-1 ${ball === "4" ? "four" : ball === "6" ? "six" : ball === "W" || ball?.toLowerCase() === "wicket" ? "wicket" : ""}`}>{ball}</span>
+                                                                    ))}
+                                                                </div>
                                                             </div>
                                                         </div>
                                                     </div>
@@ -219,12 +226,13 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
                                                 // gameName={currentGame?.ename?.split(" ").slice(-2).join(" ") || "Super Over"}
                                                 roundId={null}
                                                 videoSrc={iframe_url}
+                                                cards={cards}
                                                 results={results}
                                                 timeLeft={currentGame?.autotime || 0}
                                                 totalTime={currentGame?.ft || 30}
                                                 isCardDrawerOpen={isCardDrawerOpen}
                                                 setIsCardDrawerOpen={setIsCardDrawerOpen}
-                                                CardsComponent={is2 ? null : Cards}
+                                                CardsComponent={Cards}
                                                 resultPath={phpFile}
                                             />
                                         </div>
@@ -251,7 +259,7 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
                                                         <div className="text-right nation-name">
                                                             <span className="max-bet">
                                                                 Min:<span>{formatNumber(sanitizeNumber(currentGame?.min || 100))}</span>
-                                                                Max:<span>{formatNumber(sanitizeNumber(currentGame?.max || '3L'))}</span>
+                                                                Max:<span>{currentGame?.max ? formatNumber(currentGame.max) : '5L'}</span>
                                                             </span>
                                                         </div>
                                                         <div className="back bl-title d-none-mobile">Back</div>
@@ -274,11 +282,11 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
                                                                     </div>
                                                                     <div className="bl-box back back" onClick={() => handleOddsClick("Bookmaker", runner.nat, runner.b1, runner, true, runner.status)}>
                                                                         <span className="d-block odds">{runner.b1 || "—"}</span>
-                                                                        <span className="d-block">{runner.bs1}</span>
+                                                                        <span className="d-block">{formatNumber(runner.bs1)}</span>
                                                                     </div>
                                                                     <div className="bl-box lay lay" onClick={() => handleOddsClick("Bookmaker", runner.nat, runner.l1, runner, false, runner.status)}>
                                                                         <span className="d-block odds">{runner.l1 || "—"}</span>
-                                                                        <span className="d-block">{runner.ls1}</span>
+                                                                        <span className="d-block">{formatNumber(runner.ls1)}</span>
                                                                     </div>
                                                                 </div>
                                                             </React.Fragment>

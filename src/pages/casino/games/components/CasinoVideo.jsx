@@ -12,28 +12,16 @@ const CasinoVideo = ({
     results = [],
     timeLeft = 0,
     totalTime = 30,
-    isCardDrawerOpen,
-    setIsCardDrawerOpen,
     CardsComponent,
-    resultPath = "",
-    showResults = true,
-    showRawLabel = false,
-    showImage = false,
-    imagePath = "cards",
-    showCardDrawer = true,
     titleExtra = null,
-    timerClassName = "",
-    isLastResultOpen: isLastResultOpenProp,
-    setIsLastResultOpen: setIsLastResultOpenProp,
-}) => {
-    // const [isLastResultOpen, setIsLastResultOpen] = useState(false);
-    const [isResultModalOpen, setIsResultModalOpen] = useState(false);
-    const { game_type, result_image } = useGetFileData();
-    const [isLastResultOpenInternal, setIsLastResultOpenInternal] = useState(true);
 
-    console.log('isLastResultOpenProp !== undefined', isLastResultOpenProp !== undefined);
-    const isLastResultOpen = isLastResultOpenProp !== undefined ? isLastResultOpenProp : isLastResultOpenInternal;
-    const setIsLastResultOpen = setIsLastResultOpenProp !== undefined ? setIsLastResultOpenProp : setIsLastResultOpenInternal;
+    showLastResults = true,
+    showCardDrawer = true,
+}) => {
+    const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+    const [mid, setMid] = useState(false);
+    const { game_type, result_image } = useGetFileData();
+    const [isLastResultOpen, setIsLastResultOpen] = useState(true);
 
     const getTimerColorClass = () => {
         if (timeLeft <= 5) return "red";
@@ -43,18 +31,14 @@ const CasinoVideo = ({
 
     const strokeDasharrayValue = ((timeLeft || 0) / (totalTime || 30)) * 283;
 
-
     return (
         <div className="casino-video">
-            {/* video */}
             {(gameName || roundId || titleExtra) && (
                 <div className="casino-video-title">
                     {gameName && <span className="casino-name">{gameName}</span>}
-                    {/* {roundId && ( */}
                     <div className="casino-video-rid">
                         Round ID: {getValueAfterDot(roundId) || "Loading..."}
                     </div>
-                    {/* )} */}
                     {titleExtra}
                 </div>
             )}
@@ -67,7 +51,6 @@ const CasinoVideo = ({
 
             {showCardDrawer && (
                 <div className={`casino-video-cards ${isCardDrawerOpen ? "" : "hide-cards"}`}>
-                    {/* cards */}
                     <div
                         className="casino-cards-shuffle"
                         onClick={() => setIsCardDrawerOpen(!isCardDrawerOpen)}
@@ -90,7 +73,6 @@ const CasinoVideo = ({
                                             />
                                         </span>
                                     ))}
-                                    {/* Fill up to 5 cards if less are provided initially */}
                                     {Array.from({ length: 5 - cards.length }).map((_, index) => (
                                         <span key={`empty-${index}`} data-v-b64efdfa="">
                                             <img
@@ -108,7 +90,7 @@ const CasinoVideo = ({
             )}
 
             {/* timer */}
-            <div className={`casino-timer ${timerClassName}`}>
+            <div className="casino-timer">
                 <div data-v-07e7cfbb="" className="base-timer">
                     <svg
                         data-v-07e7cfbb=""
@@ -147,33 +129,28 @@ const CasinoVideo = ({
                 <div title="Rules" className="casino-video-rules-icon">
                     <i className="fas fa-info-circle"></i>
                 </div>
-                <div
-                    title="Last Results"
-                    className="casino-video-lr-icon"
-                    onClick={() => setIsLastResultOpen(!isLastResultOpen)}
-                >
-                    <i className={`fas fa-chevron-circle-${isLastResultOpen ? "up" : "down"}`}></i>
-                </div>
+                {showLastResults &&
+                    <div
+                        title="Last Results"
+                        className="casino-video-lr-icon"
+                        onClick={() => setIsLastResultOpen(!isLastResultOpen)}
+                    >
+                        <i className={`fas fa-chevron-circle-${isLastResultOpen ? "up" : "down"}`}></i>
+                    </div>}
             </div>
 
             <div></div>
 
-            {/* last results */}
-            {showResults && (
+            {showLastResults && (
                 <LastResult
                     results={results}
-                    gameName={gameName}
-                    resultPath={resultPath}
-                    showRawLabel={showRawLabel}
-                    showImage={showImage}
-                    imagePath={imagePath}
-                    className={isLastResultOpen ? "" : "hide-lr"}
-                    isResultModalOpen={isResultModalOpen}
-                    setIsResultModalOpen={setIsResultModalOpen}
+                    isOpen={isLastResultOpen}
+                    mid={mid}
+                    setMid={setMid}
                 />
             )}
 
-            <Result_parent show={isResultModalOpen} onClose={() => setIsResultModalOpen(false)} result={[]} game_type={game_type} />
+            <Result_parent mid={mid} setMid={setMid} game_type={game_type} />
         </div>
     );
 };

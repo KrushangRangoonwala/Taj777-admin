@@ -35,6 +35,7 @@ import UserHistory from './pages/reports/UserHistory'
 import GeneralLock from './pages/reports/GeneralLock'
 import CasinoResult from './pages/reports/CasinoResult'
 import LiveCasinoResult from './pages/reports/LiveCasinoResult'
+import SportBookReport from './pages/reports/SportBookReport'
 
 function putLiveFirst(arr) {
   if (arr && Array.isArray(arr)) {
@@ -162,6 +163,7 @@ function AppContent() {
           <Route path="admin/reports/userlock" element={<GeneralLock />} />
           <Route path="admin/reports/casinoresult" element={<CasinoResult />} />
           <Route path="admin/reports/livecasinoreport" element={<LiveCasinoResult />} />
+          <Route path="admin/reports/sportbookreport" element={<SportBookReport />} />
           <Route path="admin/createaccount" element={<CreateAccount />} />
           <Route path="admin/game/details" element={
             <EventPage

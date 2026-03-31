@@ -13,7 +13,7 @@ if u find any library in below html code, then use that library in this react pr
 -------------
 
 instructions :
-copy below code's exact same html struture with exact same css classes and exactly same attributes in this react project
+copy below html file's code's exact same html struture with exact same css classes and exactly same attributes in this react project
 if u find any library in below html code, then use that library in this react project
 
 if u find same structure repeating multiple time then use .map in react, or just made re-usable components
