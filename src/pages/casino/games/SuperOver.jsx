@@ -4,34 +4,90 @@ import { useGetFileData } from "../../../hooks/useGetFileData";
 import { getValueAfterDot, formatNumber, sanitizeNumber } from "../../../utilies/helpers";
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
-// import { fetchCasinoExposureApi } from "../../../api/api";
+import { Exposure } from "../CasinoCenter";
+import LastResult from "./components/LastResult";
+import useIsMobile from "../../../hooks/useIsMobile";
+import Collapse from "react-bootstrap/Collapse";
 
-const getCardImage = (cardCode) => {
-    if (!cardCode) return "admin/assets/cards_new/1.png";
-    const code = cardCode.toString().replace(/(SS|CC|DD|HH)/g, "");
-    if (code === "1") return "admin/assets/cards_new/1.png";
-    if (["A", "K", "W", "2", "3", "4", "6", "10", "0"].includes(code)) return `/admin/assets/cards_new/cricket/${code === "0" ? "10" : code === "W" ? "wicket" : code}.png`;
-    return `admin/assets/cards_new/${cardCode}.png`;
-};
+function ScoreCard({ liveScoreData }) {
+    const isN1Active = liveScoreData?.activenation1 === "1";
+    const isN2Active = liveScoreData?.activenation2 === "1";
 
-const getBallImage = (ballCode) => {
-    if (!ballCode) return "admin/assets/cards_new/1.png";
-    const code = ballCode.toString().replace(/(SS|CC|DD|HH)/g, "");
-    if (code === "1") return "admin/assets/cards_new/1.png";
-    const ballName = code === "0" ? "10" : code === "W" ? "wicket" : code;
-    return `/admin/assets/cards_new/cricket/${ballName}.png`;
-};
+    const renderActiveInfo = (n) => {
+        const crr = liveScoreData?.[`spnrunrate${n}`] || "0.00";
+        const rr = liveScoreData?.[`spnreqrate${n}`];
+        return (
+            <div>
+                <span>CRR {crr}</span>
+                {rr && <span className="" style={{ display: "block" }}>RR {rr}</span>}
+            </div>
+        );
+    };
 
-const SuperOver = ({ onBetSelection, lastBetTime }) => {
+    const renderBalls = () => (
+        <div>
+            {liveScoreData?.balls?.filter(b => b !== "").map((ball, bidx) => (
+                <span key={bidx} className={`ball-runs mr-1 ${ball === "4" ? "four" : ball === "6" ? "six" : ball?.toLowerCase() === "ww" ? "wicket" : ""}`}>{ball}</span>
+            ))}
+        </div>
+    );
+
+    return (
+        <div className="col-xl-2 banner d-flex align-items-center mb-1">
+            <div className="scorecard">
+                <div className="scorecard-row">
+                    <div className="score-top-row">
+                        <div className="score-team">
+                            <b>{liveScoreData?.spnnation1 || "ENG"}</b> {liveScoreData?.score1 || "0-0 (0.0)"}
+                        </div>
+                        {isN1Active ? renderActiveInfo(1) : <div></div>}
+                        {isN2Active && liveScoreData?.spnmessage && (
+                            <div className="score-message">
+                                <span>{liveScoreData.spnmessage}</span>
+                            </div>
+                        )}
+                    </div>
+                </div>
+                <div className="scorecard-row">
+                    <div className="score-top-row">
+                        <div className="score-team">
+                            <b>{liveScoreData?.spnnation2 || "RSA"}</b> {liveScoreData?.score2 || "0-0 (0.0)"}
+                        </div>
+                        {isN2Active ? renderActiveInfo(2) : <div></div>}
+                        <div className="score-message">
+                            {isN1Active && liveScoreData?.spnmessage && <span className="mr-2">{liveScoreData.spnmessage}</span>}
+                            {renderBalls()}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}
+
+
+
+const SuperOver = ({ exposureData, lastResults }) => {
+    const isSmall = useIsMobile(769);
     const { CODE, game_type, phpFile, iframe_url } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [liveScoreData, setLiveScoreData] = useState(null);
     const [results, setResults] = useState([]);
     // const [exposureData, setExposureData] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+    const [openSections, setOpenSections] = useState({
+        bookmaker: true,
+        fancy: true,
+        tie: true,
+        fancy1: true
+    });
+
+    const toggleSection = (section) => {
+        setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
+    };
 
     const is2 = game_type === "superover2";
-    const isCricket5 = CODE === "FIVE_5_CRICKET";
+    const isCricket5 = game_type === "cricketv3";
 
     const socket = useSocket("casino");
 
@@ -55,7 +111,7 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
         const handleLiveScoreData = (data) => {
             const payload = Array.isArray(data) ? data[0] : data;
             if (payload) {
-                setLiveScoreData(payload);
+                setLiveScoreData(payload.data);
             }
         };
 
@@ -89,31 +145,6 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
         };
     }, [socket, game_type]);
 
-    // useEffect(() => {
-    //     const fetchExposure = async () => {
-    //         if (!gameData?.t1?.[0]?.mid) return;
-    //         try {
-    //             const response = await fetchCasinoExposureApi({
-    //                 markettype: CODE,
-    //                 main_event_id: gameData.t1[0].mid,
-    //                 curPageName: phpFile,
-    //             });
-    //             if (Array.isArray(response?.data)) {
-    //                 setExposureData(response.data);
-    //             }
-    //         } catch (error) {
-    //             console.error("Error fetching exposure:", error);
-    //         }
-    //     };
-    //     fetchExposure();
-    // }, [gameData?.t1?.[0]?.mid, lastBetTime, CODE, phpFile]);
-
-    // const getExposure = (marketId) => {
-    //     if (!Array.isArray(exposureData)) return 0;
-    //     const market = exposureData.find((item) => item.market_id == marketId);
-    //     return market ? market.win_loss || market.total_exposure : 0;
-    // };
-
     const currentGame = gameData?.t1?.[0];
     const bookmakerData = gameData?.t2 || [];
     const fancyData = gameData?.t3 || [];
@@ -125,15 +156,15 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
 
     const Cards = () => (
         <>
-            {cards && cards.length > 0 ? (
+            {isCricket5 ? (
                 <>
                     {cards.map((card, i) => (
-                        card && card !== "1" && card !== 1 ? (
+                        card ? (
                             <div key={i}>
                                 <span>
                                     <img
                                         style={{ width: "30px" }}
-                                        src={getBallImage(card)}
+                                        src={`/admin/assets/cards_new/${card}.png`}
                                         alt={card}
                                     />
                                 </span>
@@ -144,10 +175,10 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
             ) : (
                 <>
                     {balls.map((ball, idx) => (
-                        ball && ball !== "1" && ball !== 1 ? (
+                        ball ? (
                             <div key={idx}>
                                 <span>
-                                    <img src={getBallImage(ball)} alt={`ball-${idx}`} />
+                                    <img src={`/admin/assets/cards_new/cricket/${ball}.png`} alt={`ball-${idx}`} />
                                 </span>
                             </div>
                         ) : null
@@ -157,23 +188,8 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
         </>
     );
 
-    const handleOddsClick = (marketTitle, runnerName, odds, market, isBack, status) => {
-        if (!market || status !== "ACTIVE" && status !== "OPEN" || odds == 0) return;
-
-        if (onBetSelection) {
-            onBetSelection({
-                teamName: runnerName,
-                marketTitle: marketTitle,
-                odds: odds,
-                minBet: market?.min || 100,
-                maxBet: market?.max || 300000,
-                isBack,
-                marketId: market.sid,
-                eventId: getValueAfterDot(currentGame?.mid),
-            });
-        }
-    };
-
+    const RuleComp = () => <Rules team1={liveScoreData?.spnnation1} team2={liveScoreData?.spnnation2} />
+    console.log('liveScoreData', liveScoreData);
     return (
         <div data-v-5a10e370="">
             <div data-v-5a10e370="" className="detail-page-container">
@@ -187,40 +203,8 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
                                 </div>
                                 <div className="container-fluid container-fluid-5">
                                     <div className="row row5">
-                                        {!is2 && (
-                                            <div className="col-xl-2 banner d-flex">
-                                                <div className="scorecard">
-                                                    <div className="scorecard-row">
-                                                        <div className="score-top-row">
-                                                            <div className="score-team">
-                                                                <b>{liveScoreData?.data?.spnnation1 || "ENG"}</b> {liveScoreData?.data?.score1 || "0-0 (0.0)"}
-                                                            </div>
-                                                            <div>
-                                                                <span>
-                                                                    CRR {liveScoreData?.data?.spnrunrate1 || liveScoreData?.data?.spnrunrate2 || "0.00"}
-                                                                </span>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                    <div className="scorecard-row">
-                                                        <div className="score-top-row">
-                                                            <div className="score-team">
-                                                                <b>{liveScoreData?.data?.spnnation2 || "RSA"}</b> {liveScoreData?.data?.score2 || "0-0 (0.0)"}
-                                                            </div>
-                                                            <div></div>
-                                                            <div className="score-message">
-                                                                {liveScoreData?.data?.spnmessage && <span className="mr-2">{liveScoreData.data.spnmessage}</span>}
-                                                                <div>
-                                                                    {(liveScoreData?.balls || liveScoreData?.data?.balls || [])?.filter(b => b !== "").map((ball, bidx) => (
-                                                                        <span key={bidx} className={`ball-runs mr-1 ${ball === "4" ? "four" : ball === "6" ? "six" : ball === "W" || ball?.toLowerCase() === "wicket" ? "wicket" : ""}`}>{ball}</span>
-                                                                    ))}
-                                                                </div>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        )}
+                                        {!is2 && <ScoreCard liveScoreData={liveScoreData} />}
+
                                         <div className={is2 ? "col-xl-12" : "col-xl-10"}>
                                             <CasinoVideo
                                                 // gameName={currentGame?.ename?.split(" ").slice(-2).join(" ") || "Super Over"}
@@ -244,17 +228,23 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
                                     {bookmakerData.length > 0 && (
                                         <div className="market-2">
                                             <div className="bet-table">
-                                                <div className="bet-table-header">
+                                                <div className="bet-table-header" onClick={() => toggleSection("bookmaker")} style={{ cursor: 'pointer' }}>
                                                     <div className="nation-name">
                                                         <span title="Bookmaker">
-                                                            <a href="javascript:void(0)" title="">
-                                                                <img src="https://wver.sprintstaticdata.com/v210/static/admin/img/arrow-down.svg" className="mr-1" alt="" />
+                                                            <a href="javascript:void(0)" onClick={(e) => e.preventDefault()} title="">
+                                                                <img
+                                                                    src="https://wver.sprintstaticdata.com/v210/static/admin/img/arrow-down.svg"
+                                                                    className="mr-1"
+                                                                    alt=""
+                                                                    style={{ transform: openSections.bookmaker ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}
+                                                                />
                                                             </a>
-                                                            Bookmaker
+                                                            {' '}Bookmaker
                                                         </span>
                                                     </div>
                                                 </div>
-                                                <div id="market0" className="bet-table-body collapse show">
+                                                <Collapse in={openSections.bookmaker}>
+                                                    <div id="market0" className="bet-table-body">
                                                     <div className="bet-table-row">
                                                         <div className="text-right nation-name">
                                                             <span className="max-bet">
@@ -272,19 +262,19 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
                                                                 <div className="bet-table-mobile-row d-none-desktop">
                                                                     <div className="bet-table-mobile-team-name">
                                                                         <span>{runner.nat}</span>
-                                                                        <span style={{ color: "rgb(153, 153, 153)" }}>0</span>
+                                                                        <Exposure className="mb-0" data={exposureData} id={runner?.mid} isInlineColor={true} />
                                                                     </div>
                                                                 </div>
                                                                 <div className={`bet-table-row ${isSuspended ? 'suspendedtext' : ''}`} data-title={isSuspended ? runner.status : ""}>
                                                                     <div className="nation-name d-none-mobile">
                                                                         <p>{runner.nat}</p>
-                                                                        <p className="mb-0 float-left" style={{ color: "rgb(153, 153, 153)" }}>0</p>
+                                                                        <Exposure className="mb-0 float-left" data={exposureData} id={runner?.mid} isInlineColor={true} />
                                                                     </div>
-                                                                    <div className="bl-box back back" onClick={() => handleOddsClick("Bookmaker", runner.nat, runner.b1, runner, true, runner.status)}>
+                                                                    <div className="bl-box back back" >
                                                                         <span className="d-block odds">{runner.b1 || "—"}</span>
                                                                         <span className="d-block">{formatNumber(runner.bs1)}</span>
                                                                     </div>
-                                                                    <div className="bl-box lay lay" onClick={() => handleOddsClick("Bookmaker", runner.nat, runner.l1, runner, false, runner.status)}>
+                                                                    <div className="bl-box lay lay" >
                                                                         <span className="d-block odds">{runner.l1 || "—"}</span>
                                                                         <span className="d-block">{formatNumber(runner.ls1)}</span>
                                                                     </div>
@@ -293,37 +283,51 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
                                                         );
                                                     })}
                                                 </div>
+                                                </Collapse>
                                             </div>
                                         </div>
                                     )}
 
                                     {/* Fancy/Fancy1 Markets */}
                                     {[
-                                        { title: "Fancy", data: fancyData },
+                                        { title: "Fancy", data: fancyData, isFancy: true, colmnName1: "", colmnName2: "", isLasyFirst: true },
                                         { title: "Tie", data: tieData },
                                         { title: "Fancy1", data: fancy1Data }
                                     ].map((section, sidx) => (
                                         section.data.length > 0 && (
                                             <div className="market-6" key={sidx}>
                                                 <div className="bet-table">
-                                                    <div className="bet-table-header">
+                                                    <div className="bet-table-header" onClick={() => toggleSection(section.title.toLowerCase())} style={{ cursor: 'pointer' }}>
                                                         <div className="nation-name">
                                                             <span title={section.title}>
-                                                                <a href="javascript:void(0)" title="">
-                                                                    <img src="https://wver.sprintstaticdata.com/v210/static/front/img/arrow-down.svg" className="mr-1" alt="" />
+                                                                <a href="javascript:void(0)" onClick={(e) => e.preventDefault()} title="">
+                                                                    <img
+                                                                        src="https://wver.sprintstaticdata.com/v210/static/front/img/arrow-down.svg"
+                                                                        className="mr-1"
+                                                                        alt=""
+                                                                        style={{ transform: openSections[section.title.toLowerCase()] ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s' }}
+                                                                    />
                                                                 </a>
-                                                                {section.title}
+                                                                {' '}{section.title}
                                                             </span>
                                                         </div>
-                                                        {section.title === "Fancy1" && (
+                                                        {!section.isFancy && (
                                                             <div className="float-right"><a href="javascript:void(0)" className="btn btn-back">Bet Lock</a></div>
                                                         )}
                                                     </div>
-                                                    <div className="bet-table-body collapse show">
+                                                    <Collapse in={openSections[section.title.toLowerCase()]}>
+                                                        <div className="bet-table-body">
                                                         <div className="bet-table-row">
                                                             <div className="text-right nation-name"></div>
-                                                            <div className="back bl-title d-none-mobile">Back</div>
-                                                            <div className="lay bl-title d-none-mobile">Lay</div>
+                                                            {section.isFancy ?
+                                                                <>
+                                                                    <div className="lay bl-title d-none-mobile">No</div>
+                                                                    <div className="back bl-title d-none-mobile">Yes</div>
+                                                                </>
+                                                                : <>
+                                                                    <div className="back bl-title d-none-mobile">Back</div>
+                                                                    <div className="lay bl-title d-none-mobile">Lay</div>
+                                                                </>}
                                                         </div>
                                                         {section.data.map((item, idx) => {
                                                             const isSuspended = item.status !== "ACTIVE" && item.status !== "OPEN";
@@ -332,30 +336,51 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
                                                                     <div className="bet-table-mobile-row d-none-desktop">
                                                                         <div className="bet-table-mobile-team-name">
                                                                             <span>{item.nat}</span>
-                                                                            <span style={{ color: "rgb(153, 153, 153)" }}>0</span>
+                                                                            <Exposure className="mb-0" data={exposureData} id={item?.sid} isInlineColor={true} />
                                                                         </div>
                                                                     </div>
                                                                     <div className={`bet-table-row ${isSuspended ? 'suspendedtext' : ''}`} data-title={isSuspended ? item.status : ""}>
                                                                         <div className="nation-name d-none-mobile">
                                                                             <p>{item.nat}</p>
-                                                                            <p className="mb-0" style={{ color: "rgb(153, 153, 153)" }}>0</p>
+                                                                            <Exposure className="mb-0" data={exposureData} id={item?.sid} isInlineColor={true} />
                                                                         </div>
-                                                                        <div className="bl-box back" onClick={() => handleOddsClick(section.title, item.nat, item.b1, item, true, item.status)}>
-                                                                            <span className="d-block odds" style={{ color: item.b1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                {item.b1 > 0 ? item.b1 : "-"}
-                                                                            </span>
-                                                                            <span className="d-block" style={{ color: item.bs1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                {item.bs1 > 0 ? formatNumber(item.bs1) : "-"}
-                                                                            </span>
-                                                                        </div>
-                                                                        <div className="bl-box lay no-val" onClick={() => handleOddsClick(section.title, item.nat, item.l1, item, false, item.status)}>
-                                                                            <span className="d-block odds" style={{ color: item.l1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                {item.l1 > 0 ? item.l1 : "-"}
-                                                                            </span>
-                                                                            <span className="d-block" style={{ color: item.ls1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                {item.ls1 > 0 ? formatNumber(item.ls1) : "-"}
-                                                                            </span>
-                                                                        </div>
+                                                                        {section.isLasyFirst ?
+                                                                            <>
+                                                                                <div className="bl-box lay no-val" >
+                                                                                    <span className="d-block odds" style={{ color: item.l1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                        {item.l1 > 0 ? item.l1 : "-"}
+                                                                                    </span>
+                                                                                    <span className="d-block" style={{ color: item.ls1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                        {item.ls1 > 0 ? formatNumber(item.ls1) : "-"}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="bl-box back" >
+                                                                                    <span className="d-block odds" style={{ color: item.b1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                        {item.b1 > 0 ? item.b1 : "-"}
+                                                                                    </span>
+                                                                                    <span className="d-block" style={{ color: item.bs1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                        {item.bs1 > 0 ? formatNumber(item.bs1) : "-"}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </>
+                                                                            : <>
+                                                                                <div className="bl-box back" >
+                                                                                    <span className="d-block odds" style={{ color: item.b1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                        {item.b1 > 0 ? item.b1 : "-"}
+                                                                                    </span>
+                                                                                    <span className="d-block" style={{ color: item.bs1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                        {item.bs1 > 0 ? formatNumber(item.bs1) : "-"}
+                                                                                    </span>
+                                                                                </div>
+                                                                                <div className="bl-box lay no-val" >
+                                                                                    <span className="d-block odds" style={{ color: item.l1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                        {item.l1 > 0 ? item.l1 : "-"}
+                                                                                    </span>
+                                                                                    <span className="d-block" style={{ color: item.ls1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                        {item.ls1 > 0 ? formatNumber(item.ls1) : "-"}
+                                                                                    </span>
+                                                                                </div>
+                                                                            </>}
                                                                         <div className="fancy-min-max">
                                                                             Min:<span>{formatNumber(sanitizeNumber(item.min))}</span> Max:<span>{formatNumber(sanitizeNumber(item.max))}</span>
                                                                         </div>
@@ -364,65 +389,23 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
                                                             );
                                                         })}
                                                     </div>
+                                                    </Collapse>
                                                 </div>
                                             </div>
                                         )
                                     ))}
                                 </div>
+                                {isSmall && <LastResult results={lastResults} />}
                             </div>
                         </div>
                     </div>
+
                     <div className="right-sidebar">
-                        <CasinoRightSidebar />
-                        <div className="card mb-2 my-bet cricket-rule">
-                            <div className="card-header text-center">
-                                <span>{liveScoreData?.spnnation1 || "ENG"} vs {liveScoreData?.spnnation2 || "RSA"}<br />Inning's Card Rules</span>
-                            </div>
-                            <div className="card-body">
-                                <div className="card">
-                                    <div className="card-header">
-                                        <div className="row row5 mt-1">
-                                            <div className="col-4">Cards</div>
-                                            <div className="col-3 text-center">Count</div>
-                                            <div className="col-5 text-right">Value</div>
-                                        </div>
-                                    </div>
-                                    <div className="card-body">
-                                        {[
-                                            { card: "A", count: 5, ball: "1" },
-                                            { card: "2", count: 5, ball: "2" },
-                                            { card: "3", count: 5, ball: "3" },
-                                            { card: "4", count: 5, ball: "4" },
-                                            { card: "6", count: 5, ball: "6" },
-                                            { card: "10", count: 5, ball: "0" }
-                                        ].map((rule, ridx) => (
-                                            <div className="row row5 mt-1" key={ridx}>
-                                                <div className="col-4">
-                                                    <img src={`https://wver.sprintstaticdata.com/v210/static/front/img/superOver/cards/card${rule.card}.png`} alt="" />
-                                                    <span className="ml-2">X</span>
-                                                </div>
-                                                <div className="col-3 text-center">{rule.count}</div>
-                                                <div className="col-5 text-right value">
-                                                    <img src={`https://wver.sprintstaticdata.com/v210/static/front/img/superOver/balls/ball${rule.ball}.png`} alt="" />
-                                                </div>
-                                            </div>
-                                        ))}
-                                        <div className="row row5 mt-1">
-                                            <div className="col-4">
-                                                <img src="https://wver.sprintstaticdata.com/v210/static/front/img/superOver/cards/cardK.png" alt="" />
-                                                <span className="ml-2">X</span>
-                                            </div>
-                                            <div className="col-3 text-center">5</div>
-                                            <div className="col-5 text-right value">
-                                                WICKET
-                                                <img src="https://wver.sprintstaticdata.com/v210/static/front/img/superOver/balls/wicket.png" alt="" />
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        <CasinoRightSidebar
+                            RulesComponent={isCricket5 ? null : RuleComp}
+                        />
                     </div>
+
                 </div>
             </div>
         </div>
@@ -430,3 +413,56 @@ const SuperOver = ({ onBetSelection, lastBetTime }) => {
 };
 
 export default SuperOver;
+
+function Rules({ team1, team2 }) {
+    return (
+        <div className="card mb-2 my-bet cricket-rule">
+            <div className="card-header text-center">
+                <span>{team1 || "ENG"} vs {team2 || "RSA"}<br />Inning's Card Rules</span>
+            </div>
+            <div className="card-body">
+                <div className="card">
+                    <div className="card-header">
+                        <div className="row row5 mt-1">
+                            <div className="col-4">Cards</div>
+                            <div className="col-3 text-center">Count</div>
+                            <div className="col-5 text-right">Value</div>
+                        </div>
+                    </div>
+                    <div className="card-body">
+                        {[
+                            { card: "A", count: 5, ball: "1" },
+                            { card: "2", count: 5, ball: "2" },
+                            { card: "3", count: 5, ball: "3" },
+                            { card: "4", count: 5, ball: "4" },
+                            { card: "6", count: 5, ball: "6" },
+                            { card: "10", count: 5, ball: "0" }
+                        ].map((rule, ridx) => (
+                            <div className="row row5 mt-1" key={ridx}>
+                                <div className="col-4">
+                                    <img src={`https://wver.sprintstaticdata.com/v210/static/front/img/superOver/cards/card${rule.card}.png`} alt="" />
+                                    <span className="ml-2">X</span>
+                                </div>
+                                <div className="col-3 text-center">{rule.count}</div>
+                                <div className="col-5 text-right value">
+                                    <img src={`https://wver.sprintstaticdata.com/v210/static/front/img/superOver/balls/ball${rule.ball}.png`} alt="" />
+                                </div>
+                            </div>
+                        ))}
+                        <div className="row row5 mt-1">
+                            <div className="col-4">
+                                <img src="https://wver.sprintstaticdata.com/v210/static/front/img/superOver/cards/cardK.png" alt="" />
+                                <span className="ml-2">X</span>
+                            </div>
+                            <div className="col-3 text-center">5</div>
+                            <div className="col-5 text-right value">
+                                WICKET
+                                <img src="https://wver.sprintstaticdata.com/v210/static/front/img/superOver/balls/wicket.png" alt="" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    )
+}

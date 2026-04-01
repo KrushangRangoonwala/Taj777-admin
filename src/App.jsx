@@ -36,6 +36,9 @@ import GeneralLock from './pages/reports/GeneralLock'
 import CasinoResult from './pages/reports/CasinoResult'
 import LiveCasinoResult from './pages/reports/LiveCasinoResult'
 import SportBookReport from './pages/reports/SportBookReport'
+import AuthList from './pages/reports/AuthList'
+import Turnover from './pages/reports/Turnover'
+import UserRegisterDetail from './pages/reports/UserRegisterDetail'
 
 function putLiveFirst(arr) {
   if (arr && Array.isArray(arr)) {
@@ -164,6 +167,9 @@ function AppContent() {
           <Route path="admin/reports/casinoresult" element={<CasinoResult />} />
           <Route path="admin/reports/livecasinoreport" element={<LiveCasinoResult />} />
           <Route path="admin/reports/sportbookreport" element={<SportBookReport />} />
+          <Route path="admin/reports/authlist" element={<AuthList />} />
+          <Route path="admin/reports/turnover" element={<Turnover />} />
+          <Route path="admin/reports/userregisterdetail" element={<UserRegisterDetail />} />
           <Route path="admin/createaccount" element={<CreateAccount />} />
           <Route path="admin/game/details" element={
             <EventPage

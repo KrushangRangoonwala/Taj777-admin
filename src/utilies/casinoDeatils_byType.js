@@ -242,6 +242,7 @@ export const gameType_To_details = {
         phpFile: "live_race2.php",
         placeBetApi: "bet_place_race2.php",
     },
+
     "race20": {
         CODE: "RACE_20",
         phpFile: "live_race20.php",

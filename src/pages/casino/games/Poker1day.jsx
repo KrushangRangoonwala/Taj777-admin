@@ -7,8 +7,40 @@ import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import { Exposure } from "../CasinoCenter";
 import BetLimitInfo from "./components/BetLimitInfo2";
+import Rules, { RulesHeader } from "./rules/Rules";
 
-const OneCard1day = ({ gameData, exposureData, lastResults }) => {
+const ruleList = [
+    { label: "Pair (2-10)", value: "1 TO 3" },
+    { label: "A/Q or A/J Off Suited", value: "1 TO 5" },
+    { label: "Pair (JQK)", value: "1 TO 10" },
+    { label: "A/K Off Suited", value: "1 TO 15" },
+    { label: "A/Q or A/J Suited", value: "1 TO 20" },
+    { label: "A/K Suited", value: "1 TO 25" },
+    { label: "A/A", value: "1 TO 30" },
+];
+const ruleList2 = [
+    { label: "Three of a Kind", value: "1 TO 3" },
+    { label: "Straight", value: "1 TO 4" },
+    { label: "Flush", value: "1 TO 6" },
+    { label: "Full House", value: "1 TO 8" },
+    { label: "Four of a Kind", value: "1 TO 30" },
+    { label: "Straight Flush", value: "1 TO 50" },
+    { label: "Royal Flush", value: "1 TO 100" },
+];
+
+function RulesComponent() {
+    return (
+        <>
+            <RulesHeader />
+            <div className="card-body" style={{ padding: "10px" }}>
+                <Rules title="Bonus 1 (2 Cards Bonus)" rules={ruleList} />
+                <Rules title="Bonus 2 (7 Cards Bonus)" rules={ruleList2} />
+            </div>
+        </>
+    )
+}
+
+const Poker1day = ({ gameData, exposureData, lastResults }) => {
     const { CODE, game_type, phpFile, game_name, iframe_url, result_image } = useGetFileData();
 
     const currentGame = gameData?.t1?.[0];
@@ -213,10 +245,12 @@ const OneCard1day = ({ gameData, exposureData, lastResults }) => {
                     </div>
 
                 </div>
-                <CasinoRightSidebar />
+
+
+                <CasinoRightSidebar RulesComponent={RulesComponent} />
             </div>
         </div>
     );
 };
 
-export default OneCard1day;
+export default Poker1day;

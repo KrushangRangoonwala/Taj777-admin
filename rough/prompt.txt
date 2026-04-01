@@ -4,12 +4,6 @@ if u find any library in below html code, then use that library in this react pr
 if u find same structure repeating multiple time then use .map in react, or just made re-usable components
 also maintain code readability and maintainability, so dont make .map if it is not necessary
 
-
---------------------
-
-copy below code's exact same html struture with exact same css classes and exactly same attributes in this react project
-if u find any library in below html code, then use that library in this react project
-
 -------------
 
 instructions :
@@ -21,17 +15,19 @@ also maintain code readability and maintainability, so dont make .map if it is n
 
 
 task :
-org_html = file_name.jsx
+org_html = file_name.html
 admin_game_file = file_name.jsx
-old_game_file = file_name.jsx
+old_game_file = file_name.js
+new_ref_file = @OneCard1day.jsx file and @Poker1day.jsx file
 
 copy this <org_html> code structure in  <admin_game_file>
 
 for <div className="casino-video"> element of <org_html> use casinovideo.jsx
 for <div class="right-sidebar"> element of <org_html> use casinorightsidebar.jsx
+simillarly if u found structure that is simillar to these components Exposure, RemarkMarquee.jsx , RulesHeader, Rules, BetLimitInfo2.jsx then use this component as these are used in <new_ref_file>
 
-take reffrence of html structure from <org_html> file and take refference of logics and how to set socket data from <old_game_file> file
+no need to manually call socket events and exposure api as there in <old_game_file>, instead take this data (gameData, exposureData, lastResults)  as there in <new_ref_file>, 
 
-take refference for setting up socket connection from @OneCard1day.jsx file
+also dont take "handleOddsClick" function logic when user clicks on odds, remove it completely
 
-comment out exposure logic from <admin_game_file> as done in @OneCard1day.jsx file
+take reffrence of html structure from <org_html> file and take refference of logics and how and where data setted from <old_game_file> file

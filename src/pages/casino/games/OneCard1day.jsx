@@ -77,8 +77,6 @@ const OneCard1day = ({ gameData, exposureData, lastResults }) => {
     const dealerMarket = getMarketByName("Dealer");
     const playerMarket = getMarketByName("Player");
 
-
-
     return (
         <div data-v-5a10e370="" className="detail-page-container">
             <div className="center-main-container">

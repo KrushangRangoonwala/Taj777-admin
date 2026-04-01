@@ -1,6 +1,7 @@
 import React from 'react'
+import BetCountMob from './BetCountMob'
 
-const CasinoRightSidebar = () => {
+const CasinoRightSidebar = ({ RulesComponent }) => {
     return (
         <div className="right-sidebar">
             <div className="right-sidebar">
@@ -56,12 +57,18 @@ const CasinoRightSidebar = () => {
                                                     </div>
                                                 </div>
                                             </div>
+
+                                            {RulesComponent
+                                                ? <div className="card m-b-10"><RulesComponent /></div>
+                                                : null}
+
+                                            <BetCountMob betCount={0} />
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                        <div className="simplebar-placeholder" style={{ width: "auto", height: "114px" }}></div>
+                        <div className="simplebar-placeholder" style={{ width: "auto", height: "80vh" }}></div>
                     </div>
                     <div className="simplebar-track simplebar-horizontal" style={{ visibility: "hidden" }}>
                         <div className="simplebar-scrollbar" style={{ width: "0px", display: "none" }}></div>

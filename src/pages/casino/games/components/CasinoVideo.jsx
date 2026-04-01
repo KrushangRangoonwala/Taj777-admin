@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { getValueAfterDot, getImage } from "../../../../utilies/helpers";
 import { useGetFileData } from "../../../../hooks/useGetFileData";
 import LastResult from "./LastResult";
-import Result_parent from "./Result_parent";
 
 const CasinoVideo = ({
     gameName,
@@ -14,12 +13,12 @@ const CasinoVideo = ({
     totalTime = 30,
     CardsComponent,
     titleExtra = null,
+    Popup,
 
     showLastResults = true,
     showCardDrawer = true,
 }) => {
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
-    const [mid, setMid] = useState(false);
     const { game_type, result_image } = useGetFileData();
     const [isLastResultOpen, setIsLastResultOpen] = useState(true);
 
@@ -30,6 +29,8 @@ const CasinoVideo = ({
     };
 
     const strokeDasharrayValue = ((timeLeft || 0) / (totalTime || 30)) * 283;
+
+    const isAllClosed = cards?.every(val => !val || val == 1);
 
     return (
         <div className="casino-video">
@@ -46,11 +47,13 @@ const CasinoVideo = ({
             <div className="video-box-container">
                 <div className="video-box">
                     <iframe src={videoSrc} title="Casino Video" />
+                    {Popup && <Popup />}
                 </div>
             </div>
 
             {showCardDrawer && (
-                <div className={`casino-video-cards ${isCardDrawerOpen ? "" : "hide-cards"}`}>
+                <div className={`casino-video-cards ${(isCardDrawerOpen && !isAllClosed) ? "" : "hide-cards"}`}>
+                    {/* hide cardDrawer when all cards are closed : ${(isCardDrawerOpen && !isAllClosed) ? "" : "hide-cards"} */}
                     <div
                         className="casino-cards-shuffle"
                         onClick={() => setIsCardDrawerOpen(!isCardDrawerOpen)}
@@ -142,15 +145,8 @@ const CasinoVideo = ({
             <div></div>
 
             {showLastResults && (
-                <LastResult
-                    results={results}
-                    isOpen={isLastResultOpen}
-                    mid={mid}
-                    setMid={setMid}
-                />
+                <LastResult results={results} isOpen={isLastResultOpen} />
             )}
-
-            <Result_parent mid={mid} setMid={setMid} game_type={game_type} />
         </div>
     );
 };

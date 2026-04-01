@@ -141,6 +141,10 @@ export const getMarketByNation = (data, nation, keyName = 'nation') => {
     return data.find((m) => m[keyName] === nation);
 };
 
+export const getMarketBySid = (data, sid) => {
+    return data.find((m) => String(m.sid) === String(sid));
+};
+
 export const isObject = (val) => val !== null && typeof val === "object" && !Array.isArray(val);
 
 export const getIsSuspended = (market) => {

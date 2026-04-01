@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import StatCard from '../components/StatCard';
 import ChartCard from '../components/ChartCard';
-import { fetchCasinoList, fetchDashboardData } from '../api/API';
+import { fetchCasinoList, fetchDashboardData } from '../api/API_games';
 import { gameCodeMap } from '../utilies/helpers';
 import { Link } from 'react-router-dom';
 

@@ -1,4 +1,5 @@
-import axiosInstance from "./axiosConfig";
+import axios from "axios";
+import { apiConfigUserData } from "./axiosConfig";
 
 export function getDefaultParams() {
   const aa = JSON.parse(sessionStorage.getItem("userdata") || null);
@@ -9,22 +10,13 @@ export function getDefaultParams() {
   };
 }
 
-
-export function isApiSuccess(response) {
-  return (
-    response?.data?.status?.toLowerCase() === "ok" ||
-    response?.status?.toLowerCase() === "ok" ||
-    response?.data === "Login success"
-  );
-}
-
 export const loginAdmin = async (email, password) => {
   const params = new URLSearchParams();
   params.append('login-email', email);
   params.append('login-password', password);
 
   try {
-    const response = await axiosInstance.post('login.php', params);
+    const response = await apiConfigUserData.post('login.php', params);
 
     if (response.data.status === "ok") {
       return {
@@ -44,44 +36,10 @@ export const loginAdmin = async (email, password) => {
 
 };
 
-export const fetchCasinoList = async () => {
-  try {
-    const response = await axiosInstance.get('http://159.65.143.49/~sevennew/ajaxfiles/casino_list.php');
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching casino list:', error);
-    throw error;
-  }
-};
-
-export function splitByDot(value, idx = 1) {
-  return value.includes(".") ? value.split(".")[idx] : value;
-}
-
-export async function fetchCasinoExposureApi(payload) {
-  const { markettype, main_event_id, curPageName } = payload;
-  const fullPayload = {
-    markettype,
-    main_event_id: splitByDot(String(main_event_id)) || "",
-    curPageName,
-    ...getDefaultParams(),
-  };
-  try {
-    const { data } = await axiosInstance.post(
-      "get_casino_on_page_exposure",
-      fullPayload
-    );
-    return data;
-  } catch (error) {
-    console.error("Error fetching exposure:", error);
-    throw error;
-  }
-}
-
 export async function getAccountStatement(extraPayload = {}) {
   try {
     const payload = { ...getDefaultParams(), ...extraPayload };
-    const { data } = await axiosInstance.post(
+    const { data } = await apiConfigUserData.post(
       "get_account_statement",
       payload
     );
@@ -98,7 +56,7 @@ export async function getClients(search = "") {
       search,
       ...getDefaultParams(),
     };
-    const { data } = await axiosInstance.post("get_clients.php", payload);
+    const { data } = await apiConfigUserData.post("get_clients.php", payload);
 
     return data;
   } catch (error) {
@@ -113,7 +71,7 @@ export async function getProfitLoss(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await axiosInstance.post("profit_loss", fullPayload);
+    const { data } = await apiConfigUserData.post("profit_loss", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching profit loss:", error);
@@ -127,7 +85,7 @@ export async function getCurrentBets(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await axiosInstance.post("current_bets", fullPayload);
+    const { data } = await apiConfigUserData.post("current_bets", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching profit loss:", error);
@@ -141,7 +99,7 @@ export async function getUserHistory(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await axiosInstance.post("user_history", fullPayload);
+    const { data } = await apiConfigUserData.post("user_history", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching history:", error);
@@ -154,7 +112,7 @@ export async function getCasinoResult(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await axiosInstance.post("casino_result", fullPayload);
+    const { data } = await apiConfigUserData.post("casino_result", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching history:", error);
@@ -167,7 +125,7 @@ export async function checkUserLockPwd(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await axiosInstance.post("check_pwd", fullPayload);
+    const { data } = await apiConfigUserData.post("check_pwd", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching history:", error);
@@ -180,30 +138,36 @@ export async function updateUserLockStatus(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await axiosInstance.post("update_status", fullPayload);
+    const { data } = await apiConfigUserData.post("update_status", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching history:", error);
     throw error;
   }
 }
-export async function fetchDashboardData() {
+export async function getAuthList(payload) {
   try {
-    const payload = { ...getDefaultParams() };
-    const { data } = await axiosInstance.post("get_dashboard_data.php", payload);  // DUMMY URL
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await apiConfigUserData.post("auth_list", fullPayload);
     return data;
   } catch (error) {
-    console.error("Error fetching dashboard data:", error);
+    console.error("Error fetching history:", error);
     throw error;
   }
 }
-
-export async function fetchTeenpattiResult(mid) {
+export async function getUserRegisterDetail(payload) {
   try {
-    const response = await axiosInstance.get(`https://worlds777.app/ajaxfiles/teenpatti_result?mid=${mid}`);
-    return response.data;
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await apiConfigUserData.post("get_user_register_detail", fullPayload);
+    return data;
   } catch (error) {
-    console.error("Error fetching teenpatti result:", error);
+    console.error("Error fetching data:", error);
     throw error;
   }
 }
@@ -216,7 +180,7 @@ export async function fetchResultById(eventId, gameType) {
       ...getDefaultParams(),
     };
 
-    const { data } = await axiosInstance.post("teenpatti_result", requestBody);
+    const { data } = await apiConfigUserData.post("teenpatti_result", requestBody);
     isApiSuccess(data);
     return data;
   } catch (error) {

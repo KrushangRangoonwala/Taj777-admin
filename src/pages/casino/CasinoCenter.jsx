@@ -1,14 +1,14 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { fetchCasinoExposureApi } from '../../api/API';
+import { fetchCasinoExposureApi } from '../../api/API_games';
 import { useGetFileData } from '../../hooks/useGetFileData';
 import useSocket from '../../api/Socket/useSocket';
 
+const DragonTiger20 = lazy(() => import('./games/DragonTiger20'));
 const Poker1day = lazy(() => import('./games/Poker1day'));
 const Poker20 = lazy(() => import('./games/Poker20'));
-const OneCard1day = lazy(() => import('./games/OneCard1day'));
-
-const TeenPatti1Day = lazy(() => import('./games/TeenPatti1Day'));
+const Poker6 = lazy(() => import('./games/Poker6'));
+const OneCard1day = lazy(() => import('./games/OneCard1day')); const TeenPatti1Day = lazy(() => import('./games/TeenPatti1Day'));
 const VIPTeenPatti1Day = lazy(() => import('./games/VIPTeenPatti1Day'));
 const InstantTeenPatti3 = lazy(() => import('./games/InstantTeenPatti3'));
 const InstantTeenPatti2 = lazy(() => import('./games/InstantTeenPatti2'));
@@ -41,12 +41,34 @@ const TeenPattiPoison1Day = lazy(() => import('./games/TeenPattiPoison1Day'));
 const Mogambo = lazy(() => import('./games/Mogambo'));
 const Trio = lazy(() => import('./games/Trio'));
 const SuperOver = lazy(() => import('./games/SuperOver'));
+const BallByBall = lazy(() => import('./games/BallByBall'));
+const DragonTiger1Day = lazy(() => import('./games/DragonTiger1Day'));
+const Card32A = lazy(() => import('./games/Card32A'));
+const Card32B = lazy(() => import('./games/Card32B'));
+const TeenPatti2cards = lazy(() => import('./games/TeenPatti2cards'));
+const MuflisTeenPatti = lazy(() => import('./games/MuflisTeenPatti'));
+const TeenPattiOpen = lazy(() => import('./games/TeenPattiOpen'));
+const TwentyNineCardBaccarat = lazy(() => import('./games/29CardBaccarat'));
+const TeenPatti2020C = lazy(() => import('./games/TeenPatti2020C'));
+const TeenPattiTest = lazy(() => import('./games/TeenPattiTest'));
+const BeachRoulette = lazy(() => import('./games/BeachRoulette'));
+const TeenPatti20 = lazy(() => import('./games/TeenPatti2.0'));
+const DTL20 = lazy(() => import('./games/2020DTL'));
+const Sicbo = lazy(() => import("./games/Sicbo"));
+const ThreeCardsJudgement = lazy(() => import("./games/ThreeCardsJudgement"));
 
 
 const gamePath_To_Component = {
+    "sicbo": Sicbo,
+    "sicbo2": Sicbo,
     "pokeroneday": Poker1day,
     "pokert20": Poker20,
+    "poker6player": Poker6,
+    "3cardsjudgement": ThreeCardsJudgement,
     "1card1day": OneCard1day,
+    "dragontigert20": DragonTiger20,
+    "dragontigert202": DragonTiger20,
+    "dragontigeroneday": DragonTiger1Day,
     "odi_teenpatti": TeenPatti1Day,
     "teen62": VIPTeenPatti1Day,
     "instantteenpatti3": InstantTeenPatti3,
@@ -81,6 +103,26 @@ const gamePath_To_Component = {
     "mogambo": Mogambo,
     "trio": Trio,
     "superover": SuperOver,
+    "superover2": SuperOver,
+    "superover3": SuperOver,
+    "5fivecricket": SuperOver,
+    "ball_by_ball": BallByBall,
+    "card32-A": Card32A,
+    "card32-B": Card32B,
+    "teenpatti2cards": TeenPatti2cards,
+    "teenmuf": MuflisTeenPatti,
+    "teenpattiopen": TeenPattiOpen,
+    "29cardbaccarat": TwentyNineCardBaccarat,
+    "teenpattit20c": TeenPatti2020C,
+    "teenpattit20b": TeenPatti2020C,
+    "teenpattit20": TeenPatti2020C,
+    "teenpattitest": TeenPattiTest,
+    "roulette12": BeachRoulette,
+    "roulette13": BeachRoulette,
+    "roulette11": BeachRoulette,
+    "teen6": TeenPatti20,
+    "dragontigerliont20": DTL20,
+
 }
 
 const CasinoCenter = () => {
@@ -175,11 +217,22 @@ export function getExposure(exposureData, marketId) {
     return market ? Number(market.win_loss) || Number(market.total_exposure) : 0;
 }
 
-export function Exposure({ className = "", data, id }) {
+export function Exposure({ className = "", data, id, isInlineColor = false }) {
     const exposure = getExposure(data, id);
+    // if (exposure === 0) return null;
     const exposureClass = exposure > 0 ? "book-red" : exposure < 0 ? "book-green" : "book-black";
+    const exposureColor = exposure > 0 ? "red" : exposure < 0 ? "green" : "black";
 
     return (
-        <span className={`${className} ${exposureClass}`}>{exposure}</span>
+        <>
+            <span
+                className={`${className} ${isInlineColor ? '' : exposureClass}`}
+                style={{ color: isInlineColor ? exposureColor : '' }}
+            >
+                {exposure}
+            </span>
+
+            {/* <span className="badge badge-dark book-per">0.98%</span> */}
+        </>
     )
 }

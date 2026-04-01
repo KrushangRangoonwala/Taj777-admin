@@ -388,6 +388,7 @@ const Lucky7A = ({ onBetSelection, lastBetTime }) => {
                                         showRawLabel={true}
                                         className="d-none-big"
                                     />
+
                                 </div>
                             </div>
                         </div>

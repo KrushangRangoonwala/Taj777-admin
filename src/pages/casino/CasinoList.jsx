@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { fetchCasinoList } from '../../api/API';
+import { fetchCasinoList } from '../../api/API_games';
 import { Link } from 'react-router-dom';
 import { format_casino_list, gameCodeMap } from '../../utilies/helpers';
 import { setAllCasinoGames } from '../../store/slices/casinoSlice';

@@ -128,7 +128,6 @@ const CasinoVideo = ({
 
     return (
         <>
-
             <div className="casino-video" style={height ? { height: height } : {}}>
                 {/* ===== Title ===== */}
                 {gameName && roundId &&

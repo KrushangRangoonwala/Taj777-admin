@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import useSocket from "../../../api/Socket/useSocket";
 import { useGetFileData } from "../../../hooks/useGetFileData";
 import { getValueAfterDot, getIsSuspended, getImage, getExposureClass } from "../../../utilies/helpers";
-import { fetchCasinoExposureApi } from "../../../api/API";
+import { fetchCasinoExposureApi } from "../../../api/API_games";
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";

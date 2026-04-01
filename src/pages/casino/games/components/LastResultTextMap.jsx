@@ -11,7 +11,7 @@ const suitMap = {
 const lastResultTextMap = { // BY PATH_NAME
     DEFAULT: { // NOT MAPPED
         getResultTxt: (win) => (win === "1" ? "A" : "B"),
-        getColorClass: null,
+        getColorClass: (w) => (w === "1" ? "resulta" : w === "2" ? "resultb" : "resulttie"),
     },
 
     goal: {
@@ -73,19 +73,23 @@ const lastResultTextMap = { // BY PATH_NAME
     },
 
     superover: {
-        getResultTxt: (w) => (w === "1" ? "E" : w === "2" ? "R" : "R"),
+        getResultTxt: (w) => (w === "1" ? "E" : w === "2" ? "R" : "T"),
+        getColorClass: (w) => (w === "1" ? "resulta" : w === "2" ? "resultb" : "resulttie"),
     },
 
     superover2: {
         getResultTxt: (w) => (w === "1" ? "I" : w === "2" ? "E" : "R"),
+        getColorClass: (w) => (w === "1" ? "resulta" : w === "2" ? "resultb" : "resulttie"),
     },
 
     superover3: {
         getResultTxt: (w) => (w === "1" ? "I" : w === "2" ? "A" : "R"),
+        getColorClass: (w) => (w === "1" ? "resulta" : w === "2" ? "resultb" : "resulttie"),
     },
 
     cricketv3: {
         getResultTxt: (w) => (w === "1" ? "A" : w === "2" ? "I" : "T"),
+        getColorClass: (w) => (w === "1" ? "resulta" : w === "2" ? "resultb" : "resulttie"),
     },
 
     poker: {
@@ -589,7 +593,7 @@ const lastResultTextMap = { // BY PATH_NAME
 
     ballbyball: {
         getResultTxt: (win) => "R",
-        getColorClass: (win) => "resulttie",
+        getColorClass: (win) => "result-circle player-A resultb",
     },
     lucky15: {
         getResultTxt: (win) => {
@@ -635,8 +639,13 @@ const lastResultTextMap = { // BY PATH_NAME
         getResultTxt: (win) => 'R',
         getColorClass: (win) => "resulttie",
         isRulesFirst: true,
-    }
+    },
 
+    dragontigeroneday: {
+        getResultTxt: (r) => (r === "2" ? "T" : r === "1" ? "D" : "T"),
+        getColorClass: (w) =>
+            w === "2" ? "resultb" : w === "1" ? "resulta" : "resulttie",
+    },
 };
 
 export default lastResultTextMap;

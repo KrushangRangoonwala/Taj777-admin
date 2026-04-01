@@ -1,12 +1,13 @@
 import React, { lazy, Suspense, useState, useEffect } from 'react';
 import { Modal } from 'react-bootstrap';
-import { fetchResultById } from '../../../../api/API';
+import { fetchResultById } from '../../../../api/API_games';
 import { useSelector } from 'react-redux';
 import useIsMobile from '../../../../hooks/useIsMobile';
 // import showToast from '../../../../utilies/toaster';
 import { getGameNameFromType, getValueAfterDot } from '../../../../utilies/helpers';
-
 import Result_BetData from './Result_BetData';
+
+const eee = { fontFamily: "monospace", fontSize: "18px", textAlign: "center", padding: "15px 0px" }
 
 function ResultModalNotFound() {
     return (
@@ -108,26 +109,29 @@ const Result_parent = ({ mid, game_type, setMid }) => {
                 <Modal.Title as="h5">{gameName}</Modal.Title>
                 <button type="button" className="btn-close result-modal-close-btn" aria-label="Close" onClick={onClose}>x</button>
             </Modal.Header>
-            <Modal.Body>
-                <div className="casino-result-round">
-                    <div>Round-ID: {midToPass}</div>
-                    <div>
-                        Match Time: <span>{time}</span>
+
+            {resultData?.game_type && resultData?.event_id
+                ? <Modal.Body>
+                    <div className="casino-result-round">
+                        <div>Round-ID: {midToPass}</div>
+                        <div>
+                            Match Time: <span>{time}</span>
+                        </div>
                     </div>
-                </div>
 
-                <Suspense fallback={<div>Loading...</div>}>
-                    <ResultComponent resultData={resultData} />
-                </Suspense>
+                    <Suspense fallback={<div>Loading...</div>}>
+                        <ResultComponent resultData={resultData} />
+                    </Suspense>
 
-                {betData && betData.length > 0 &&
-                    <Result_BetData
-                        betData={betData}
-                        selectedFilter={selectedFilter}
-                        setSelectedFilter={setSelectedFilter}
-                    />}
+                    {betData && betData.length > 0 &&
+                        <Result_BetData
+                            betData={betData}
+                            selectedFilter={selectedFilter}
+                            setSelectedFilter={setSelectedFilter}
+                        />}
 
-            </Modal.Body>
+                </Modal.Body>
+                : <div style={eee}>No Data Found</div>}
         </Modal>
     );
 };
