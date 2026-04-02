@@ -171,6 +171,19 @@ export async function getUserRegisterDetail(payload) {
     throw error;
   }
 }
+export async function getTurnover(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await apiConfigUserData.post("get_turnover", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+}
 
 export async function fetchResultById(eventId, gameType) {
   try {

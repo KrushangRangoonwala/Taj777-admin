@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { getValueAfterDot, getImage } from "../../../../utilies/helpers";
 import { useGetFileData } from "../../../../hooks/useGetFileData";
 import LastResult from "./LastResult";
+import { Link } from "react-router-dom";
 
 const CasinoVideo = ({
     gameName,
@@ -125,9 +126,9 @@ const CasinoVideo = ({
 
             <div className="casino-video-right-icons">
                 <div title="Home" className="casino-video-home-icon">
-                    <a href="/admin/casino/list" className="" style={{ color: "var(--text-highlight)" }}>
+                    <Link to="/admin/casino/list" className="" style={{ color: "var(--text-highlight)" }}>
                         <i className="fas fa-home"></i>
-                    </a>
+                    </Link>
                 </div>
                 <div title="Rules" className="casino-video-rules-icon">
                     <i className="fas fa-info-circle"></i>

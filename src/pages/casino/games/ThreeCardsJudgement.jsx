@@ -1,6 +1,6 @@
 import React from "react";
 import { useGetFileData } from "../../../hooks/useGetFileData";
-import { getImage, getMarketByNation, getIsSuspended } from "../../../utilies/helpers";
+import { getImage, getMarketByNation, getIsSuspended, formatNumber } from "../../../utilies/helpers";
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import { Exposure } from "../CasinoCenter";
@@ -131,8 +131,8 @@ const ThreeCardsJudgement = ({ gameData, exposureData, lastResults }) => {
                                     </div>
 
                                     <div className="text-right casino-min-max">
-                                        R:<span>{markets.YES?.min || 100}</span>-
-                                        <span>{markets.YES?.max || "200000"}</span>
+                                        R:<span>{formatNumber(markets.YES?.min) || 100}</span>-
+                                        <span>{formatNumber(markets.YES?.max) || "2L"}</span>
                                     </div>
 
                                     <RemarkMarquee remark={remarkText} />

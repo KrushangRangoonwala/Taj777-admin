@@ -56,7 +56,18 @@ const TeenPatti20 = lazy(() => import('./games/TeenPatti2.0'));
 const DTL20 = lazy(() => import('./games/2020DTL'));
 const Sicbo = lazy(() => import("./games/Sicbo"));
 const ThreeCardsJudgement = lazy(() => import("./games/ThreeCardsJudgement"));
-
+const Cricket20 = lazy(() => import("./games/Cricket20"));
+const Cmeter1 = lazy(() => import("./games/Cmeter1"));
+const Cmeter_1card = lazy(() => import("./games/Cmeter_1card"));
+const Goal = lazy(() => import("./games/Goal"));
+const Dolidana = lazy(() => import("./games/Dolidana"));
+const Dum10 = lazy(() => import("./games/Dum10"));
+const OneCard2020 = lazy(() => import("./games/OneCard2020"));
+const Notenum = lazy(() => import("./games/Notenum"));
+const Trap = lazy(() => import("./games/Trap"));
+const Lottery = lazy(() => import("./games/Lottery"));
+const AndarBahar = lazy(() => import("./games/AndarBahar"));
+const Worli = lazy(() => import("./games/Worli"));
 
 const gamePath_To_Component = {
     "sicbo": Sicbo,
@@ -102,11 +113,25 @@ const gamePath_To_Component = {
     "poisonteenpatti": TeenPattiPoison1Day,
     "mogambo": Mogambo,
     "trio": Trio,
+    "dolidana": Dolidana,
+    "lottery": Lottery,
+
     "superover": SuperOver,
     "superover2": SuperOver,
     "superover3": SuperOver,
     "5fivecricket": SuperOver,
+    "cricket-match-2020": Cricket20,
+    "cmeter": Cmeter1,
+    "1cardmeter": Cmeter_1card,
+    "goal": Goal,
     "ball_by_ball": BallByBall,
+    "lucky15": BallByBall,
+
+    "dum10": Dum10,
+    "1card2020": OneCard2020,
+    "notenum": Notenum,
+    "trap": Trap,
+
     "card32-A": Card32A,
     "card32-B": Card32B,
     "teenpatti2cards": TeenPatti2cards,
@@ -120,9 +145,13 @@ const gamePath_To_Component = {
     "roulette12": BeachRoulette,
     "roulette13": BeachRoulette,
     "roulette11": BeachRoulette,
+    "our-roulette": BeachRoulette,
     "teen6": TeenPatti20,
     "dragontigerliont20": DTL20,
+    "andarbahar": AndarBahar,
 
+    "instant_worli": Worli,
+    "worli_matka": Worli,
 }
 
 const CasinoCenter = () => {

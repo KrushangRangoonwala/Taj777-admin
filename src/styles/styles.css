@@ -1148,8 +1148,16 @@ li {
     width: calc(100% - 148px);
 }
 
+.detail-page-container .market-6.ball-by-ball.lucky15-kk .bet-table-header .nation-name {
+    width: calc(100% - 224px);
+}
+
 .detail-page-container .market-6.ball-by-ball .nation-name {
     width: calc(100% - 148px);
+}
+
+.detail-page-container .market-6.ball-by-ball.lucky15-kk .nation-name {
+    width: calc(100% - 224px);
 }
 
 .detail-page-container .market-6 .bet-table-header .nation-name {

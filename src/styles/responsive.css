@@ -5684,6 +5684,10 @@
         width: calc(100% - 148px);
     }
 
+    .detail-page-container .market-6.ball-by-ball.lucky15-kk .nation-name {
+        width: calc(100% - 224px);
+    }
+
     .board-text,
     .board-number {
         font-size: 20px;

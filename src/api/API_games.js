@@ -20,6 +20,27 @@ export const fetchCasinoList = async () => {
     }
 };
 
+export const apiGetSports = async () => {
+    try {
+        const payload = { ...getDefaultParams() };
+        const response = await apiGames.post('/sport_list.php',payload);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching list:', error);
+        throw error;
+    }
+};
+
+export const apiGetGameType = async () => {
+    try {
+        const payload = { ...getDefaultParams() };
+        const response = await apiGames.post('/game_type_list.php',payload);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching list:', error);
+        throw error;
+    }
+};
 
 export function splitByDot(value, idx = 1) {
     return value.includes(".") ? value.split(".")[idx] : value;

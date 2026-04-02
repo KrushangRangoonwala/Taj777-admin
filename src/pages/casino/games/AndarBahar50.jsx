@@ -395,7 +395,7 @@ const AndarBahar50 = ({ onBetSelection, lastBetTime }) => {
                             </div>
 
                             <div className="casino-detail">
-                                <div className="ab-bg d-flex">
+                                <div className="ab-bg d-flex" style={{ gap: '5px' }}>
                                     <div className={`andar-cards-box text-center ${isAndarLocked ? "suspended" : ""}`} style={{ position: 'relative', flex: 1, paddingRight: '2px', gap: '2px' }}>
                                         <h5 className="w-100 text-center text-playera" style={{ fontSize: '20px' }}>Andar</h5>
                                         {isAndarLocked && (

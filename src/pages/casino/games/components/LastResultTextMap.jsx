@@ -22,6 +22,7 @@ const lastResultTextMap = { // BY PATH_NAME
     cmeter: {
         getResultTxt: (win) => (win === "2" ? "H" : win === "1" ? "L" : "T"),
         getColorClass: () => "resultb",
+        isBgTransparent:true,
     },
 
     cmeter1: {

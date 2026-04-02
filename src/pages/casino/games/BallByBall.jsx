@@ -5,97 +5,17 @@ import { formatNumber, sanitizeNumber, getValueAfterDot } from "../../../utilies
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import Collapse from "react-bootstrap/Collapse";
+import RemarkMarquee from "./components/RemarkMarquee";
 
 // import { fetchCasinoExposureApi } from "../../../api/api";
 
-const BallByBall = ({ onBetSelection, lastBetTime, lastResults }) => {
+const BallByBall = ({ exposureData, gameData, lastResults }) => {
     const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
-    const [gameData, setGameData] = useState(null);
+    const isLucky15 = game_type === "lucky15";
     const [results, setResults] = useState([]);
-    const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(false);
     const [openSections, setOpenSections] = useState({ runs: true });
-    // const [exposureData, setExposureData] = useState([]);
     const [displayRdesc, setDisplayRdesc] = useState("");
     const rdescTimerRef = useRef(null);
-
-    const socket = useSocket("casino");
-    useEffect(() => {
-        if (!socket) return;
-
-        const handleData = (data) => {
-            try {
-                const payload = Array.isArray(data) ? data[0] : data;
-                if (payload) {
-                    setGameData(payload);
-                    if (payload.last_results) {
-                        setResults(payload.last_results);
-                    }
-                }
-            } catch (error) {
-                console.error("Error processing BallByBall data:", error);
-            }
-        };
-
-        const handleConnect = () => {
-            console.log(`✅ ${game_type} Connected:`, socket.id);
-            socket.emit("Room", game_type);
-        };
-
-        if (socket.connected) {
-            handleConnect();
-        }
-
-        socket.on("connect", handleConnect);
-        socket.on("game", handleData);
-        socket.on(game_type, handleData);
-
-        return () => {
-            socket.off("connect", handleConnect);
-            socket.off("game", handleData);
-            socket.off(game_type, handleData);
-        };
-    }, [socket, game_type]);
-
-    // useEffect(() => {
-    //     const fetchExposure = async () => {
-    //         if (!gameData?.t1?.mid) return;
-    //         try {
-    //             const response = await fetchCasinoExposureApi({
-    //                 markettype: CODE,
-    //                 main_event_id: gameData.t1.mid,
-    //                 curPageName: phpFile,
-    //             });
-    //             if (Array.isArray(response?.data)) {
-    //                 setExposureData(response.data);
-    //             }
-    //         } catch (error) {
-    //             console.error("Error fetching exposure:", error);
-    //         }
-    //     };
-    //     fetchExposure();
-    // }, [gameData?.t1?.mid, lastBetTime, CODE, phpFile]);
-
-    // const getExposure = (marketId) => {
-    //     if (!Array.isArray(exposureData)) return 0;
-    //     const market = exposureData.find((item) => item.market_id == marketId);
-    //     return market ? market.win_loss || market.total_exposure : 0;
-    // };
-
-    const handleOddsClick = (marketName, odds, market, isBack) => {
-        if (!market || odds == 0) return;
-
-        if (onBetSelection) {
-            onBetSelection({
-                teamName: marketName,
-                odds: odds,
-                minBet: market?.min || 50,
-                maxBet: market?.max || 25000,
-                isBack,
-                marketId: market.sid,
-                eventId: getValueAfterDot(currentGame?.mid),
-            });
-        }
-    };
 
     useEffect(() => {
         if (gameData?.t1?.rdesc) {
@@ -139,7 +59,7 @@ const BallByBall = ({ onBetSelection, lastBetTime, lastResults }) => {
                         <div className="casino-container">
                             <div className="casino-table five-cricket super-over detail-page-container">
                                 <div className="game-header">
-                                    <span className="game-header-name">Ball By Ball</span>
+                                    <span className="game-header-name">{game_name}</span>
                                     <span className="float-right game-header-date">Round ID: {getValueAfterDot(currentGame?.mid) || "Loading..."}</span>
                                 </div>
                                 <div className="container-fluid container-fluid-5">
@@ -162,7 +82,7 @@ const BallByBall = ({ onBetSelection, lastBetTime, lastResults }) => {
                                     </div>
                                 </div>
                                 <div className="market-container">
-                                    <div className="market-6 ball-by-ball">
+                                    <div className={`market-6 ${isLucky15 ? "" : "ball-by-ball"}`}>
                                         <div className="bet-table">
                                             <div
                                                 className={`bet-table-header ${openSections.runs ? "" : "collapsed"}`}
@@ -178,6 +98,7 @@ const BallByBall = ({ onBetSelection, lastBetTime, lastResults }) => {
                                                                 src="https://wver.sprintstaticdata.com/v211/static/front/img/arrow-down.svg"
                                                                 className="mr-1"
                                                                 alt=""
+                                                                style={{ display: isLucky15 ? "none" : "" }}
                                                             />
                                                         </a>
                                                         Runs
@@ -187,7 +108,7 @@ const BallByBall = ({ onBetSelection, lastBetTime, lastResults }) => {
                                             <Collapse in={openSections.runs}>
                                                 <div id="market-runs" className="bet-table-body container-fluid container-fluid-5">
                                                     <div className="row row5 d-none-mobile">
-                                                        <div className="col-12 col-md-6">
+                                                        <div className={`${isLucky15 ? "col-6" : "col-12"} col-md-6`}>
                                                             <div className="fancy-tripple">
                                                                 <div className="bet-table-row">
                                                                     <div className="nation-name"></div>
@@ -195,7 +116,7 @@ const BallByBall = ({ onBetSelection, lastBetTime, lastResults }) => {
                                                                 </div>
                                                             </div>
                                                         </div>
-                                                        <div className="col-12 col-md-6">
+                                                        <div className={`${isLucky15 ? "col-6" : "col-12"} col-md-6`}>
                                                             <div className="fancy-tripple">
                                                                 <div className="bet-table-row">
                                                                     <div className="nation-name"></div>
@@ -213,7 +134,7 @@ const BallByBall = ({ onBetSelection, lastBetTime, lastResults }) => {
                                                             const size = formatNumber(sanitizeNumber(runner.bs)) || "0";
 
                                                             return (
-                                                                <div className="col-12 col-md-6" key={runner.sid || index}>
+                                                                <div className={`${isLucky15 ? "col-6" : "col-12"} col-md-6`} key={runner.sid || index}>
                                                                     <div className="fancy-tripple">
                                                                         <div className="bet-table-mobile-row d-none-desktop">
                                                                             <div className="bet-table-mobile-team-name">
@@ -229,7 +150,6 @@ const BallByBall = ({ onBetSelection, lastBetTime, lastResults }) => {
                                                                             <div
                                                                                 className={`bl-box back ${odds == 0 || isSuspended ? "no-val" : ""} ${isSuspended ? "suspended" : ""}`}
                                                                                 data-title={isSuspended ? "SUSPENDED" : ""}
-                                                                                onClick={() => handleOddsClick(runner.nat, odds, runner, true)}
                                                                             >
                                                                                 {isSuspended ? (
                                                                                     <>
@@ -260,12 +180,7 @@ const BallByBall = ({ onBetSelection, lastBetTime, lastResults }) => {
                                         </div>
                                     </div>
                                 </div>
-                                <div className="casino-remark mt-3">
-                                    <div className="remark-icon">
-                                        <img src="https://wver.sprintstaticdata.com/v209/static/front/img/icons/remark.png" />
-                                    </div>
-                                    <marquee>{currentGame?.remark || "Results are based on stream only. Score board may be different or updated later."}</marquee>
-                                </div>
+                                {!isLucky15 && <RemarkMarquee remark={currentGame?.remark} />}
                             </div>
                         </div>
                     </div>

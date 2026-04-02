@@ -46,7 +46,6 @@ const PlaceBet_Lottery = () => {
         )
     }
 
-
     useEffect(() => {
         if (!socket) return;
 

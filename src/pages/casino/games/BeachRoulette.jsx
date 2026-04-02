@@ -3,21 +3,13 @@ import { useGetFileData } from "../../../hooks/useGetFileData";
 import { getImage } from "../../../utilies/helpers";
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
-import { Exposure } from "../CasinoCenter";
 
-const BoardCell = ({ label, className, sid, exposureData, isNumber = false }) => {
+
+const BoardCell = ({ label, className, isNumber = false }) => {
     return (
         <div className={`board-cell ${className}`}>
             <div className="board-cell-in">
                 <span className={isNumber ? "board-number" : "board-text"}>{label}</span>
-                {sid && (
-                    <Exposure
-                        data={exposureData}
-                        id={sid}
-                        isInlineColor={true}
-                        className="roulette-exposure"
-                    />
-                )}
             </div>
         </div>
     );
@@ -92,8 +84,6 @@ const BeachRoulette = ({ gameData, exposureData, lastResults }) => {
                                                     key={i}
                                                     label={col.label}
                                                     className="yellow"
-                                                    sid={col.sid}
-                                                    exposureData={exposureData}
                                                 />
                                             ))}
                                         </div>
@@ -104,8 +94,6 @@ const BeachRoulette = ({ gameData, exposureData, lastResults }) => {
                                                     key={i}
                                                     label={cat.label}
                                                     className="yellow"
-                                                    sid={cat.sid}
-                                                    exposureData={exposureData}
                                                 />
                                             ))}
                                         </div>
@@ -116,8 +104,6 @@ const BeachRoulette = ({ gameData, exposureData, lastResults }) => {
                                                     key={num}
                                                     label={num}
                                                     className={getNumColor(num)}
-                                                    sid={num === 0 ? 1 : num + 1}
-                                                    exposureData={exposureData}
                                                     isNumber={true}
                                                 />
                                             ))}
@@ -132,12 +118,7 @@ const BeachRoulette = ({ gameData, exposureData, lastResults }) => {
             </div>
 
             <style jsx="true">{`
-                .roulette-exposure {
-                    display: block;
-                    font-size: 10px;
-                    margin-top: 2px;
-                    font-weight: bold;
-                }
+
                 .board-number {
                     font-size: 18px;
                     font-weight: bold;

@@ -1,3 +1,4 @@
+// USE THIS FOR CASINORIGHTSIDEBAR.JSX
 import React from 'react'
 
 const Rules = ({ title, rules = [] }) => {
