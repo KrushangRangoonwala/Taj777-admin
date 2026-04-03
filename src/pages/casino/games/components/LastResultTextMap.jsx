@@ -22,7 +22,7 @@ const lastResultTextMap = { // BY PATH_NAME
     cmeter: {
         getResultTxt: (win) => (win === "2" ? "H" : win === "1" ? "L" : "T"),
         getColorClass: () => "resultb",
-        isBgTransparent:true,
+        isBgTransparent: true,
     },
 
     cmeter1: {
@@ -68,6 +68,11 @@ const lastResultTextMap = { // BY PATH_NAME
         getColorClass: (w) => (w === "1" ? "resulta" : "resultb"),
     },
 
+    teen62: {
+        getResultTxt: (w) => (w === "1" ? "A" : "B"),
+        getColorClass: (w) => (w === "1" ? "resulta" : "resultb"),
+    },
+
     teen120: {
         getResultTxt: (w) => (w === "1" ? "P" : "D"),
         getColorClass: (w) => (w === "1" ? "resulta" : "resultb"),
@@ -108,21 +113,21 @@ const lastResultTextMap = { // BY PATH_NAME
     baccarat: {
         getResultTxt: (w) => (w === "1" ? "P" : w === "2" ? "B" : "T"),
         getColorClass: (w) =>
-            w === "1"
-                ? "baccarat-resulta"
-                : w === "2"
-                    ? "baccarat-resultb"
-                    : "baccarat-resulttie",
+            w == "1"
+                ? "resulta"
+                : w == "2"
+                    ? "resultb"
+                    : "resulttie",
     },
 
     baccarat2: {
         getResultTxt: (w) => (w === "1" ? "P" : w === "2" ? "B" : "T"),
         getColorClass: (w) =>
             w === "1"
-                ? "baccarat-resulta"
+                ? "resulta"
                 : w === "2"
-                    ? "baccarat-resultb"
-                    : "baccarat-resulttie",
+                    ? "resultb"
+                    : "resulttie",
     },
 
     ab20: {

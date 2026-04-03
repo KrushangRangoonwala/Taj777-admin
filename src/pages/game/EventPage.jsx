@@ -155,7 +155,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
         market6: true
     });
 
-    const socket = useSocket("mining");
+    const socket = useSocket("casino");
     useEffect(() => {
         if (selectedMatch?.marketid) {
             requestOdds(selectedMatch?.marketid)

@@ -8,10 +8,10 @@ import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
 import BetLimitInfo from "./components/BetLimitInfo";
 
-const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
+const InstantTeenPatti3 = ({ onBetSelection, exposureData, lastResults }) => {
     const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
-    const [lastResults, setLastResults] = useState([]);
+    // const [lastResults, setLastResults] = useState([]);
     // const [exposureData, setExposureData] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     const [openRanges, setOpenRanges] = useState({});
@@ -222,12 +222,12 @@ const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
                                                 <div className="casino-nation-name"><b>Main</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <BetLimitInfo 
-                                                            id="range1" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketByName("Player A")?.min} 
-                                                            max={getMarketByName("Player A")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range1"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketByName("Player A")?.min}
+                                                            max={getMarketByName("Player A")?.max}
                                                             fallbackMax={300000}
                                                         />
                                                     </div>
@@ -257,12 +257,12 @@ const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
                                                 <div className="casino-nation-name"><b>Main</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <BetLimitInfo 
-                                                            id="range7" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketByName("Player B")?.min} 
-                                                            max={getMarketByName("Player B")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range7"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketByName("Player B")?.min}
+                                                            max={getMarketByName("Player B")?.max}
                                                             fallbackMax={300000}
                                                         />
                                                     </div>
@@ -285,12 +285,12 @@ const InstantTeenPatti3 = ({ onBetSelection, lastBetTime }) => {
                                             <div className="casino-bl-box casino-bl-box-title">
                                                 <div className="casino-bl-box-item"><b>Main</b>
                                                     <div className="float-right">
-                                                        <BetLimitInfo 
-                                                            id="range1_mb" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketByName("Player A")?.min} 
-                                                            max={getMarketByName("Player A")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range1_mb"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketByName("Player A")?.min}
+                                                            max={getMarketByName("Player A")?.max}
                                                             iconClass="float-right"
                                                             fallbackMax={300000}
                                                         />

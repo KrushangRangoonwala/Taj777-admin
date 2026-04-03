@@ -189,15 +189,16 @@ const Trio = ({ onBetSelection, lastBetTime }) => {
                                     setIsCardDrawerOpen={setIsCardDrawerOpen}
                                     CardsComponent={Cards}
                                     resultPath={phpFile}
-                                    showLastResults={false}
-                                // isLastResultOpen={isLastResultOpen}
-                                // setIsLastResultOpen={setIsLastResultOpen}
+                                    showLastResults={true}
+                                    showLastResultComponent={false}
+                                    isLastResultOpen={isLastResultOpen}
+                                    setIsLastResultOpen={setIsLastResultOpen}
                                 />
                                 <LastResult
                                     results={gameData?.last_results || []}
                                     gameName={game_name}
                                     resultPath={game_type}
-                                    className={isLastResultOpen ? "" : "hide-lr"}
+                                    isOpen={isLastResultOpen}
                                 />
                                 <div className="casino-detail">
                                     <div className="row row5">

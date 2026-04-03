@@ -68,6 +68,7 @@ const Trap = lazy(() => import("./games/Trap"));
 const Lottery = lazy(() => import("./games/Lottery"));
 const AndarBahar = lazy(() => import("./games/AndarBahar"));
 const Worli = lazy(() => import("./games/Worli"));
+const AndarBahar2 = lazy(() => import("./games/AndarBahar2"));
 
 const gamePath_To_Component = {
     "sicbo": Sicbo,
@@ -80,11 +81,12 @@ const gamePath_To_Component = {
     "dragontigert20": DragonTiger20,
     "dragontigert202": DragonTiger20,
     "dragontigeroneday": DragonTiger1Day,
+
     "odi_teenpatti": TeenPatti1Day,
     "teen62": VIPTeenPatti1Day,
     "instantteenpatti3": InstantTeenPatti3,
-    "instantteenpatti2": InstantTeenPatti2,
-    "instantteenpatti": InstantTeenPatti,
+    "instantteenpatti2": InstantTeenPatti3,
+    "instantteenpatti": InstantTeenPatti3,
     "teenpatti41": QueenTopOpenTeenPatti,
     "teenpatti42": JackTopOpenTeenPatti,
     "jokerteenpatti120": UnlimitedJoker2020,
@@ -100,8 +102,8 @@ const gamePath_To_Component = {
     "baccarat": Baccarat,
     "baccarat2": Baccarat2,
     "lucky7": Lucky7A,
-    "lucky7eu": Lucky7B,
-    "lucky7eu2": Lucky7C,
+    "lucky7eu": Lucky7A,
+    "lucky7eu2": Lucky7A,
     "lucky5": Lucky6,
     "queen": Queen,
     "ab3": AndarBahar50,
@@ -149,6 +151,7 @@ const gamePath_To_Component = {
     "teen6": TeenPatti20,
     "dragontigerliont20": DTL20,
     "andarbahar": AndarBahar,
+    "andarbahar2": AndarBahar2,
 
     "instant_worli": Worli,
     "worli_matka": Worli,

@@ -100,13 +100,13 @@ const BollywoodCasino2 = ({ onBetSelection }) => {
                 onClick={() => handleOddsClick(marketName || market?.nat, odds, market, type === "back")}
                 style={{ position: "relative" }}
             >
-                {suspended && (
+                {/* {suspended && (
                     <img
                         src="/assets/images/lock.svg"
                         alt="lock"
                         style={{ width: "15px", height: "15px", filter: "brightness(0)", zIndex: 10, position: "absolute", left: "calc(50% - 7px)", top: "calc(50% - 7px)" }}
                     />
-                )}
+                )} */}
                 {children(odds)}
             </div>
         );

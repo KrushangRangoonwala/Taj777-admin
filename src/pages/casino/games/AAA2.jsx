@@ -121,13 +121,13 @@ const AAA2 = ({ onBetSelection, lastBetTime }) => {
                 className={`${className} ${suspended ? "suspended" : ""}`}
                 onClick={() => handleOddsClick(marketName || market?.nat, odds, market, type === "back")}
             >
-                {suspended && (
+                {/* {suspended && (
                     <img
                         src="/assets/images/lock.svg"
                         alt="lock"
                         style={{ width: "15px", height: "15px", opacity: 1, zIndex: 10, position: "absolute", filter: "brightness(0)", left: "calc(50% - 7px)", top: "calc(50% - 7px)" }}
                     />
-                )}
+                )} */}
                 {children(odds)}
             </div>
         );

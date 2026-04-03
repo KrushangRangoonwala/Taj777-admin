@@ -3,6 +3,7 @@ import { getValueAfterDot, getImage } from "../../../../utilies/helpers";
 import { useGetFileData } from "../../../../hooks/useGetFileData";
 import LastResult from "./LastResult";
 import { Link } from "react-router-dom";
+import VideoRules from "./VideoRules";
 
 const CasinoVideo = ({
     gameName,
@@ -18,10 +19,19 @@ const CasinoVideo = ({
 
     showLastResults = true,
     showCardDrawer = true,
+    showLastResultComponent = true,
+
+    isLastResultOpen: externalIsLastResultOpen,
+    setIsLastResultOpen: externalSetIsLastResultOpen,
 }) => {
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     const { game_type, result_image } = useGetFileData();
-    const [isLastResultOpen, setIsLastResultOpen] = useState(true);
+    const [internalIsLastResultOpen, setInternalIsLastResultOpen] = useState(true);
+
+    const isLastResultOpen = externalIsLastResultOpen !== undefined ? externalIsLastResultOpen : internalIsLastResultOpen;
+    const setIsLastResultOpen = externalSetIsLastResultOpen !== undefined ? externalSetIsLastResultOpen : setInternalIsLastResultOpen;
+    const [isAllClosed, setIsAllClosed] = useState(false);
+    const [isRulesOpen, setIsRulesOpen] = useState(false);
 
     const getTimerColorClass = () => {
         if (timeLeft <= 5) return "red";
@@ -31,7 +41,19 @@ const CasinoVideo = ({
 
     const strokeDasharrayValue = ((timeLeft || 0) / (totalTime || 30)) * 283;
 
-    const isAllClosed = cards?.every(val => !val || val == 1);
+    useEffect(() => {
+        console.log('cards', cards);
+        if (cards && cards.length > 0) {
+            setIsAllClosed(cards?.every(val => !val || val == 1));
+        } else {
+            setIsAllClosed(false)
+        }
+    }, [cards])
+
+
+    useEffect(() => {
+        console.log('isAllClosed', isAllClosed); // this logs "true"
+    }, [isAllClosed]);
 
     return (
         <div className="casino-video">
@@ -53,7 +75,7 @@ const CasinoVideo = ({
             </div>
 
             {showCardDrawer && (
-                <div className={`casino-video-cards ${(isCardDrawerOpen && !isAllClosed) ? "" : "hide-cards"}`}>
+                <div className={`casino-video-cards ${isCardDrawerOpen && !isAllClosed ? "" : "hide-cards"}`}>
                     {/* hide cardDrawer when all cards are closed : ${(isCardDrawerOpen && !isAllClosed) ? "" : "hide-cards"} */}
                     <div
                         className="casino-cards-shuffle"
@@ -130,7 +152,7 @@ const CasinoVideo = ({
                         <i className="fas fa-home"></i>
                     </Link>
                 </div>
-                <div title="Rules" className="casino-video-rules-icon">
+                <div title="Rules" className="casino-video-rules-icon" onClick={() => setIsRulesOpen(!isRulesOpen)}>
                     <i className="fas fa-info-circle"></i>
                 </div>
                 {showLastResults &&
@@ -145,9 +167,11 @@ const CasinoVideo = ({
 
             <div></div>
 
-            {showLastResults && (
+            {showLastResults && showLastResultComponent && (
                 <LastResult results={results} isOpen={isLastResultOpen} />
             )}
+
+            {isRulesOpen && <VideoRules gameName={gameName} onClose={() => setIsRulesOpen(false)} />}
         </div>
     );
 };

@@ -2,6 +2,10 @@ import React, { useEffect, useState } from "react";
 import { DatePicker } from "antd";
 import "antd/dist/reset.css";
 import dayjs from "dayjs";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 import { getClients, getTurnover } from "../../api/API";
 import { apiGetSports, apiGetGameType } from "../../api/API_games";
@@ -341,7 +345,7 @@ const Turnover = () => {
                       format="DD/MM/YYYY"
                       style={{ width: "100%" }}
                       disabledDate={(current) => {
-                        if (!fromDate) return true; // disable all if fromDate not selected
+                        if (!fromDate) return current.isAfter(dayjs(), "day"); // disable all if fromDate not selected
 
                         const maxDate = fromDate.add(7, "day");
                         const endOfMonth = fromDate.endOf("month");
@@ -349,7 +353,11 @@ const Turnover = () => {
                         const limitDate = maxDate.isBefore(endOfMonth) ? maxDate : endOfMonth;
 
                         // disable dates before fromDate or after limitDate
-                        return current.isBefore(fromDate, "day") || current.isAfter(limitDate, "day");
+                        return (
+                          current.isBefore(fromDate, "day") ||
+                          current.isAfter(limitDate, "day") ||
+                          current.isAfter(dayjs(), "day")
+                        );
                       }}
                     />
                   </div>

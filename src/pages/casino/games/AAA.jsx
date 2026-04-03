@@ -121,13 +121,13 @@ const AAA = ({ onBetSelection, lastBetTime }) => {
                 className={`${className} ${suspended ? "suspended" : ""}`}
                 onClick={() => handleOddsClick(marketName || market?.nat, odds, market, type === "back")}
             >
-                {suspended && (
+                {/* {suspended && (
                     <img
                         src="/assets/images/lock.svg"
                         alt="lock"
                         style={{ width: "15px", height: "15px", opacity: 1, zIndex: 10, position: "absolute", filter: "brightness(0)", left: "calc(50% - 7px)", top: "calc(50% - 7px)" }}
                     />
-                )}
+                )} */}
                 {children(odds)}
             </div>
         );
@@ -205,7 +205,7 @@ const AAA = ({ onBetSelection, lastBetTime }) => {
                                     ].map((item) => (
                                         <div className="casino-bl-box" key={item.sid}>
                                             <div className="casino-bl-box-item casino-odds-name">
-                                                <b>{item.name}</b> 
+                                                <b>{item.name}</b>
                                                 <span className="float-right book-black">0</span>
                                             </div>
                                             <BetBox sid={item.sid} marketName={item.name} className="back casino-bl-box-item" type="back">

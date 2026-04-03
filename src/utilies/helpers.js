@@ -101,9 +101,10 @@ export const getImage = (cardCode, folders, extension_) => {
 
 export function getCardImage(cardCode, folders_) {
     const folders = folders_ ? folders_ : 'cards_new';
-    if (!cardCode || cardCode === "1") return getImage(cardCode, folders);
-    let formattedCode = String(cardCode).toUpperCase();
-    if (formattedCode.length > 1) {
+    if (!cardCode || cardCode == "1") return getImage(cardCode, folders);
+    var formattedCode = String(cardCode);
+    if (formattedCode?.length > 1 && !formattedCode?.toLowerCase()?.includes("dice")) {
+        formattedCode = formattedCode.toUpperCase();
         const lastChar = formattedCode.slice(-1);
         const secondLastChar = formattedCode.slice(-2, -1);
 

@@ -198,8 +198,8 @@ const InstantTeenPatti2 = ({ onBetSelection, lastBetTime }) => {
                                     results={lastResults}
                                     timeLeft={currentGame?.autotime || 0}
                                     totalTime={currentGame?.ft || 30}
-                                    isCardDrawerOpen={isCardDrawerOpen}
-                                    setIsCardDrawerOpen={setIsCardDrawerOpen}
+                                    // isCardDrawerOpen={isCardDrawerOpen}
+                                    // setIsCardDrawerOpen={setIsCardDrawerOpen}
                                     CardsComponent={Cards}
                                     resultPath={phpFile}
                                     showRawLabel={true}

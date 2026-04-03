@@ -184,6 +184,19 @@ export async function getTurnover(payload) {
     throw error;
   }
 }
+export async function getTotalProfitLoss(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await apiConfigUserData.post("total_profit_loss", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+}
 
 export async function fetchResultById(eventId, gameType) {
   try {

@@ -39,6 +39,7 @@ import SportBookReport from './pages/reports/SportBookReport'
 import AuthList from './pages/reports/AuthList'
 import Turnover from './pages/reports/Turnover'
 import UserRegisterDetail from './pages/reports/UserRegisterDetail'
+import TotalProfitLoss from './pages/reports/TotalProfitLoss'
 
 function putLiveFirst(arr) {
   if (arr && Array.isArray(arr)) {
@@ -52,7 +53,7 @@ function putLiveFirst(arr) {
 
 function AppContent() {
   const dispatch = useDispatch();
-  const socket = useSocket("mining");
+  const socket = useSocket("casino");
   const activeTab = useSelector(state => state.match.activeTab);
   const game_id = activeTab?.id;
   const game_name = activeTab?.label;
@@ -170,6 +171,7 @@ function AppContent() {
           <Route path="admin/reports/authlist" element={<AuthList />} />
           <Route path="admin/reports/turnover" element={<Turnover />} />
           <Route path="admin/reports/userregisterdetail" element={<UserRegisterDetail />} />
+          <Route path="admin/reports/totalprofitloss" element={<TotalProfitLoss />} />
           <Route path="admin/createaccount" element={<CreateAccount />} />
           <Route path="admin/game/details" element={
             <EventPage

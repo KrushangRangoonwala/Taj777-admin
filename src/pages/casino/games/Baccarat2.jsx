@@ -8,10 +8,10 @@ import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
 import BetLimitInfo from "./components/BetLimitInfo";
 
-const Baccarat2 = ({ onBetSelection, lastBetTime }) => {
+const Baccarat2 = ({ onBetSelection, lastBetTime, lastResults }) => {
     const { game_type, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
-    const [lastResults, setLastResults] = useState([]);
+    // const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     const [exposureData, setExposureData] = useState([]);
     const [openRanges, setOpenRanges] = useState({});
@@ -151,13 +151,13 @@ const Baccarat2 = ({ onBetSelection, lastBetTime }) => {
                     className={`baccarat-odd-name ${suspended ? "suspended" : ""}`}
                     onClick={() => handleOddsClick(label, odds, market)}
                 >
-                    {suspended && (
+                    {/* {suspended && (
                         <img
                             src="/assets/images/lock.svg"
                             alt="lock"
                             style={{ width: "12px", position: "absolute", left: "calc(50% - 6px)", top: "calc(50% - 6px)", zIndex: 100, filter: "brightness(0)" }}
                         />
-                    )}
+                    )} */}
                     {label} {displayOdds}
                 </div>
                 <div className={`baccarat-odd-val ${getExposureClass(exposure) || "book-black"}`}>{exposure || 0}</div>
@@ -196,13 +196,13 @@ const Baccarat2 = ({ onBetSelection, lastBetTime }) => {
         return (
             <div className={className} onClick={() => handleOddsClick(label, odds, market)}>
                 <div className={`baccarat-bets-name ${suspended ? "suspended" : ""}`}>
-                    {suspended && (
+                    {/* {suspended && (
                         <img
                             src="/assets/images/lock.svg"
                             alt="lock"
                             style={getLockStyle()}
                         />
-                    )}
+                    )} */}
                     <div>{label}{cards.length > 0 ? ` ${displayOdds}` : ""}</div>
                     <div className="mb-0" style={{ position: "relative", zIndex: 100 }}>
                         {cards.length > 0 ? (
@@ -292,7 +292,6 @@ const Baccarat2 = ({ onBetSelection, lastBetTime }) => {
                                 CardsComponent={Cards}
                                 resultPath="baccarat2"
                                 showCardDrawer={false}
-                                showLastResults={false}
                             />
 
                             <div className="casino-detail">

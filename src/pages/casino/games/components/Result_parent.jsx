@@ -9,12 +9,6 @@ import Result_BetData from './Result_BetData';
 
 const eee = { fontFamily: "monospace", fontSize: "18px", textAlign: "center", padding: "15px 0px" }
 
-function ResultModalNotFound() {
-    return (
-        <div className="text-center" style={{ fontFamily: "monospace", fontSize: "18px" }}>Result Modal not found</div>
-    )
-}
-
 function getGameName(type, casino_list) {
     if (type.includes("superover")) {
         return "Result";
@@ -36,14 +30,7 @@ function getGameName(type, casino_list) {
 }
 
 
-const Result_instantTeenpatti = lazy(() => import('../results/Result_instantTeenpatti'));
 const Result_one = lazy(() => import('../results/Result_one'));
-
-const resultMap = { // BY GAME_TYPE
-    "teen3": Result_one,
-    "teen32": Result_one,
-    "teen33": Result_one,
-}
 
 const Result_parent = ({ mid, game_type, setMid }) => {
     console.log('### game_type', game_type);
@@ -51,7 +38,6 @@ const Result_parent = ({ mid, game_type, setMid }) => {
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [resultData, setResultData] = useState();
-    const ResultComponent = resultMap[game_type] || ResultModalNotFound;
     const casino_list = useSelector(state => state.casino.casino_list);
     const [selectedFilter, setSelectedFilter] = useState('all');
     const [time, setTime] = useState('');
@@ -70,6 +56,7 @@ const Result_parent = ({ mid, game_type, setMid }) => {
             setTime(data?.result_time);
             if (data) {
                 setResultData(data);
+                console.log("PARSED RESULT DATA", JSON.parse(data?.data))
                 setBetData(response?.betdata || []);
             } else {
                 // showToast({ isSuccess: false, message: response.message || "Details not available" })
@@ -120,7 +107,7 @@ const Result_parent = ({ mid, game_type, setMid }) => {
                     </div>
 
                     <Suspense fallback={<div>Loading...</div>}>
-                        <ResultComponent resultData={resultData} />
+                        <Result_one resultData={resultData} />
                     </Suspense>
 
                     {betData && betData.length > 0 &&

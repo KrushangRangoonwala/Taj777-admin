@@ -55,11 +55,11 @@ const Cards = ({ currentGame, result_image }) => (
     </div>
 );
 
-const VIPTeenPatti1Day = ({ onBetSelection }) => {
+const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
     const { game_type: raw_game_type, phpFile, game_name, iframe_url, result_image } = useGetFileData();
     const game_type = raw_game_type || "teen62";
     const [gameData, setGameData] = useState(null);
-    const [lastResults, setLastResults] = useState([]);
+    // const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     const [openRanges, setOpenRanges] = useState({});
 
@@ -226,12 +226,12 @@ const VIPTeenPatti1Day = ({ onBetSelection }) => {
                                                     <b>Main</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <BetLimitInfo 
-                                                            id="range1" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketBySid("1")?.min} 
-                                                            max={getMarketBySid("1")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range1"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketBySid("1")?.min}
+                                                            max={getMarketBySid("1")?.max}
                                                         />
                                                     </div>
                                                 </div>
@@ -249,12 +249,12 @@ const VIPTeenPatti1Day = ({ onBetSelection }) => {
                                                     <b>Consecutive</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <BetLimitInfo 
-                                                            id="range6" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketBySid("17")?.min} 
-                                                            max={getMarketBySid("17")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range6"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketBySid("17")?.min}
+                                                            max={getMarketBySid("17")?.max}
                                                             fallbackMax={100000}
                                                         />
                                                     </div>
@@ -285,12 +285,12 @@ const VIPTeenPatti1Day = ({ onBetSelection }) => {
                                                     <b>Main</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <BetLimitInfo 
-                                                            id="range7" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketBySid("2")?.min} 
-                                                            max={getMarketBySid("2")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range7"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketBySid("2")?.min}
+                                                            max={getMarketBySid("2")?.max}
                                                         />
                                                     </div>
                                                 </div>
@@ -308,12 +308,12 @@ const VIPTeenPatti1Day = ({ onBetSelection }) => {
                                                     <b>Consecutive</b>
                                                     <div className="float-right">
                                                         <span className="mr-2 casino-book book-black">0</span>
-                                                        <BetLimitInfo 
-                                                            id="range12" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketBySid("18")?.min} 
-                                                            max={getMarketBySid("18")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range12"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketBySid("18")?.min}
+                                                            max={getMarketBySid("18")?.max}
                                                             fallbackMax={100000}
                                                         />
                                                     </div>
@@ -341,12 +341,12 @@ const VIPTeenPatti1Day = ({ onBetSelection }) => {
                                                 <div className="casino-nation-name mb-4">
                                                     <b>Odd</b>
                                                     <div className="float-right">
-                                                        <BetLimitInfo 
-                                                            id="range13" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketBySid("11")?.min} 
-                                                            max={getMarketBySid("11")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range13"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketBySid("11")?.min}
+                                                            max={getMarketBySid("11")?.max}
                                                             fallbackMax={25000}
                                                         />
                                                     </div>
@@ -364,12 +364,12 @@ const VIPTeenPatti1Day = ({ onBetSelection }) => {
                                                 <div className="casino-nation-name mb-4">
                                                     <b>Even</b>
                                                     <div className="float-right">
-                                                        <BetLimitInfo 
-                                                            id="range14" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketBySid("11")?.min} 
-                                                            max={getMarketBySid("11")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range14"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketBySid("11")?.min}
+                                                            max={getMarketBySid("11")?.max}
                                                             fallbackMax={25000}
                                                         />
                                                     </div>
@@ -393,12 +393,12 @@ const VIPTeenPatti1Day = ({ onBetSelection }) => {
                                                 <div className="casino-bl-box-item">
                                                     <b>Main</b>
                                                     <div className="float-right">
-                                                        <BetLimitInfo 
-                                                            id="range1_m" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketBySid("1")?.min} 
-                                                            max={getMarketBySid("1")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range1_m"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketBySid("1")?.min}
+                                                            max={getMarketBySid("1")?.max}
                                                             iconClass="float-right"
                                                         />
                                                     </div>
@@ -430,12 +430,12 @@ const VIPTeenPatti1Day = ({ onBetSelection }) => {
                                                 <div className="casino-bl-box-item casino-card-img">
                                                     <b>Consecutive</b>
                                                     <div className="float-right">
-                                                        <BetLimitInfo 
-                                                            id="range6_m" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketBySid("17")?.min} 
-                                                            max={getMarketBySid("17")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range6_m"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketBySid("17")?.min}
+                                                            max={getMarketBySid("17")?.max}
                                                             iconClass="float-right"
                                                             fallbackMax={100000}
                                                         />
@@ -468,12 +468,12 @@ const VIPTeenPatti1Day = ({ onBetSelection }) => {
                                                 <div className="casino-bl-box-item casino-card-img">
                                                     <b>Cards</b>
                                                     <div className="float-right">
-                                                        <BetLimitInfo 
-                                                            id="range7_m" 
-                                                            openRanges={openRanges} 
-                                                            toggleRange={toggleRange} 
-                                                            min={getMarketBySid("11")?.min} 
-                                                            max={getMarketBySid("11")?.max} 
+                                                        <BetLimitInfo
+                                                            id="range7_m"
+                                                            openRanges={openRanges}
+                                                            toggleRange={toggleRange}
+                                                            min={getMarketBySid("11")?.min}
+                                                            max={getMarketBySid("11")?.max}
                                                             iconClass="float-right"
                                                             fallbackMax={25000}
                                                         />
