@@ -181,7 +181,7 @@ const Queen = ({ onBetSelection }) => {
                 {...(type === "back" ? { "data-toggle": "modal", "data-target": "#casino-betslip" } : {})}
                 style={{ position: 'relative' }}
             >
-                {showLock && suspended && (
+                {/* {showLock && suspended && (
                     <img
                         src="/assets/images/lock.svg"
                         alt="lock"
@@ -195,7 +195,7 @@ const Queen = ({ onBetSelection }) => {
                             zIndex: 10
                         }}
                     />
-                )}
+                )} */}
                 <span className="casino-box-odd">
                     {suspended || isLocked ? "0" : odds}
                 </span>
@@ -235,7 +235,7 @@ const Queen = ({ onBetSelection }) => {
                                                     <div className="casino-box-row">
                                                         <div className="casino-nation-name"><b>{nat}</b></div>
                                                         <div className="casino-bl-box" style={{ position: 'relative' }}>
-                                                            {suspended && (
+                                                            {/* {suspended && (
                                                                 <img
                                                                     src="/assets/images/lock.svg"
                                                                     alt="lock"
@@ -249,7 +249,7 @@ const Queen = ({ onBetSelection }) => {
                                                                         zIndex: 10
                                                                     }}
                                                                 />
-                                                            )}
+                                                            )} */}
                                                             <RenderBetBox nat={nat} type="back" />
                                                             <RenderBetBox nat={nat} type="lay" />
                                                         </div>

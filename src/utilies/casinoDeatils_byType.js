@@ -53,7 +53,7 @@ export const gamePath_MapTo_gametype = {
     "mogambo": "mogambo",
     "jokerteenpatti1": "joker1",
     "jokerteenpatti120": "joker120",
-    "unique_teenpatti": "teen20c",
+    "unique_teenpatti": "teenunique",
     "odi_teenpatti": "teen",
     "card32-A": "card32",
     "card32-B": "card32eu",

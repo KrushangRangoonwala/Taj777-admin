@@ -4,7 +4,7 @@ import { fetchResultById } from '../../../../api/API_games';
 import { useSelector } from 'react-redux';
 import useIsMobile from '../../../../hooks/useIsMobile';
 // import showToast from '../../../../utilies/toaster';
-import { getGameNameFromType, getValueAfterDot } from '../../../../utilies/helpers';
+import { formatWithTimezone, getGameNameFromType, getValueAfterDot } from '../../../../utilies/helpers';
 import Result_BetData from './Result_BetData';
 
 const eee = { fontFamily: "monospace", fontSize: "18px", textAlign: "center", padding: "15px 0px" }
@@ -53,10 +53,11 @@ const Result_parent = ({ mid, game_type, setMid }) => {
             const response = await fetchResultById(midToPass, game_type);
 
             const data = response.data;
-            setTime(data?.result_time);
             if (data) {
                 setResultData(data);
-                console.log("PARSED RESULT DATA", JSON.parse(data?.data))
+                const qq = JSON.parse(data?.data);
+                console.log("PARSED RESULT DATA", qq);
+                setTime(qq?.t1?.mtime);
                 setBetData(response?.betdata || []);
             } else {
                 // showToast({ isSuccess: false, message: response.message || "Details not available" })
@@ -102,7 +103,8 @@ const Result_parent = ({ mid, game_type, setMid }) => {
                     <div className="casino-result-round">
                         <div>Round-ID: {midToPass}</div>
                         <div>
-                            Match Time: <span>{time}</span>
+                            {/* Match Time: <span>{time}</span> */}
+                            Match Time: <span>{formatWithTimezone(time?.slice(0, time?.length - 3))}</span>
                         </div>
                     </div>
 

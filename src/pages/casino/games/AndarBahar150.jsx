@@ -402,11 +402,11 @@ const AndarBahar150 = ({ onBetSelection, lastBetTime }) => {
                                 <div className="ab-bg d-flex" style={{ gap: '5px' }}>
                                     <div className={`andar-cards-box text-center ${isAndarLocked ? "suspended" : ""}`} style={{ position: 'relative', flex: 1, paddingRight: '2px', gap: '2px' }}>
                                         <h5 className="w-100 text-center text-playera" style={{ fontSize: '20px' }}>Andar</h5>
-                                        {isAndarLocked && (
+                                        {/* {isAndarLocked && (
                                             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 11 }}>
                                                 <img src="/assets/images/lock.svg" alt="lock" style={{ width: '15px', height: '15px' }} />
                                             </div>
-                                        )}
+                                        )} */}
                                         <div className="row row5 justify-content-center">
                                             {marketData.slice(0, 13).map((item) => (
                                                 <div key={item.sid} className="col-6 col-md-4 mb-2">
@@ -417,11 +417,11 @@ const AndarBahar150 = ({ onBetSelection, lastBetTime }) => {
                                     </div>
                                     <div className={`bahar-cards-box text-center ${isBaharLocked ? "suspended" : ""}`} style={{ position: 'relative', flex: 1, paddingLeft: '2px', gap: '2px' }}>
                                         <h5 className="w-100 text-center text-playerb" style={{ fontSize: '20px' }}>Bahar</h5>
-                                        {isBaharLocked && (
+                                        {/* {isBaharLocked && (
                                             <div style={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', zIndex: 11 }}>
                                                 <img src="/assets/images/lock.svg" alt="lock" style={{ width: '15px', height: '15px' }} />
                                             </div>
-                                        )}
+                                        )} */}
                                         <div className="row row5 justify-content-center">
                                             {marketData.slice(13, 26).map((item) => (
                                                 <div key={item.sid} className="col-6 col-md-4 mb-2">

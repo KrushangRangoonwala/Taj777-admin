@@ -189,7 +189,7 @@ const SuperOver = ({ exposureData, lastResults }) => {
     );
 
     const RuleComp = () => <Rules team1={liveScoreData?.spnnation1} team2={liveScoreData?.spnnation2} />
-    console.log('liveScoreData', liveScoreData);
+    // console.log('liveScoreData', liveScoreData);
     return (
         <div data-v-5a10e370="">
             <div data-v-5a10e370="" className="detail-page-container">
@@ -245,44 +245,44 @@ const SuperOver = ({ exposureData, lastResults }) => {
                                                 </div>
                                                 <Collapse in={openSections.bookmaker}>
                                                     <div id="market0" className="bet-table-body">
-                                                    <div className="bet-table-row">
-                                                        <div className="text-right nation-name">
-                                                            <span className="max-bet">
-                                                                Min:<span>{formatNumber(sanitizeNumber(currentGame?.min || 100))}</span>
-                                                                Max:<span>{currentGame?.max ? formatNumber(currentGame.max) : '5L'}</span>
-                                                            </span>
+                                                        <div className="bet-table-row">
+                                                            <div className="text-right nation-name">
+                                                                <span className="max-bet">
+                                                                    Min:<span>{formatNumber(sanitizeNumber(currentGame?.min || 100))}</span>
+                                                                    Max:<span>{currentGame?.max ? formatNumber(currentGame.max) : '5L'}</span>
+                                                                </span>
+                                                            </div>
+                                                            <div className="back bl-title d-none-mobile">Back</div>
+                                                            <div className="lay bl-title d-none-mobile">Lay</div>
                                                         </div>
-                                                        <div className="back bl-title d-none-mobile">Back</div>
-                                                        <div className="lay bl-title d-none-mobile">Lay</div>
+                                                        {bookmakerData.map((runner, idx) => {
+                                                            const isSuspended = runner.status !== "ACTIVE" && runner.status !== "OPEN";
+                                                            return (
+                                                                <React.Fragment key={idx}>
+                                                                    <div className="bet-table-mobile-row d-none-desktop">
+                                                                        <div className="bet-table-mobile-team-name">
+                                                                            <span>{runner.nat}</span>
+                                                                            <Exposure className="mb-0" data={exposureData} id={runner?.mid} isInlineColor={true} />
+                                                                        </div>
+                                                                    </div>
+                                                                    <div className={`bet-table-row ${isSuspended ? 'suspendedtext' : ''}`} data-title={isSuspended ? runner.status : ""}>
+                                                                        <div className="nation-name d-none-mobile">
+                                                                            <p>{runner.nat}</p>
+                                                                            <Exposure className="mb-0 float-left" data={exposureData} id={runner?.mid} isInlineColor={true} />
+                                                                        </div>
+                                                                        <div className="bl-box back back" >
+                                                                            <span className="d-block odds">{runner.b1 || "—"}</span>
+                                                                            <span className="d-block">{formatNumber(runner.bs1)}</span>
+                                                                        </div>
+                                                                        <div className="bl-box lay lay" >
+                                                                            <span className="d-block odds">{runner.l1 || "—"}</span>
+                                                                            <span className="d-block">{formatNumber(runner.ls1)}</span>
+                                                                        </div>
+                                                                    </div>
+                                                                </React.Fragment>
+                                                            );
+                                                        })}
                                                     </div>
-                                                    {bookmakerData.map((runner, idx) => {
-                                                        const isSuspended = runner.status !== "ACTIVE" && runner.status !== "OPEN";
-                                                        return (
-                                                            <React.Fragment key={idx}>
-                                                                <div className="bet-table-mobile-row d-none-desktop">
-                                                                    <div className="bet-table-mobile-team-name">
-                                                                        <span>{runner.nat}</span>
-                                                                        <Exposure className="mb-0" data={exposureData} id={runner?.mid} isInlineColor={true} />
-                                                                    </div>
-                                                                </div>
-                                                                <div className={`bet-table-row ${isSuspended ? 'suspendedtext' : ''}`} data-title={isSuspended ? runner.status : ""}>
-                                                                    <div className="nation-name d-none-mobile">
-                                                                        <p>{runner.nat}</p>
-                                                                        <Exposure className="mb-0 float-left" data={exposureData} id={runner?.mid} isInlineColor={true} />
-                                                                    </div>
-                                                                    <div className="bl-box back back" >
-                                                                        <span className="d-block odds">{runner.b1 || "—"}</span>
-                                                                        <span className="d-block">{formatNumber(runner.bs1)}</span>
-                                                                    </div>
-                                                                    <div className="bl-box lay lay" >
-                                                                        <span className="d-block odds">{runner.l1 || "—"}</span>
-                                                                        <span className="d-block">{formatNumber(runner.ls1)}</span>
-                                                                    </div>
-                                                                </div>
-                                                            </React.Fragment>
-                                                        );
-                                                    })}
-                                                </div>
                                                 </Collapse>
                                             </div>
                                         </div>
@@ -317,78 +317,78 @@ const SuperOver = ({ exposureData, lastResults }) => {
                                                     </div>
                                                     <Collapse in={openSections[section.title.toLowerCase()]}>
                                                         <div className="bet-table-body">
-                                                        <div className="bet-table-row">
-                                                            <div className="text-right nation-name"></div>
-                                                            {section.isFancy ?
-                                                                <>
-                                                                    <div className="lay bl-title d-none-mobile">No</div>
-                                                                    <div className="back bl-title d-none-mobile">Yes</div>
-                                                                </>
-                                                                : <>
-                                                                    <div className="back bl-title d-none-mobile">Back</div>
-                                                                    <div className="lay bl-title d-none-mobile">Lay</div>
-                                                                </>}
+                                                            <div className="bet-table-row">
+                                                                <div className="text-right nation-name"></div>
+                                                                {section.isFancy ?
+                                                                    <>
+                                                                        <div className="lay bl-title d-none-mobile">No</div>
+                                                                        <div className="back bl-title d-none-mobile">Yes</div>
+                                                                    </>
+                                                                    : <>
+                                                                        <div className="back bl-title d-none-mobile">Back</div>
+                                                                        <div className="lay bl-title d-none-mobile">Lay</div>
+                                                                    </>}
+                                                            </div>
+                                                            {section.data.map((item, idx) => {
+                                                                const isSuspended = item.status !== "ACTIVE" && item.status !== "OPEN";
+                                                                return (
+                                                                    <div className="fancy-tripple" key={idx}>
+                                                                        <div className="bet-table-mobile-row d-none-desktop">
+                                                                            <div className="bet-table-mobile-team-name">
+                                                                                <span>{item.nat}</span>
+                                                                                <Exposure className="mb-0" data={exposureData} id={item?.sid} isInlineColor={true} />
+                                                                            </div>
+                                                                        </div>
+                                                                        <div className={`bet-table-row ${isSuspended ? 'suspendedtext' : ''}`} data-title={isSuspended ? item.status : ""}>
+                                                                            <div className="nation-name d-none-mobile">
+                                                                                <p>{item.nat}</p>
+                                                                                <Exposure className="mb-0" data={exposureData} id={item?.sid} isInlineColor={true} />
+                                                                            </div>
+                                                                            {section.isLasyFirst ?
+                                                                                <>
+                                                                                    <div className="bl-box lay no-val" >
+                                                                                        <span className="d-block odds" style={{ color: item.l1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                            {item.l1 > 0 ? item.l1 : "-"}
+                                                                                        </span>
+                                                                                        <span className="d-block" style={{ color: item.ls1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                            {item.ls1 > 0 ? formatNumber(item.ls1) : "-"}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div className="bl-box back" >
+                                                                                        <span className="d-block odds" style={{ color: item.b1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                            {item.b1 > 0 ? item.b1 : "-"}
+                                                                                        </span>
+                                                                                        <span className="d-block" style={{ color: item.bs1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                            {item.bs1 > 0 ? formatNumber(item.bs1) : "-"}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </>
+                                                                                : <>
+                                                                                    <div className="bl-box back" >
+                                                                                        <span className="d-block odds" style={{ color: item.b1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                            {item.b1 > 0 ? item.b1 : "-"}
+                                                                                        </span>
+                                                                                        <span className="d-block" style={{ color: item.bs1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                            {item.bs1 > 0 ? formatNumber(item.bs1) : "-"}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                    <div className="bl-box lay no-val" >
+                                                                                        <span className="d-block odds" style={{ color: item.l1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                            {item.l1 > 0 ? item.l1 : "-"}
+                                                                                        </span>
+                                                                                        <span className="d-block" style={{ color: item.ls1 > 0 ? "black" : "#AAAFB5" }}>
+                                                                                            {item.ls1 > 0 ? formatNumber(item.ls1) : "-"}
+                                                                                        </span>
+                                                                                    </div>
+                                                                                </>}
+                                                                            <div className="fancy-min-max">
+                                                                                Min:<span>{formatNumber(sanitizeNumber(item.min))}</span> Max:<span>{formatNumber(sanitizeNumber(item.max))}</span>
+                                                                            </div>
+                                                                        </div>
+                                                                    </div>
+                                                                );
+                                                            })}
                                                         </div>
-                                                        {section.data.map((item, idx) => {
-                                                            const isSuspended = item.status !== "ACTIVE" && item.status !== "OPEN";
-                                                            return (
-                                                                <div className="fancy-tripple" key={idx}>
-                                                                    <div className="bet-table-mobile-row d-none-desktop">
-                                                                        <div className="bet-table-mobile-team-name">
-                                                                            <span>{item.nat}</span>
-                                                                            <Exposure className="mb-0" data={exposureData} id={item?.sid} isInlineColor={true} />
-                                                                        </div>
-                                                                    </div>
-                                                                    <div className={`bet-table-row ${isSuspended ? 'suspendedtext' : ''}`} data-title={isSuspended ? item.status : ""}>
-                                                                        <div className="nation-name d-none-mobile">
-                                                                            <p>{item.nat}</p>
-                                                                            <Exposure className="mb-0" data={exposureData} id={item?.sid} isInlineColor={true} />
-                                                                        </div>
-                                                                        {section.isLasyFirst ?
-                                                                            <>
-                                                                                <div className="bl-box lay no-val" >
-                                                                                    <span className="d-block odds" style={{ color: item.l1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                        {item.l1 > 0 ? item.l1 : "-"}
-                                                                                    </span>
-                                                                                    <span className="d-block" style={{ color: item.ls1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                        {item.ls1 > 0 ? formatNumber(item.ls1) : "-"}
-                                                                                    </span>
-                                                                                </div>
-                                                                                <div className="bl-box back" >
-                                                                                    <span className="d-block odds" style={{ color: item.b1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                        {item.b1 > 0 ? item.b1 : "-"}
-                                                                                    </span>
-                                                                                    <span className="d-block" style={{ color: item.bs1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                        {item.bs1 > 0 ? formatNumber(item.bs1) : "-"}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </>
-                                                                            : <>
-                                                                                <div className="bl-box back" >
-                                                                                    <span className="d-block odds" style={{ color: item.b1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                        {item.b1 > 0 ? item.b1 : "-"}
-                                                                                    </span>
-                                                                                    <span className="d-block" style={{ color: item.bs1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                        {item.bs1 > 0 ? formatNumber(item.bs1) : "-"}
-                                                                                    </span>
-                                                                                </div>
-                                                                                <div className="bl-box lay no-val" >
-                                                                                    <span className="d-block odds" style={{ color: item.l1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                        {item.l1 > 0 ? item.l1 : "-"}
-                                                                                    </span>
-                                                                                    <span className="d-block" style={{ color: item.ls1 > 0 ? "black" : "#AAAFB5" }}>
-                                                                                        {item.ls1 > 0 ? formatNumber(item.ls1) : "-"}
-                                                                                    </span>
-                                                                                </div>
-                                                                            </>}
-                                                                        <div className="fancy-min-max">
-                                                                            Min:<span>{formatNumber(sanitizeNumber(item.min))}</span> Max:<span>{formatNumber(sanitizeNumber(item.max))}</span>
-                                                                        </div>
-                                                                    </div>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
                                                     </Collapse>
                                                 </div>
                                             </div>

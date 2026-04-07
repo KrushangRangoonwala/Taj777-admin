@@ -4,11 +4,11 @@ import { formatNumber, sanitizeNumber } from '../../../utilies/helpers';
 
 export const OddsBox = ({ type, level, odds, size, noVal, suspended, animateColor }) => {
     const isNoVal = (!odds || odds == "0" || odds == "0.00") && (!size || size == "0" || size == "0.00");
-    const className = `bl-box ${type} ${level ? type + level : ''} ${noVal || isNoVal ? 'no-val' : ''} ${suspended ? 'suspended' : ''}`;
+    const className = `bl-box ${type} ${level ? type + level : ''} ${noVal || isNoVal ? 'no-val' : ''}`;
     return (
         <div className={className}>
             {/* {animateColor && (<span className={`flash-overlay ${animateColor}`} />)} */}
-            {isNoVal && !suspended ? (
+            {isNoVal || suspended ? (
                 <span className="d-block odds aqa">—</span>
             ) : (
                 <>
@@ -51,7 +51,7 @@ export const MarketTable = ({
                                     alt=""
                                 />
                             </a>
-                            {title}
+                            {' '}{title}
                         </span>
                     </div>
                     <div className="float-right">

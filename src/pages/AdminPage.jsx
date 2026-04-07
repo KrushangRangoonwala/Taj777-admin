@@ -3,7 +3,8 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { login } from '../store/slices/userSlice';
-import { loginAdmin } from '../api/API';
+import { loginAdmin, getBannerImages } from '../api/API';
+import dayjs from 'dayjs';
 
 const AdminPage = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -11,6 +12,7 @@ const AdminPage = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [carouselBanners, setCarouselBanners] = useState([]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -21,6 +23,30 @@ const AdminPage = () => {
       navigate('/admin/home');
     }
   }, [isLoggedIn, navigate]);
+
+  useEffect(() => {
+    const fetchBanners = async () => {
+      try {
+        const banners = await getBannerImages();
+        if (banners && banners.length > 0) {
+          setCarouselBanners(banners);
+        } else {
+          // Fallback banners from user request
+          setCarouselBanners([
+            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775535285240.webp",
+            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775509048644.webp",
+            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775515932883.webp",
+            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775464523068.webp",
+            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775508829184.webp",
+            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775517246538.webp"
+          ]);
+        }
+      } catch (err) {
+        console.error("Error fetching banners on AdminPage:", err);
+      }
+    };
+    fetchBanners();
+  }, []);
 
   const toggleLogin = () => setIsLoginOpen(!isLoginOpen);
 
@@ -69,13 +95,20 @@ const AdminPage = () => {
     }
   }, [isLoginOpen])
 
-  const carouselBanners = [
-    "https://sitethemedata.com/sitethemes/world777.com/front/banners/1774237684677.webp",
-    "https://sitethemedata.com/sitethemes/world777.com/front/banners/1774224933045.webp",
-    "https://sitethemedata.com/sitethemes/world777.com/front/banners/1774242278412.webp",
-    "https://sitethemedata.com/sitethemes/world777.com/front/banners/1774226663520.webp",
-    "https://sitethemedata.com/sitethemes/world777.com/front/banners/1774226931993.webp",
-    "https://sitethemedata.com/sitethemes/world777.com/front/banners/1774262353127.webp"
+  const fixtures = [
+    { title: "Ladislav Novotny - Petr Serak", date: "07/04/2026 11:30:00", icon: "icon-8" },
+    { title: "Yasmine Hamza - Anja Blazina", date: "07/04/2026 12:30:00", icon: "icon-22" },
+    { title: "Ringwood Hawks W - Nunawading W", date: "07/04/2026 13:30:00", icon: "icon-15" },
+    { title: "Peliwo v Wendelken", date: "07/04/2026 14:30:00", icon: "icon-2" },
+    { title: "Petra Saarnivaara - Natalia Slobodova", date: "07/04/2026 15:00:00", icon: "icon-22" },
+    { title: "Zhetysu W - Turan Turkestan W", date: "07/04/2026 16:30:00", icon: "icon-18" },
+    { title: "Hatayspor v Adana Demirspor", date: "07/04/2026 17:00:00", icon: "icon-1" },
+    { title: "Volynets v Vekic", date: "07/04/2026 18:30:00", icon: "icon-2" },
+    { title: "Rajasthan Royals v Mumbai Indians", date: "07/04/2026 19:30:00", icon: "icon-4" },
+    { title: "Deauville", date: "07/04/2026 20:20:00", icon: "icon-10" },
+    { title: "Carmen Maria Jimenez / Nikol Carulla - Debora Jille / Isabel Lohau", date: "07/04/2026 21:40:00", icon: "icon-22" },
+    { title: "Schweinfurt v Rot-Weiss Essen", date: "07/04/2026 22:30:00", icon: "icon-1" },
+    { title: "Ka Pliskova v A Sasnovich", date: "07/04/2026 23:00:00", icon: "icon-2" }
   ];
   // --- slide ---
   const latestCasinos = [
@@ -194,7 +227,17 @@ const AdminPage = () => {
           <div data-v-019a5d71="" className="upcoming-fixure">
             <div data-v-019a5d71="" className="fixure-title">Upcoming Fixtures</div>
             <marquee data-v-019a5d71="">
-              <div data-v-019a5d71="" className="fixure-box-container"></div>
+              <div data-v-019a5d71="" className="fixure-box-container">
+                {fixtures.map((fx, i) => (
+                  <div key={i} data-v-019a5d71="" className="fixure-box">
+                    <div data-v-019a5d71="">
+                      <i data-v-019a5d71="" className={`d-icon mr-2 ${fx.icon}`}></i>
+                      {fx.title}
+                    </div>
+                    <div data-v-019a5d71="">{fx.date}</div>
+                  </div>
+                ))}
+              </div>
             </marquee>
           </div>
           <div data-v-019a5d71="" className="w-100 d-none-desktop">
@@ -203,37 +246,37 @@ const AdminPage = () => {
             </marquee>
           </div>
           <div data-v-019a5d71="">
-            <div data-v-019a5d71="" role="region" aria-busy="false" className="carousel carousal-23 slide" id="__BVID__5049">
-              <div role="list" className="carousel-inner" id="__BVID__5049___BV_inner_">
+            <div data-v-019a5d71="" role="region" aria-busy="false" className="carousel carousal-23 slide" id="__BVID__16">
+              <div role="list" className="carousel-inner" id="__BVID__16___BV_inner_">
                 {carouselBanners.map((banner, index) => (
                   <div
                     key={index}
                     data-v-019a5d71=""
                     role="listitem"
-                    className={`carousel-item ${index === carouselBanners.length - 1 ? 'active' : ''}`}
-                    aria-current={index === carouselBanners.length - 1}
+                    className={`carousel-item ${index === 0 ? 'active' : ''}`}
+                    aria-current={index === 0}
                     aria-posinset={index + 1}
                     aria-setsize={carouselBanners.length}
-                    id={`__BVID__${5050 + index}`}
+                    id={`__BVID__${17 + index}`}
                     style={{ background: `url("${banner}")` }}
-                    aria-hidden={index !== carouselBanners.length - 1}
+                    aria-hidden={index !== 0}
                   >
                     {/*  */}
                   </div>
                 ))}
               </div>
-              <ol aria-hidden="false" aria-label="Select a slide to display" className="carousel-indicators" id="__BVID__5049___BV_indicators_" aria-owns="__BVID__5049___BV_inner_">
+              <ol aria-hidden="false" aria-label="Select a slide to display" className="carousel-indicators" id="__BVID__16___BV_indicators_" aria-owns="__BVID__16___BV_inner_">
                 {carouselBanners.map((_, index) => (
                   <li
                     key={index}
                     role="button"
                     tabIndex="0"
-                    aria-current={index === carouselBanners.length - 1}
+                    aria-current={index === 0}
                     aria-label={`Goto slide ${index + 1}`}
-                    className={index === carouselBanners.length - 1 ? 'active' : ''}
-                    id={`__BVID__5049___BV_indicator_${index + 1}_`}
-                    aria-controls="__BVID__5049___BV_inner_"
-                    aria-describedby={`__BVID__${5050 + index}`}
+                    className={index === 0 ? 'active' : ''}
+                    id={`__BVID__16___BV_indicator_${index + 1}_`}
+                    aria-controls="__BVID__16___BV_inner_"
+                    aria-describedby={`__BVID__${17 + index}`}
                   ></li>
                 ))}
               </ol>

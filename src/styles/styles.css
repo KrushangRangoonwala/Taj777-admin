@@ -646,7 +646,7 @@ body[data-sidebar="dark"] #sidebar-menu ul li a:hover i {
 
 .suspended:before {
     content: "";
-    background-image: url("../img/lock.svg");
+    background-image: url("/admin/img/lock.svg");
     background-size: 15px 15px;
     background-repeat: no-repeat;
     position: absolute;

@@ -148,11 +148,7 @@ const InstantTeenPatti2 = ({ onBetSelection, lastBetTime }) => {
                 className={`${className} ${suspended ? "suspended" : ""}`}
                 onClick={() => handleOddsClick(marketName, odds, market, type === "back", suspended)}
             >
-                {suspended ? (
-                    <img src="/admin/assets/images/lock.svg" alt="lock" style={{ width: "15px", height: "15px", opacity: 1, zIndex: 10, position: "relative" }} />
-                ) : (
-                    children(odds)
-                )}
+                {children(suspended ? 0 : odds)}
             </div>
         );
     };

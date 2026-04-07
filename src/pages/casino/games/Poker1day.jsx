@@ -59,11 +59,11 @@ const Poker1day = ({ gameData, exposureData, lastResults }) => {
     };
 
     const boardCards = [
-        currentGame?.BC1,
-        currentGame?.BC2,
-        currentGame?.BC3,
-        currentGame?.BC4,
-        currentGame?.BC5,
+        currentGame?.C5,
+        currentGame?.C6,
+        currentGame?.C7,
+        currentGame?.C8,
+        currentGame?.C9,
     ].filter(Boolean);
 
     const playerACards = [currentGame?.C1, currentGame?.C2].filter(Boolean);
@@ -75,6 +75,34 @@ const Poker1day = ({ gameData, exposureData, lastResults }) => {
     const playerBBonus2 = getMarketByName("2 Cards Bonus B");
     const playerABonus7 = getMarketByName("7 Cards Bonus A");
     const playerBBonus7 = getMarketByName("7 Cards Bonus B");
+
+    function CardsComponent() {
+        return (
+            <div className="playerboardcards">
+                <div className="dealer-name w-100 mb-1">Board</div>
+                <div className="d-flex">
+                    {boardCards.map((card, index) => (
+                        <span key={index} data-v-b64efdfa="">
+                            <img
+                                data-v-b64efdfa=""
+                                src={getImage(card, result_image)}
+                                alt={`card-${index}`}
+                            />
+                        </span>
+                    ))}
+                    {Array.from({ length: 5 - boardCards.length }).map((_, index) => (
+                        <span key={`empty-${index}`} data-v-b64efdfa="">
+                            <img
+                                data-v-b64efdfa=""
+                                src={getImage(1, result_image)}
+                                alt="empty-card"
+                            />
+                        </span>
+                    ))}
+                </div>
+            </div>
+        )
+    }
 
     return (
         <div data-v-5a10e370="" className="detail-page-container">
@@ -90,6 +118,7 @@ const Poker1day = ({ gameData, exposureData, lastResults }) => {
                                 results={lastResults}
                                 timeLeft={currentGame?.autotime || 0}
                                 totalTime={currentGame?.ft || 30}
+                                CardsComponent={CardsComponent}
                             />
 
                             <div className="casino-detail">

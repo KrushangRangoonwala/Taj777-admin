@@ -198,6 +198,22 @@ export async function getTotalProfitLoss(payload) {
   }
 }
 
+export async function getBannerImages() {
+  try {
+    const payload = getDefaultParams();
+    const { data } = await apiConfigUserData.post("/main_slider", payload);
+
+    const imgArr = [];
+    data.data?.forEach((item) => {
+      imgArr.push(item.image);
+    });
+    return imgArr || [];
+  } catch (error) {
+    console.error("Error fetching banner images:", error);
+    return [];
+  }
+}
+
 export async function fetchResultById(eventId, gameType) {
   try {
     const requestBody = {

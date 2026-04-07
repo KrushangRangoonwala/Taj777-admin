@@ -1,7 +1,11 @@
 import React, { useState } from 'react';
+import { Collapse } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 import SimpleBar from 'simplebar-react';
+import SafeIframe from '../../../components/SafeIframe';
 
-const EventRightSidebar = () => {
+const EventRightSidebar = ({ tvUrl }) => {
+    const [isTvOn, setIsTvOn] = useState(false);
     const [betList, setBetList] = useState([
         {
             marketType: 'Normal',
@@ -25,6 +29,23 @@ const EventRightSidebar = () => {
         <div className="right-sidebar">
             <SimpleBar style={{ maxHeight: '100%' }}>
                 <div className="card m-b-10"></div>
+
+                <div className="card m-b-10">
+                    <div data-toggle="collapse" data-target=".video-tv" aria-expanded="true" className="card-header pointer" onClick={() => setIsTvOn(!isTvOn)}>
+                        <h6 className="card-title">
+                            <Link to="" title="">
+                                <img src="/admin/assets/images/arrow-down.svg" className="mr-1" />
+                            </Link>
+                            Live Match
+                        </h6>
+                    </div>
+                    <Collapse in={isTvOn}>
+                        <div className="video-tv">
+                            <SafeIframe allow="autoplay" src={tvUrl} />
+                        </div>
+                    </Collapse>
+                </div>
+
                 <div id="my-game-bets" className="card m-b-10 my-bet">
                     <div className="card-header">
                         <h6 className="card-title float-left">My Bets</h6>

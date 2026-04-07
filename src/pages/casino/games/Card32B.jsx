@@ -291,7 +291,7 @@ const Card32B = ({ gameData, exposureData, lastResults }) => {
                                     </div>
                                 </div>
 
-                                
+
                                 {/* Mobile View */}
                                 <div className="teen1daycasino-container d-none-big">
                                     {/* Winner Section */}
@@ -429,16 +429,16 @@ const Card32B = ({ gameData, exposureData, lastResults }) => {
                                     </div>
                                     <div className="cards32bextra">
                                         <div className="casino-bl-box">
-                                        {singles.map((digit, idx) => {
-                                            const market = getMarket(digit);
-                                            const suspended = getIsSuspended(market);
-                                            return (
-                                                <BetBox key={idx} market={market} className="casino-bl-box-item back" isBack={true} isRate={false}>
-                                                    <span className="casino-box-odd">{digit}</span>
-                                                    <Exposure className="casino-book" data={exposureData} id={market?.sid} />
-                                                </BetBox>
-                                            );
-                                        })}
+                                            {singles.map((digit, idx) => {
+                                                const market = getMarket(digit);
+                                                const suspended = getIsSuspended(market);
+                                                return (
+                                                    <BetBox key={idx} market={market} className="casino-bl-box-item back" isBack={true} isRate={false}>
+                                                        <span className="casino-box-odd">{digit}</span>
+                                                        <Exposure className="casino-book" data={exposureData} id={market?.sid} />
+                                                    </BetBox>
+                                                );
+                                            })}
                                         </div>
                                     </div>
                                 </div>

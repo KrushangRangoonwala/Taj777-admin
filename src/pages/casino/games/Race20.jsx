@@ -5,11 +5,13 @@ import { getImage, getValueAfterDot, getIsSuspended } from "../../../utilies/hel
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import BetLimitInfo2 from "./components/BetLimitInfo2";
+import Result_parent from "./components/Result_parent";
 
 const Race20 = ({ onBetSelection }) => {
     const { game_type, phpFile, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+    const [resultMid, setResultMid] = useState(null);
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -185,7 +187,7 @@ const Race20 = ({ onBetSelection }) => {
                                     setIsCardDrawerOpen={setIsCardDrawerOpen}
                                     CardsComponent={VideoCards}
                                     resultPath={phpFile}
-                                    showLastResults={false}
+                                    showLastResults={true}
                                     showImage={false}
                                 />
                                 <div className="casino-detail">
@@ -369,7 +371,7 @@ const Race20 = ({ onBetSelection }) => {
                                             "4": 'diamond'
                                         }[winVal] || 'spade';
                                         return (
-                                            <span key={idx}>
+                                            <span key={idx} onClick={() => setResultMid(res.mid)} style={{ cursor: 'pointer' }}>
                                                 <img src={getImage(resultSuitName, result_image)} alt={winVal} />
                                             </span>
                                         );
@@ -380,6 +382,7 @@ const Race20 = ({ onBetSelection }) => {
                         </div>
                     </div>
                     <CasinoRightSidebar />
+                    <Result_parent mid={resultMid} setMid={setResultMid} game_type={game_type || 'race20'} />
                 </div>
             </div>
             <style jsx>{`

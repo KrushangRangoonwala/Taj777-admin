@@ -5,8 +5,9 @@ import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import RemarkMarquee from "./components/RemarkMarquee";
 import { Exposure } from "../CasinoCenter";
+import Result_parent from "./components/Result_parent";
 
-const imgPath = "/cards/lottery/";
+const imgPath = "cards_new";
 
 const getBallImg = (card) => {
     const ball = card === "A" ? "1" : card === "10" ? "0" : card;
@@ -142,8 +143,9 @@ const LotteryTabs = memo(({ single, double, triple, activeTab, setActiveTab }) =
 ));
 
 const Lottery = ({ gameData, exposureData, lastResults }) => {
-    const { game_name, iframe_url } = useGetFileData();
+    const { game_name, iframe_url, game_type } = useGetFileData();
     const [activeTab, setActiveTab] = useState("single");
+    const [mid, setMid] = useState(false);
 
     const currentGame = gameData?.t1?.[0];
     const data = gameData?.t2 || [];
@@ -151,10 +153,10 @@ const Lottery = ({ gameData, exposureData, lastResults }) => {
     const getDDD_cards = (card) => (card?.length > 2 ? `${card.slice(0, -2)}DD` : card);
 
     const currentCards = [
-        getDDD_cards(currentGame?.C1),
-        getDDD_cards(currentGame?.C2),
-        getDDD_cards(currentGame?.C3),
-    ].filter(Boolean);
+        getDDD_cards(currentGame?.C1) || 1,
+        getDDD_cards(currentGame?.C2) || 1,
+        getDDD_cards(currentGame?.C3) || 1,
+    ];
 
     const single = data.find((item) => item.nat === "Single");
     const double = data.find((item) => item.nat === "Double");
@@ -171,7 +173,7 @@ const Lottery = ({ gameData, exposureData, lastResults }) => {
                         <span key={idx} data-v-b64efdfa="">
                             <img
                                 data-v-b64efdfa=""
-                                src={getCardImage(card, imgPath + "cards")}
+                                src={getCardImage(card, "cards_new")}
                                 alt={`card-${idx}`}
                             />
                         </span>
@@ -205,7 +207,12 @@ const Lottery = ({ gameData, exposureData, lastResults }) => {
                                 <div className="mb-3">
                                     <div className="casino-video-last-results">
                                         {lastResults?.slice(0, 10).map((result, index) => (
-                                            <span key={index} className="resultb">
+                                            <span 
+                                                key={index} 
+                                                className="resultb" 
+                                                onClick={() => setMid(result?.mid)}
+                                                style={{ cursor: "pointer" }}
+                                            >
                                                 {result.win}
                                             </span>
                                         ))}
@@ -214,6 +221,8 @@ const Lottery = ({ gameData, exposureData, lastResults }) => {
                                         </a>
                                     </div>
                                 </div>
+
+                                <Result_parent mid={mid} setMid={setMid} game_type={game_type} />
 
                                 {/* <div className="casino-details">
                                     <BetBtns betBtn={25} />

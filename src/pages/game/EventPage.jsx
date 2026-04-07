@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from 'react-router-dom';
-import { formatNumber, formatToUTCMinus8, getSportName } from "../../utilies/helpers";
+import { formatNumber, formatWithTimezone, getSportName } from "../../utilies/helpers";
 import { MarketTable, OddsBox } from './components/MarketComponents';
 import EventRightSidebar from './components/EventRightSidebar';
 import './blink.css';
@@ -15,7 +15,7 @@ function getExposureColor(exposure = 0) {
 
 function Exposure({ exposure = 0, pr }) {
     return (
-        <p className="mb-0" style={{ color: getExposureColor(exposure) }}>
+        <p className="mb-0 float-left" style={{ color: getExposureColor(exposure) }}>
             {exposure}
             {pr && <span className="badge badge-dark book-per">{pr}</span>}
         </p>
@@ -122,6 +122,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
     const selectedMatch = location.state?.match || selectedMatchRedux;
     const livePoints = useSelector(state => state.bet?.livePoints);
     const openedBetPoint = useSelector(state => state.bet?.openedBetPoint);
+    const isCricket = selectedMatch?.SportId == 4;
 
     const [bookmaker_odds, setBookmaker_odds] = useState();
     const [bookmaker_tied_odds, setBookmaker_tied_odds] = useState();
@@ -178,12 +179,12 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
         if (socketData) {
             setNormalData(filterRecord(socketData?.body?.session?.[0]?.value?.session, false));
             setFancy1(filterRecord(socketData?.body?.session1?.[0]?.value?.session, false));
-            setOddEven(filterRecord(socketData?.body?.oddEven?.[0]?.value?.session));
-            setOverByOver(filterRecord(socketData?.body?.overByOver?.[0]?.value?.session));
-            setBallByBall(filterRecord(socketData?.body?.ballByBall?.[0]?.value?.session));
+            setOddEven(filterRecord(socketData?.body?.oddEven?.[0]?.value?.session, false));
+            setOverByOver(filterRecord(socketData?.body?.overByOver?.[0]?.value?.session, false));
+            setBallByBall(filterRecord(socketData?.body?.ballByBall?.[0]?.value?.session, false));
             setKhado(filterRecord(socketData?.body?.khado?.[0]?.value?.session, false));
-            setMeter(filterRecord(socketData?.body?.meter?.[0]?.value?.session));
-            setCricketcasino(socketData?.body?.cricketcasino?.[0]?.value?.session);
+            setMeter(filterRecord(socketData?.body?.meter?.[0]?.value?.session, false));
+            setCricketcasino(socketData?.body?.cricketcasino?.[0]?.value?.session, false);
 
             const bmSession = socketData?.body?.bm1?.[0]?.value?.session;
             if (bmSession) {
@@ -249,7 +250,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
 
     const getHeaderDate = () => {
         if (selectedMatch && selectedMatch.matchdate) {
-            return formatToUTCMinus8(selectedMatch.matchdate);
+            return formatWithTimezone(selectedMatch.matchdate, false);
         }
         return "Date Not Available";
     };
@@ -363,12 +364,12 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
 
         return (
             <>
-                <OddsBox type="back" level="2" odds={formatNumber(sanitizeNumber(back[2]?.price))} size={formatNumber(sanitizeNumber(back[2]?.size))} animateColor={back_color[2]} />
-                <OddsBox type="back" level="1" odds={formatNumber(sanitizeNumber(back[1]?.price))} size={formatNumber(sanitizeNumber(back[1]?.size))} animateColor={back_color[1]} />
-                <OddsBox type="back" odds={formatNumber(sanitizeNumber(back[0]?.price))} size={formatNumber(sanitizeNumber(back[0]?.size))} animateColor={back_color[0]} />
-                <OddsBox type="lay" odds={formatNumber(sanitizeNumber(lay[0]?.price))} size={formatNumber(sanitizeNumber(lay[0]?.size))} animateColor={lay_color[0]} />
-                <OddsBox type="lay" level="1" odds={formatNumber(sanitizeNumber(lay[1]?.price))} size={formatNumber(sanitizeNumber(lay[1]?.size))} animateColor={lay_color[1]} />
-                <OddsBox type="lay" level="2" odds={formatNumber(sanitizeNumber(lay[2]?.price))} size={formatNumber(sanitizeNumber(lay[2]?.size))} animateColor={lay_color[2]} />
+                <OddsBox type="back" level="2" odds={formatNumber(sanitizeNumber(back[2]?.price), 2)} size={formatNumber(sanitizeNumber(back[2]?.size), 2)} animateColor={back_color[2]} />
+                <OddsBox type="back" level="1" odds={formatNumber(sanitizeNumber(back[1]?.price), 2)} size={formatNumber(sanitizeNumber(back[1]?.size), 2)} animateColor={back_color[1]} />
+                <OddsBox type="back" odds={formatNumber(sanitizeNumber(back[0]?.price), 2)} size={formatNumber(sanitizeNumber(back[0]?.size), 2)} animateColor={back_color[0]} />
+                <OddsBox type="lay" odds={formatNumber(sanitizeNumber(lay[0]?.price), 2)} size={formatNumber(sanitizeNumber(lay[0]?.size), 2)} animateColor={lay_color[0]} />
+                <OddsBox type="lay" level="1" odds={formatNumber(sanitizeNumber(lay[1]?.price), 2)} size={formatNumber(sanitizeNumber(lay[1]?.size), 2)} animateColor={lay_color[1]} />
+                <OddsBox type="lay" level="2" odds={formatNumber(sanitizeNumber(lay[2]?.price), 2)} size={formatNumber(sanitizeNumber(lay[2]?.size), 2)} animateColor={lay_color[2]} />
             </>
         );
     }
@@ -384,10 +385,13 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
         min,
         max,
         marketClass = "market-6",
-        column = [{ type: "back", title: "Back" }, { type: "lay", title: "Lay" }]
+        column = [{ type: "back", title: "Back" }, { type: "lay", title: "Lay" }],
+        inMinMax = true
+
     }) {
         addSectionIfNotExist(sectionId);
         if (!data?.length) return null;
+        const isLay1st = isLayFirst ?? column[0].type === "lay";
 
         return (
             <MarketTable
@@ -410,21 +414,17 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                                     <ExposureMob />
                                 </div>
                             </div>
-                            <div className="bet-table-row">
+                            <div className={`bet-table-row ${isSuspendedMarker ? "suspendedtext" : ""}`} data-title={item.Active}>
                                 <div className="nation-name d-none-mobile">
                                     <p className="two-line-text">{item.RunnerName}</p>
                                     <Exposure />
                                 </div>
-                                {isSuspendedMarker ? (
-                                    <div data-title={item.Active} className="suspendedtext2">
-                                        <Boxes_2 item={item} isAllBackBox={isAllBackBox} isSuspended={true} isLayFirst={isLayFirst} is_1_OddBox={is_1_OddBox} />
-                                    </div>
-                                ) : (
-                                    <Boxes_2 item={item} isAllBackBox={isAllBackBox} isSuspended={false} isLayFirst={isLayFirst} is_1_OddBox={is_1_OddBox} />
-                                )}
-                                <div className="fancy-min-max">
+
+                                <Boxes_2 item={item} isAllBackBox={isAllBackBox} isSuspended={isSuspendedMarker} isLayFirst={isLay1st} is_1_OddBox={is_1_OddBox} />
+
+                                {inMinMax && <div className="fancy-min-max">
                                     Min:<span>{formatNumber(sanitizeNumber(item.Min))}</span> Max:<span>{formatNumber(sanitizeNumber(item.Max))}</span>
-                                </div>
+                                </div>}
                             </div>
                         </div>
                     );
@@ -459,18 +459,13 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                                     <span>{d.name}</span> <ExposureMob />
                                 </div>
                             </div>
-                            <div className="bet-table-row">
+                            <div className={`bet-table-row ${isSuspendedMarker ? "suspendedtext" : ""}`} data-title={d.status}>
                                 <div className="nation-name d-none-mobile">
                                     <p>{d.name}</p>
                                     <Exposure />
+                                    <div className='mb-0 float-right d-none'>0</div>
                                 </div>
-                                {isSuspendedMarker ? (
-                                    <div data-title={d.status} className="suspendedtext2 w-100">
-                                        <Boxes_6 data={d} />
-                                    </div>
-                                ) : (
-                                    <Boxes_6 data={d} />
-                                )}
+                                <Boxes_6 data={d} />
                             </div>
                         </React.Fragment>
                     );
@@ -524,18 +519,12 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                                     <ExposureMob />
                                 </div>
                             </div>
-                            <div className="bet-table-row">
+                            <div className={`bet-table-row ${isSuspendedMarker ? "suspendedtext" : ""}`} data-title={status}>
                                 <div className="nation-name d-none-mobile">
                                     <p>{item.RunnerName}</p>
                                     <Exposure />
                                 </div>
-                                {isSuspendedMarker ? (
-                                    <div data-title={status} className="suspendedtext2 w-100">
-                                        <Boxes_2 item={item} isAllBackBox={false} isSuspended={true} />
-                                    </div>
-                                ) : (
-                                    <Boxes_2 item={item} isAllBackBox={false} isSuspended={false} />
-                                )}
+                                <Boxes_2 item={item} isAllBackBox={false} isSuspended={isSuspendedMarker} />
                             </div>
                         </React.Fragment>
                     );
@@ -574,17 +563,30 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
         });
     }
 
+    const oldgameId = initialSocketData?.[0]?.oldGameId;
+    const scoreCardUrl = `https://e765432.diamondcricketid.com/anm.php?type=scorecard&eventid=${oldgameId}&sportid=${selectedMatch?.SportId}`
+    const tvUrl = `https://e765432.diamondcricketid.com/tvd247.php?1=1&sportid=${selectedMatch?.SportId}&gmid=${oldgameId}`
+
     return (
         <div className="detail-page-container">
             <div className="center-main-container">
                 <div className="center-content">
                     {/* Game Header */}
-                    <div className="game-header sport4">
+                    <div className={`game-header sport${selectedMatch?.SportId}`}>
                         <span className="game-header-name">{getHeaderName()}</span>
                         <div>
                             <span>{getHeaderDate()}</span>
                         </div>
                     </div>
+
+                    {selectedMatch?.inPlay && !isCricket && // !isLeague &&
+                        <div
+                            className="banner scorestats mb-1"
+                            style={{ backgroundImage: `url('/admin/images/events-banner/${selectedMatch?.SportId}.png')` }}
+                        >
+                            <iframe src={scoreCardUrl} frameborder="0" />
+                        </div>
+                    }
 
                     <div className="market-container">
                         {socketData ? (
@@ -594,7 +596,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                                 <Single_Column_Section
                                     isDisplay={selectedMatch?.SportId == 4}
                                     sectionId="match_odds"
-                                    title={match_Odds?.marketName}
+                                    title="MATCH_ODDS"
                                     data={match_Odds}
                                     isCommonMinMax={true}
                                     bet_market_type={getTitle(match_Odds?.marketName)}
@@ -644,7 +646,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                                 />
 
                                 <Double_Column_Section
-                                    title="Oddeven"
+                                    title="oddeven"
                                     sectionId="market3"
                                     data={oddEven}
                                     isAllBackBox={true}
@@ -653,11 +655,12 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                                 />
 
                                 <Double_Column_Section
-                                    title="OverByOver"
+                                    title="Over By Over"
                                     sectionId="market33"
                                     data={overByOver}
-                                    isAllBackBox={true}
+                                    // isAllBackBox={true}
                                     bet_market_type="FANCY_ODDS"
+                                    column={[{ type: "lay", title: "No" }, { type: "back", title: "Yes" }]}
                                 />
 
                                 <Double_Column_Section
@@ -707,6 +710,8 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                                         bet_market_type={getTitle(section?.[0].header)}
                                         is_1_OddBox={true}
                                         marketClass="market-9"
+                                        column={[{ type: "back", title: "Back" }]}
+                                        inMinMax={false}
                                     />
                                 ))}
 
@@ -726,7 +731,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                         )}
                     </div>
                 </div>
-                <EventRightSidebar />
+                <EventRightSidebar tvUrl={tvUrl} />
             </div>
         </div>
     );

@@ -9,37 +9,42 @@ export function normalizeNumber(value) {
     return isNaN(q) ? '-' : q;
 }
 
-export function formatToUTCMinus8(dateString) {
+export function formatWithTimezone(dateString, showUTC = false) {
     if (!dateString) return '';
     const date = new Date(dateString);
 
-    // Convert to UTC-08:00
-    const utcTime = date.getTime() + (date.getTimezoneOffset() * 60000);
-    const targetTime = new Date(utcTime - (8 * 60 * 60000));
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const year = date.getFullYear();
 
-    const day = String(targetTime.getDate()).padStart(2, "0");
-    const month = String(targetTime.getMonth() + 1).padStart(2, "0");
-    const year = targetTime.getFullYear();
+    const hours = String(date.getHours()).padStart(2, "0");
+    const minutes = String(date.getMinutes()).padStart(2, "0");
+    const seconds = String(date.getSeconds()).padStart(2, "0");
 
-    const hours = String(targetTime.getHours()).padStart(2, "0");
-    const minutes = String(targetTime.getMinutes()).padStart(2, "0");
-    const seconds = String(targetTime.getSeconds()).padStart(2, "0");
+    const offsetMinutes = -date.getTimezoneOffset();
+    const sign = offsetMinutes >= 0 ? "+" : "-";
+    const h = String(Math.floor(Math.abs(offsetMinutes) / 60)).padStart(2, "0");
+    const m = String(Math.abs(offsetMinutes) % 60).padStart(2, "0");
 
-    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} (UTC-08:00)`;
+    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds} ${showUTC ? `(UTC${sign}${h}:${m})` : ''}`;
 }
 
-// console.log("@@@@@@@@@@@@@@@@@@", formatToUTCMinus8("2/12/2026 2:00:17 AM"));
+// console.log("@@@@@@@@@@@@@@@@@@", formatWithTimezone("2/12/2026 2:00:17 AM"));
 
-export function formatNumber(num) {
-    if (num >= 100000) {
+export function formatNumber(num, fix = 1) {
+    if (num === undefined || num === null || isNaN(num)) {
+        return "";
+    }
+    const n = Number(num);
+    if (n >= 100000) {
         // Convert to Lakhs
-        return (num / 100000).toFixed(1).replace(/\.0$/, "") + "L";
-    } else if (num >= 1000) {
+        return (n / 100000).toFixed(fix).replace(/\.?0+$/, "") + "L";
+    } else if (n >= 1000) {
         // Convert to Thousands
-        return (num / 1000).toFixed(1).replace(/\.0$/, "") + "K";
+        return (n / 1000).toFixed(fix).replace(/\.?0+$/, "") + "K";
     } else {
         // Less than 1000, return as is
-        return num.toString();
+        return n.toString();
     }
 }
 

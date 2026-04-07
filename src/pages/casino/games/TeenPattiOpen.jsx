@@ -42,7 +42,7 @@ const TeenPattiOpen = ({ gameData, exposureData, lastResults }) => {
 
         return (
             <div className={`${className} casino-bl-box-item ${suspended || isLocked ? "suspended" : ""}`} style={{ position: 'relative' }}>
-                {(suspended || isLocked) && (
+                {/* {(suspended || isLocked) && (
                     <i className="fas fa-lock" style={{
                         position: 'absolute',
                         top: '50%',
@@ -51,7 +51,7 @@ const TeenPattiOpen = ({ gameData, exposureData, lastResults }) => {
                         zIndex: 10,
                         color: '#fff'
                     }}></i>
-                )}
+                )} */}
                 <span className="casino-box-odd">
                     {displayValue || (isLocked || suspended ? "0" : odds)}
                 </span>

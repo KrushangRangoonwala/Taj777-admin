@@ -115,6 +115,7 @@ const Goal = ({ gameData, exposureData, lastResults }) => {
                                                 timeLeft={currentGame?.lt || 0}
                                                 totalTime={currentGame?.ft || 30}
                                                 Popup={ResultPopup}
+                                                showCardDrawer={false}
                                             />
                                         </div>
                                     </div>

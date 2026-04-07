@@ -13,7 +13,7 @@ function handleUnauthorized() {
 
 
 const apiConfigUserData = axios.create({
-    baseURL: "http://159.65.143.49/~sevennew/ajax_adm/",
+    baseURL: "https://worlds777.app/ajax_adm/",
     withCredentials: true,
     headers: {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -46,7 +46,7 @@ apiConfigUserData.interceptors.response.use(
 );
 
 const apiGames = axios.create({
-    baseURL: "http://159.65.143.49/~sevennew/ajaxfiles/",
+    baseURL: "https://worlds777.app/ajaxfiles/",
     withCredentials: true,
     headers: {
         "Content-Type": "application/x-www-form-urlencoded",

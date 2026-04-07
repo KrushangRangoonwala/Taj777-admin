@@ -141,7 +141,11 @@ const GeneralLock = () => {
   // LOAD USER LOCK DATA
   const handleLoad = async (e) => {
     e.preventDefault();
-    if (!selectedClient || !tpassword) return;
+    /* if (!selectedClient || !tpassword) return; */
+    if (!tpassword) {
+      alert("Transaction Code is required");
+      return;
+    }
 
     try {
       const res = await checkUserLockPwd({
@@ -312,52 +316,54 @@ const GeneralLock = () => {
             </div>
 
             {/* DATA DISPLAY */}
-            <div className="row mt-4">
-              {/* EVENTS */}
-              <div className="col-lg-6 col-md-6 col-12">
-                <h4 className="ptitle">Events</h4>
-                <ul
-                  id="accordian1"
-                  className="navbar-nav user-lock-nav list-unstyled"
-                >
-                  {eventData.map((node) => (
-                    <EventTreeNode
-                      key={node.id}
-                      node={node}
-                      onChange={handleCheckbox}
-                    />
-                  ))}
-                </ul>
-              </div>
+            {eventData.length > 0 && (
+              <div className="row mt-4">
+                {/* EVENTS */}
+                <div className="col-lg-6 col-md-6 col-12">
+                  <h4 className="ptitle">Events</h4>
+                  <ul
+                    id="accordian1"
+                    className="navbar-nav user-lock-nav list-unstyled"
+                  >
+                    {eventData.map((node) => (
+                      <EventTreeNode
+                        key={node.id}
+                        node={node}
+                        onChange={handleCheckbox}
+                      />
+                    ))}
+                  </ul>
+                </div>
 
-              {/* CASINO */}
-              <div className="col-lg-6 col-md-6 col-12">
-                <h4 className="ptitle">Casino List</h4>
-                <ul className="user-lock-nav list-unstyled mt-2">
-                  {casinoData.map((item) => (
-                    <li key={item.id}>
-                      <span className="custom-control custom-checkbox">
-                        <input
-                          type="checkbox"
-                          id={item.id}
-                          className="custom-control-input"
-                          checked={item.checked || false}
-                          onChange={(e) =>
-                            handleCheckbox(item, e.target.checked)
-                          }
-                        />
-                        <label
-                          htmlFor={item.id}
-                          className="custom-control-label"
-                        >
-                          {item.name}
-                        </label>
-                      </span>
-                    </li>
-                  ))}
-                </ul>
+                {/* CASINO */}
+                <div className="col-lg-6 col-md-6 col-12">
+                  <h4 className="ptitle">Casino List</h4>
+                  <ul className="user-lock-nav list-unstyled mt-2">
+                    {casinoData.map((item) => (
+                      <li key={item.id}>
+                        <span className="custom-control custom-checkbox">
+                          <input
+                            type="checkbox"
+                            id={item.id}
+                            className="custom-control-input"
+                            checked={item.checked || false}
+                            onChange={(e) =>
+                              handleCheckbox(item, e.target.checked)
+                            }
+                          />
+                          <label
+                            htmlFor={item.id}
+                            className="custom-control-label"
+                          >
+                            {item.name}
+                          </label>
+                        </span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         </div>
       </div>

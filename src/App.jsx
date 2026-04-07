@@ -203,7 +203,7 @@ function AppContent() {
 
 function App() {
   return (
-    <BrowserRouter>
+    <BrowserRouter basename="/admin_new">
       <AppContent />
     </BrowserRouter>
   )

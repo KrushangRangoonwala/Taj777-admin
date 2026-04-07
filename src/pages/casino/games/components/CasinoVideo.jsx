@@ -23,6 +23,8 @@ const CasinoVideo = ({
 
     isLastResultOpen: externalIsLastResultOpen,
     setIsLastResultOpen: externalSetIsLastResultOpen,
+    WholeCardDrawer,
+    isCardDrawer = true,
 }) => {
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     const { game_type, result_image } = useGetFileData();
@@ -42,7 +44,7 @@ const CasinoVideo = ({
     const strokeDasharrayValue = ((timeLeft || 0) / (totalTime || 30)) * 283;
 
     useEffect(() => {
-        console.log('cards', cards);
+        // console.log('cards', cards);
         if (cards && cards.length > 0) {
             setIsAllClosed(cards?.every(val => !val || val == 1));
         } else {
@@ -74,9 +76,10 @@ const CasinoVideo = ({
                 </div>
             </div>
 
-            {showCardDrawer && (
+            {WholeCardDrawer ? (
+                <WholeCardDrawer />
+            ) : showCardDrawer &&  (
                 <div className={`casino-video-cards ${isCardDrawerOpen && !isAllClosed ? "" : "hide-cards"}`}>
-                    {/* hide cardDrawer when all cards are closed : ${(isCardDrawerOpen && !isAllClosed) ? "" : "hide-cards"} */}
                     <div
                         className="casino-cards-shuffle"
                         onClick={() => setIsCardDrawerOpen(!isCardDrawerOpen)}
@@ -84,33 +87,7 @@ const CasinoVideo = ({
                         <i className="fas fa-grip-lines-vertical"></i>
                     </div>
                     <div className="casino-video-cards-container">
-                        {CardsComponent ? (
-                            <CardsComponent />
-                        ) : (
-                            <div className="playerboardcards">
-                                <div className="dealer-name w-100 mb-1">Board</div>
-                                <div className="d-flex">
-                                    {cards.map((card, index) => (
-                                        <span key={index} data-v-b64efdfa="">
-                                            <img
-                                                data-v-b64efdfa=""
-                                                src={getImage(card, result_image)}
-                                                alt={`card-${index}`}
-                                            />
-                                        </span>
-                                    ))}
-                                    {Array.from({ length: 5 - cards.length }).map((_, index) => (
-                                        <span key={`empty-${index}`} data-v-b64efdfa="">
-                                            <img
-                                                data-v-b64efdfa=""
-                                                src={getImage(1, result_image)}
-                                                alt="empty-card"
-                                            />
-                                        </span>
-                                    ))}
-                                </div>
-                            </div>
-                        )}
+                        {CardsComponent && <CardsComponent />}
                     </div>
                 </div>
             )}
@@ -171,7 +148,7 @@ const CasinoVideo = ({
                 <LastResult results={results} isOpen={isLastResultOpen} />
             )}
 
-            {isRulesOpen && <VideoRules gameName={gameName} onClose={() => setIsRulesOpen(false)} />}
+            {/* {isRulesOpen && <VideoRules gameName={gameName} onClose={() => setIsRulesOpen(false)} />} */}
         </div>
     );
 };
