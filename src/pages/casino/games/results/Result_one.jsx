@@ -1051,7 +1051,7 @@ const getGameResultContent = { // BY GAME_TYPE
         // cards are already dice1, dice2, etc from getCardList.dolidana
         return (
             <>
-                <Result_Image name={cards.join(',')} folder="cards_new" size={50} align="center" col={12} offset={0} />
+                <Result_Image name={cards.join(',')} folder="cards_new" size={50} align="center" col={7} offset={0} />
                 <Result_details data={data} />
             </>
         )

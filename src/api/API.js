@@ -1,5 +1,12 @@
 import axios from "axios";
-import { apiConfigUserData } from "./axiosConfig";
+import { apiConfigUserData, apiGames } from "./axiosConfig";
+import { successToast } from "../utils/toast";
+
+export const isApp = {
+  is_app: 1,
+  auth_key: '',
+  login_user_id: '',
+}
 
 export function getDefaultParams() {
   const aa = JSON.parse(sessionStorage.getItem("userdata") || null);
@@ -19,6 +26,7 @@ export const loginAdmin = async (email, password) => {
     const response = await apiConfigUserData.post('login.php', params);
 
     if (response.data.status === "ok") {
+      successToast("success");
       return {
         status: "ok",
         data: response.data
@@ -197,6 +205,58 @@ export async function getTotalProfitLoss(payload) {
     throw error;
   }
 }
+export async function getUserList(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await apiConfigUserData.post("get_user_list", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+}
+export async function accountTransaction(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await apiConfigUserData.post("account_transaction", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+}
+export async function changeUserPassword(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await apiConfigUserData.post("change_password", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error changing password:", error);
+    throw error;
+  }
+}
+export async function changeUserStatus(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await apiConfigUserData.post("change_status", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error changing password:", error);
+    throw error;
+  }
+}
 
 export async function getBannerImages() {
   try {
@@ -230,3 +290,13 @@ export async function fetchResultById(eventId, gameType) {
     return null;
   }
 }
+
+export async function apiGetUpcomingFixtures(dispatch) {
+  try {
+    const { data } = await apiGames.post("/upcoming_fixture", isApp);
+    return data?.all_data || [];
+  } catch (error) {
+    console.log('error', error);
+    return [];
+  }
+};

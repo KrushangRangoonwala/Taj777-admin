@@ -145,7 +145,7 @@ export default function Sidebar() {
                                                 {menuItems.map((item, index) => {
                                                     const isOpen = openMenuIndex === index;
                                                     return (
-                                                        <li key={index} className={`${item.liClassName || ""} ${isOpen ? "mm-active" : ""}`.trim()}>
+                                                        <li key={index} className={`${item.liClassName || ""} ${isOpen ? "" : ""}`.trim()}>
                                                             {item.subItems ? (
                                                                 <>
                                                                     <Link

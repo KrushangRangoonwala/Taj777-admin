@@ -2,9 +2,9 @@ import React, { useState } from 'react';
 import Collapse from 'react-bootstrap/Collapse';
 import { formatNumber, sanitizeNumber } from '../../../utilies/helpers';
 
-export const OddsBox = ({ type, level, odds, size, noVal, suspended, animateColor }) => {
+export const OddsBox = ({ type, level, odds, size, noVal, suspended, animateColor, is_1_OddBox }) => {
     const isNoVal = (!odds || odds == "0" || odds == "0.00") && (!size || size == "0" || size == "0.00");
-    const className = `bl-box ${type} ${level ? type + level : ''} ${noVal || isNoVal ? 'no-val' : ''}`;
+    const className = `bl-box ${type} ${level ? type + level : ''} ${noVal || isNoVal ? 'no-val' : ''} ${suspended && is_1_OddBox ? 'suspended' : ''}`;
     return (
         <div className={className}>
             {/* {animateColor && (<span className={`flash-overlay ${animateColor}`} />)} */}
@@ -30,7 +30,7 @@ export const MarketTable = ({
     max,
     remark,
     marketClass = "market-6",
-    column = [{ type: "back", title: "Back" }, { type: "lay", title: "Lay" }]
+    column = [{ type: "back", title: "Back" }, { type: "lay", title: "Lay" }],
 }) => {
     const [isOpen, setIsOpen] = useState(true);
 
@@ -67,7 +67,7 @@ export const MarketTable = ({
                                     {(min || max) && (
                                         <span className="max-bet">
                                             {(min || min == 0) && <>Min:<span>{formatNumber(sanitizeNumber(min))}</span></>}
-                                            {(max || max == 0) && <> Max:<span>{formatNumber(sanitizeNumber(max))}</span></>}
+                                            {(max || max == 0) && <> {max == 1 ? "" : "Max:"}<span>{formatNumber(sanitizeNumber(max))}</span></>}
                                         </span>
                                     )}
                                 </div>
@@ -80,7 +80,7 @@ export const MarketTable = ({
                     </div>
                 </Collapse>
             </div>
-            {remark && <small className="remark">{remark}</small>}
+            {remark && <div className="remark">{remark}</div>}
         </div>
     );
 };

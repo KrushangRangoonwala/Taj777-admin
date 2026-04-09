@@ -156,7 +156,7 @@ const SidebarEventsTree = ({
                         <li key={sport.key} className={isSportOpen ? "show" : ""}>
                             <Link
                                 href="javascript:void(0)"
-                                className={`has-arrow ${sport.sportClass}`}
+                                className={`${sportCount > 0 ? "has-arrow" : ""} ${sport.sportClass}`}
                                 aria-expanded={isSportOpen ? "true" : "false"}
                                 onClick={(e) => {
                                     e.preventDefault();

@@ -300,3 +300,11 @@ export const gameCodeMap = {
 export function sanitizeNumber(val) {
     return isNaN(val) || val === null ? 0 : Number(val);
 }
+
+export function capitalize_1st_letter(str) {
+    return str
+        ?.toLowerCase()
+        ?.split(" ")
+        ?.map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        ?.join(" ");
+}

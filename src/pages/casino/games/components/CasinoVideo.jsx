@@ -78,7 +78,7 @@ const CasinoVideo = ({
 
             {WholeCardDrawer ? (
                 <WholeCardDrawer />
-            ) : showCardDrawer &&  (
+            ) : showCardDrawer && (
                 <div className={`casino-video-cards ${isCardDrawerOpen && !isAllClosed ? "" : "hide-cards"}`}>
                     <div
                         className="casino-cards-shuffle"
@@ -148,7 +148,7 @@ const CasinoVideo = ({
                 <LastResult results={results} isOpen={isLastResultOpen} />
             )}
 
-            {/* {isRulesOpen && <VideoRules gameName={gameName} onClose={() => setIsRulesOpen(false)} />} */}
+            {isRulesOpen && <VideoRules gameName={gameName} onClose={() => setIsRulesOpen(false)} />}
         </div>
     );
 };

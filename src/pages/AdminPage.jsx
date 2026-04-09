@@ -13,6 +13,7 @@ const AdminPage = () => {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [carouselBanners, setCarouselBanners] = useState([]);
+  const [activeBannerIndex, setActiveBannerIndex] = useState(0);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -48,6 +49,14 @@ const AdminPage = () => {
     fetchBanners();
   }, []);
 
+  useEffect(() => {
+    if (carouselBanners.length <= 1) return;
+    const interval = setInterval(() => {
+      setActiveBannerIndex((prev) => (prev + 1) % carouselBanners.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [carouselBanners]);
+
   const toggleLogin = () => setIsLoginOpen(!isLoginOpen);
 
   const handleLogin = async (e) => {
@@ -63,7 +72,7 @@ const AdminPage = () => {
 
     try {
       const result = await loginAdmin(username, password);
-      
+
       if (result.status === "ok") {
         dispatch(login(result.data));
         sessionStorage.setItem('userdata', JSON.stringify(result.data));
@@ -253,13 +262,13 @@ const AdminPage = () => {
                     key={index}
                     data-v-019a5d71=""
                     role="listitem"
-                    className={`carousel-item ${index === 0 ? 'active' : ''}`}
-                    aria-current={index === 0}
+                    className={`carousel-item ${index === activeBannerIndex ? 'active' : ''}`}
+                    aria-current={index === activeBannerIndex}
                     aria-posinset={index + 1}
                     aria-setsize={carouselBanners.length}
                     id={`__BVID__${17 + index}`}
                     style={{ background: `url("${banner}")` }}
-                    aria-hidden={index !== 0}
+                    aria-hidden={index !== activeBannerIndex}
                   >
                     {/*  */}
                   </div>
@@ -271,12 +280,13 @@ const AdminPage = () => {
                     key={index}
                     role="button"
                     tabIndex="0"
-                    aria-current={index === 0}
+                    aria-current={index === activeBannerIndex}
                     aria-label={`Goto slide ${index + 1}`}
-                    className={index === 0 ? 'active' : ''}
+                    className={index === activeBannerIndex ? 'active' : ''}
                     id={`__BVID__16___BV_indicator_${index + 1}_`}
                     aria-controls="__BVID__16___BV_inner_"
                     aria-describedby={`__BVID__${17 + index}`}
+                    onClick={() => setActiveBannerIndex(index)}
                   ></li>
                 ))}
               </ol>
@@ -286,7 +296,7 @@ const AdminPage = () => {
             <h4 data-v-019a5d71="" className="sport-list-title">Our Latest Casino</h4>
             <div data-v-019a5d71="" className="casino-banners-list mt-2 latest-casino">
               {latestCasinos.map((casino, index) => (
-                <div key={index} data-v-019a5d71="" className="casino-banner-item login-hover">
+                <div key={index} data-v-019a5d71="" className="casino-banner-item login-hover" onClick={toggleLogin}>
                   <a data-v-019a5d71="" href="javascript:void(0);">
                     <img data-v-019a5d71="" src={casino.src} className="img-fluid" alt={casino.alt} />
                     <div data-v-019a5d71="" role="button" tabIndex="0">Login</div>
@@ -300,7 +310,7 @@ const AdminPage = () => {
                   <h4 data-v-019a5d71="" className="sport-list-title">Live Casinos</h4>
                   <div data-v-019a5d71="" className="casino-banners-list live-casinos mt-2">
                     {liveCasinos.map((casino, index) => (
-                      <div key={index} data-v-019a5d71="" className="casino-banner-item login-hover">
+                      <div key={index} data-v-019a5d71="" className="casino-banner-item login-hover" onClick={toggleLogin}>
                         <a data-v-019a5d71="" href="javascript:void(0);">
                           <img data-v-019a5d71="" src={casino.src} alt={casino.alt} className="img-fluid" />
                           <div data-v-019a5d71="" role="button" tabIndex="0">Login</div>
@@ -313,32 +323,33 @@ const AdminPage = () => {
             </div>
           </div>
           <h4 data-v-019a5d71="" className="sport-list-title">Top Winners</h4>
-        </div>
-        <footer data-v-019a5d71="" className="footer">
-          <div data-v-019a5d71="" className="container-fluid container-fluid-5">
-            <div data-v-019a5d71="" className="row row5">
-              <div data-v-019a5d71="" className="col-lg-12 text-center">
-                <div data-v-019a5d71="" className="footer-bottom">
-                  <span data-v-019a5d71="">
-                    This website is owned and operated by (WORLD777.COM) Seven Investments America N.V.. registration number: 152581, registered address: Zuikertuintjeweg Z/N (Zuikertuin Tower), Curaçao. Contact us info@world7.com. world7.com is licensed and regulated by the Government of the Autonomous Island of Anjouan, Union of Comoros and operates under License No. ALSI-122310018-F16. world7.com has passed all regulatory compliance and is legally authorized to conduct gaming operations for any and all games of chance and wagering.
-                  </span>
+          <footer data-v-019a5d71="" className="footer">
+            <div data-v-019a5d71="" className="container-fluid container-fluid-5">
+              <div data-v-019a5d71="" className="row row5">
+                <div data-v-019a5d71="" className="col-lg-12 text-center">
+                  <div data-v-019a5d71="" className="footer-bottom">
+                    <span data-v-019a5d71="">
+                      This website is owned and operated by (WORLD777.COM) Seven Investments America N.V.. registration number: 152581, registered address: Zuikertuintjeweg Z/N (Zuikertuin Tower), Curaçao. Contact us info@world7.com. world7.com is licensed and regulated by the Government of the Autonomous Island of Anjouan, Union of Comoros and operates under License No. ALSI-122310018-F16. world7.com has passed all regulatory compliance and is legally authorized to conduct gaming operations for any and all games of chance and wagering.
+                    </span>
+                  </div>
+                  <div data-v-019a5d71="" className="mt-2 gt">
+                    <a data-v-019a5d71="" href="javascript:void(0)" role="button">
+                      <img data-v-019a5d71="" data-src="https://wver.sprintstaticdata.com/v208/static/front/img/18plus.png" src="https://wver.sprintstaticdata.com/v208/static/front/img/18plus.png" lazy="loaded" />
+                    </a>
+                    <a data-v-019a5d71="" href="https://www.gamcare.org.uk/" target="_blank">
+                      <img data-v-019a5d71="" data-src="https://wver.sprintstaticdata.com/v208/static/front/img/gamecare.png" src="https://wver.sprintstaticdata.com/v208/static/front/img/gamecare.png" lazy="loaded" />
+                    </a>
+                    <a data-v-019a5d71="" href="https://www.gamblingtherapy.org/en" target="_blank">
+                      <img data-v-019a5d71="" data-src="https://wver.sprintstaticdata.com/v208/static/front/img/gt.png" src="https://wver.sprintstaticdata.com/v208/static/front/img/gt.png" lazy="loaded" />
+                    </a>
+                  </div>
+                  <div data-v-019a5d71="" className="mt-3">© Copyright 2021. All Rights Reserved.</div>
                 </div>
-                <div data-v-019a5d71="" className="mt-2 gt">
-                  <a data-v-019a5d71="" href="javascript:void(0)" role="button">
-                    <img data-v-019a5d71="" data-src="https://wver.sprintstaticdata.com/v208/static/front/img/18plus.png" src="https://wver.sprintstaticdata.com/v208/static/front/img/18plus.png" lazy="loaded" />
-                  </a>
-                  <a data-v-019a5d71="" href="https://www.gamcare.org.uk/" target="_blank">
-                    <img data-v-019a5d71="" data-src="https://wver.sprintstaticdata.com/v208/static/front/img/gamecare.png" src="https://wver.sprintstaticdata.com/v208/static/front/img/gamecare.png" lazy="loaded" />
-                  </a>
-                  <a data-v-019a5d71="" href="https://www.gamblingtherapy.org/en" target="_blank">
-                    <img data-v-019a5d71="" data-src="https://wver.sprintstaticdata.com/v208/static/front/img/gt.png" src="https://wver.sprintstaticdata.com/v208/static/front/img/gt.png" lazy="loaded" />
-                  </a>
-                </div>
-                <div data-v-019a5d71="" className="mt-3">© Copyright 2021. All Rights Reserved.</div>
               </div>
             </div>
-          </div>
-        </footer>
+          </footer>
+        </div>
+
         <div data-v-019a5d71="">
           <div data-v-019a5d71="" className="right-bar">
             <div data-v-019a5d71="">

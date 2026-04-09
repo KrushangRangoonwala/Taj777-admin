@@ -40,6 +40,7 @@ import AuthList from './pages/reports/AuthList'
 import Turnover from './pages/reports/Turnover'
 import UserRegisterDetail from './pages/reports/UserRegisterDetail'
 import TotalProfitLoss from './pages/reports/TotalProfitLoss'
+import SecureAuth from './pages/reports/SecureAuth'
 
 function putLiveFirst(arr) {
   if (arr && Array.isArray(arr)) {
@@ -156,6 +157,7 @@ function AppContent() {
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/admin/home" replace />} />
           <Route path="admin/home" element={<Dashboard />} />
+          <Route path="admin/secureauth" element={<SecureAuth />} />
           <Route path="admin/users" element={<AccountList />} />
           <Route path="admin/activeusers" element={<ActiveUsers />} />
           <Route path="admin/users/insertuser" element={<InsertUser />} />
@@ -203,7 +205,7 @@ function AppContent() {
 
 function App() {
   return (
-    <BrowserRouter basename="/admin_new">
+    <BrowserRouter>
       <AppContent />
     </BrowserRouter>
   )

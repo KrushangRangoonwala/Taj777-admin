@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import SliderRaw from 'react-slick';
 import SelectRaw from 'react-select';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -7,14 +7,59 @@ import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../store/slices/userSlice';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { apiGetUpcomingFixtures } from '../api/API';
+import ChangePasswordModal from './ChangePasswordModal';
 
 const Slider = SliderRaw && typeof SliderRaw === 'object' && SliderRaw.default ? SliderRaw.default : SliderRaw;
 const Select = SelectRaw && typeof SelectRaw === 'object' && SelectRaw.default ? SelectRaw.default : SelectRaw;
+
+const customSelectStyles = {
+    control: (provided, state) => ({
+        ...provided,
+        borderRadius: state.menuIsOpen ? '4px 4px 0 0' : '4px',
+        border: '1px solid #ced4da',
+        boxShadow: 'none',
+        '&:hover': {
+            borderColor: '#ced4da'
+        },
+        minHeight: '38px',
+    }),
+    menu: (provided) => ({
+        ...provided,
+        marginTop: '-1px',
+        borderRadius: '0 0 4px 4px',
+        border: '1px solid #ced4da',
+        boxShadow: 'none',
+        position: 'absolute',
+        zIndex: 99,
+    }),
+    menuList: (provided) => ({
+        ...provided,
+        padding: 0
+    }),
+    singleValue: (provided) => ({
+        ...provided,
+        color: '#495057',
+    }),
+    placeholder: (provided) => ({
+        ...provided,
+        color: '#ced4da',
+    }),
+    noOptionsMessage: (provided) => ({
+        ...provided,
+        textAlign: 'left',
+        padding: '8px 12px',
+        color: '#74788d',
+        fontSize: '14px'
+    })
+};
 
 export default function Header() {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { name } = useSelector((state) => state.user);
+    const [upcoming, setUpcoming] = useState([]);
+    const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -56,6 +101,15 @@ export default function Header() {
         }
     };
 
+    async function upcomingApi() {
+        const data = await apiGetUpcomingFixtures(dispatch);
+        setUpcoming(data);
+    };
+
+    useEffect(() => {
+        upcomingApi();
+    }, [])
+
     return (
         <header data-v-5a10e370="" id="page-topbar">
             <div className="navbar-header">
@@ -82,6 +136,12 @@ export default function Header() {
                             placeholder="Search User"
                             className="react-select-container"
                             classNamePrefix="react-select"
+                            components={{
+                                DropdownIndicator: () => null,
+                                IndicatorSeparator: () => null
+                            }}
+                            noOptionsMessage={() => "List is empty."}
+                            styles={customSelectStyles}
                         />
                     </div>
                 </div>
@@ -91,14 +151,14 @@ export default function Header() {
                         <div className="fixure-title">Upcoming Fixtures</div>
                         <div className="fixure-box-container1" style={{ height: '41px', overflow: 'hidden' }}>
                             <Slider {...sliderSettings} className="slick-slider slick-vertical">
-                                {fixtures.map((f, i) => (
+                                {upcoming.map((f, i) => (
                                     <div key={i} style={{ outline: 'none', width: '255px' }}>
                                         <a href="#" style={{ width: '100%', display: 'inline-block' }}>
                                             <div className="fixure-box">
-                                                <div className="f-title"><i className={`d-icon mr-2 ${f.icon}`}></i>
-                                                    {f.title}
+                                                <div className="f-title"><i className={`d-icon mr-2 icon-${f.sport_type}`}></i>
+                                                    {f.event_name}
                                                 </div>
-                                                <div>{f.date}</div>
+                                                <div>{f.date || "13/02/2026 06:30:00 (UTC-08:00)"}</div>
                                             </div>
                                         </a>
                                     </div>
@@ -118,7 +178,16 @@ export default function Header() {
                                 <form className="p-3">
                                     <div className="form-group m-0">
                                         <div className="input-group">
-                                            <Select options={[]} placeholder="Search User" />
+                                            <Select
+                                                options={[]}
+                                                placeholder="Search User"
+                                                components={{
+                                                    DropdownIndicator: () => null,
+                                                    IndicatorSeparator: () => null
+                                                }}
+                                                noOptionsMessage={() => "List is empty."}
+                                                styles={customSelectStyles}
+                                            />
                                         </div>
                                     </div>
                                 </form>
@@ -148,10 +217,10 @@ export default function Header() {
                             <Dropdown.Item href="javascript: void(0);" className="d-sm-none">
                                 <i className="fas fa-info-circle mr-1"></i> Rules
                             </Dropdown.Item>
-                            <Dropdown.Item href="/admin/secureauth">
+                            <Dropdown.Item onClick={() => navigate("/admin/secureauth")}>
                                 <i className="bx bx-lock-open font-size-16 align-middle mr-1"></i> Secure Auth
                             </Dropdown.Item>
-                            <Dropdown.Item href="javascript: void(0);">
+                            <Dropdown.Item href="javascript: void(0);" onClick={() => setShowChangePasswordModal(true)}>
                                 <i className="bx bx-wallet font-size-16 align-middle mr-1"></i> Change Password
                             </Dropdown.Item>
                             <Dropdown.Divider />
@@ -162,6 +231,7 @@ export default function Header() {
                     </Dropdown>
                 </div>
             </div>
+            {showChangePasswordModal && <ChangePasswordModal show={showChangePasswordModal} onHide={() => setShowChangePasswordModal(false)} />}
         </header>
     );
 }

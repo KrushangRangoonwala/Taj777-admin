@@ -103,10 +103,15 @@ a.link-default {
     position: relative;
 
     -webkit-animation-duration: 1s;
+    animation-duration: 1s;
     -webkit-animation-fill-mode: forwards;
+    animation-fill-mode: forwards;
     -webkit-animation-iteration-count: infinite;
+    animation-iteration-count: infinite;
     -webkit-animation-name: placeholderShimmer;
+    animation-name: placeholderShimmer;
     -webkit-animation-timing-function: linear;
+    animation-timing-function: linear;
 }
 
 /*box {
@@ -136,6 +141,16 @@ photo {
 }
 */
 @-webkit-keyframes placeholderShimmer {
+    0% {
+        background-position: -468px 0;
+    }
+
+    100% {
+        background-position: 468px 0;
+    }
+}
+
+@keyframes placeholderShimmer {
     0% {
         background-position: -468px 0;
     }

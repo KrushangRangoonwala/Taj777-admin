@@ -3,9 +3,11 @@ import { Collapse } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import SimpleBar from 'simplebar-react';
 import SafeIframe from '../../../components/SafeIframe';
+import ViewMoreModal from './ViewMoreModal';
 
-const EventRightSidebar = ({ tvUrl }) => {
+const EventRightSidebar = ({ tvUrl, liveScoreData, isLive }) => {
     const [isTvOn, setIsTvOn] = useState(false);
+    const [showViewMore, setShowViewMore] = useState(false);
     const [betList, setBetList] = useState([
         {
             marketType: 'Normal',
@@ -25,31 +27,68 @@ const EventRightSidebar = ({ tvUrl }) => {
         }
     ]);
 
+
     return (
         <div className="right-sidebar">
             <SimpleBar style={{ maxHeight: '100%' }}>
-                <div className="card m-b-10"></div>
-
-                <div className="card m-b-10">
-                    <div data-toggle="collapse" data-target=".video-tv" aria-expanded="true" className="card-header pointer" onClick={() => setIsTvOn(!isTvOn)}>
-                        <h6 className="card-title">
-                            <Link to="" title="">
-                                <img src="/admin/assets/images/arrow-down.svg" className="mr-1" />
-                            </Link>
-                            Live Match
-                        </h6>
-                    </div>
-                    <Collapse in={isTvOn}>
-                        <div className="video-tv">
-                            <SafeIframe allow="autoplay" src={tvUrl} />
+                {isLive &&
+                    <div className="card m-b-10">
+                        <div data-toggle="collapse" data-target=".video-tv" aria-expanded="true" className="card-header pointer" onClick={() => setIsTvOn(!isTvOn)}>
+                            <h6 className="card-title">
+                                <Link to="" title="">
+                                    <img src="/admin/assets/images/arrow-down.svg" className="mr-1" />
+                                </Link>
+                                Live Match
+                            </h6>
                         </div>
-                    </Collapse>
-                </div>
+                        <Collapse in={isTvOn}>
+                            <div className="video-tv">
+                                <SafeIframe allow="autoplay" src={tvUrl} />
+                            </div>
+                        </Collapse>
+                    </div>}
+
+                {liveScoreData && (
+                    <div className="card m-b-10">
+                        <div className="scorecard p-2">
+                            <div className="scorecard-row">
+                                <div className="score-top-row">
+                                    <div className="score-team">
+                                        <b>{liveScoreData.activenation1 === '1' ? liveScoreData.spnnation2 : liveScoreData.spnnation1}</b>
+                                    </div>
+                                    <div className="score-rr"></div>
+                                </div>
+                            </div>
+                            <div className="scorecard-row">
+                                <div className="score-top-row">
+                                    <div className="score-team">
+                                        <b>{liveScoreData.activenation1 === '1' ? liveScoreData.spnnation1 : liveScoreData.spnnation2}</b>{' '}
+                                        {liveScoreData.activenation1 === '1' ? liveScoreData.score1 : liveScoreData.score2}
+                                    </div>
+                                    <div className="score-rr">
+                                        {liveScoreData.activenation1 === '1' ? (
+                                            liveScoreData.spnrunrate1 && <span> CRR {liveScoreData.spnrunrate1}</span>
+                                        ) : (
+                                            liveScoreData.spnrunrate2 && <span> CRR {liveScoreData.spnrunrate2}</span>
+                                        )}
+                                    </div>
+                                    <div className="score-message">
+                                        {liveScoreData.balls && liveScoreData.balls.map((ball, index) => (
+                                            <span key={index} className={`ball-runs mr-1 ${ball.toLowerCase().includes('w') ? 'wicket' : ''}`}>
+                                                {ball}
+                                            </span>
+                                        ))}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
 
                 <div id="my-game-bets" className="card m-b-10 my-bet">
                     <div className="card-header">
                         <h6 className="card-title float-left">My Bets</h6>
-                        <a href="javascript:void(0)" className="btn btn-back float-right">View More</a>
+                        <a href="javascript:void(0)" className="btn btn-back float-right" onClick={() => setShowViewMore(true)}>View More</a>
                     </div>
                     <div className="card-body">
                         <div className="tabs">
@@ -103,6 +142,7 @@ const EventRightSidebar = ({ tvUrl }) => {
                         </div>
                     </div>
                 </div>
+                <ViewMoreModal show={showViewMore} onHide={() => setShowViewMore(false)} betList={[]} />
             </SimpleBar>
         </div>
     );

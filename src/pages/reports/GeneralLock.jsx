@@ -27,7 +27,7 @@ const EventTreeNode = ({ node, onChange }) => {
             id={node.id}
             className="custom-control-input"
             checked={node.checked || false}
-            onChange={(e) => onChange(node, e.target.checked)}
+            onChange={(e) => onChange(node, e.target.checked, null)}
           />
           <label htmlFor={node.id} className="custom-control-label">
             {node.name}
@@ -107,8 +107,23 @@ const GeneralLock = () => {
         if (!sport?.body) return;
 
         Object.values(sport.body).forEach((match) => {
-          if (!updated[match.SportId]) updated[match.SportId] = [];
-          updated[match.SportId].push({
+          const sportId = match.SportId;
+          const cid = match.cid;       // ✅ competition id
+          const cname = match.cname;   // ✅ competition name
+
+          if (!updated[sportId]) updated[sportId] = {};
+
+          // create competition group
+          if (!updated[sportId][cid]) {
+            updated[sportId][cid] = {
+              cid,
+              cname,
+              matches: [],
+            };
+          }
+
+          // push match under that competition
+          updated[sportId][cid].matches.push({
             matchName: match.matchName,
             marketId: match.marketid,
           });
@@ -149,7 +164,7 @@ const GeneralLock = () => {
 
     try {
       const res = await checkUserLockPwd({
-        client_name: selectedClient.value,
+        client_name: selectedClient?.value || null,
         tpassword,
       });
 
@@ -168,91 +183,137 @@ const GeneralLock = () => {
   const buildTree = (data) => {
     const { casino_names = [], sport_type = [] } = data;
 
-    const casinoTypes = [
+    /* const casinoTypes = [
         { value: "", label: "Select Type" },   // ✅ static first option
         ...(casino_list?.map(val => ({
             value: val.game_socket,
             label: val.game_name,
         })) || [])
-    ];
+    ]; */
 
     const sportsMap = { "4": "Cricket", "1": "Soccer", "2": "Tennis" };
 
     const events = Object.keys(matchesBySport).map((sportId) => ({
       id: sportId,
+      sportId, // ✅ important
       name: sportsMap[sportId] || "Unknown",
       checked: sport_type.includes(sportId),
-      children: matchesBySport[sportId]?.map((match) => ({
-        id: match.marketId,
-        name: match.matchName,
-        markets: [
-          {
-            type: "Match",
-            items: [
-              {
-                id: match.marketId,
-                name: match.matchName,
-                checked: casino_names.includes(match.marketId.toString()),
-                disabled: sport_type.includes(sportId),
-              },
-            ],
-          },
-        ],
+
+      children: Object.values(matchesBySport[sportId] || {}).map((comp) => ({
+        id: comp.cid,
+        name: comp.cname,
+        sportId, // ✅ pass down
+
+        children: comp.matches.map((match) => ({
+          id: match.marketId,
+          name: match.matchName,
+          sportId, // ✅ pass down
+          markets: [
+            {
+              type: "Match",
+              items: [
+                {
+                  id: match.marketId,
+                  name: match.matchName,
+                  sportId, // ✅ pass down
+                  checked: casino_names.includes(
+                    match.marketId.toString()
+                  ),
+                  disabled: sport_type.includes(sportId),
+                },
+              ],
+            },
+          ],
+        })),
       })),
     }));
 
     setEventData(events);
 
     setCasinoData(
-      casino_names.map((id) => ({
-        id,
-        name: id,
-        checked: true,
+      casino_list.map((casino) => ({
+        id: casino.game_socket,
+        name: casino.game_name,
+        checked: casino_names.includes(casino.game_socket?.toString()),
       }))
     );
   };
 
   // CHECKBOX TOGGLE HANDLER (Events + Casino)
-  const handleCheckbox = async (item, checked, parent = null) => {
-    if (!selectedClient) return;
+  const handleCheckbox = async (item, checked) => {
+      const isSportLevel = item.id === item.sportId;
 
-    try {
-      await updateUserLockStatus({
-        child_id: item.id || "all",
-        sport_type: parent?.type || "Match",
-        status: checked ? 1 : 0,
-        username: selectedClient.value,
-      });
+      try {
+        await updateUserLockStatus({
+          child_id: isSportLevel ? "all" : item.id,
+          sport_type: item.sportId,
+          status: checked ? 1 : 0,
+          username: selectedClient?.value || null,
+        });
 
-      // Update UI locally
-      if (parent) {
+        // ✅ CASINO
+        if (!item.sportId) {
+          setCasinoData((prev) =>
+            prev.map((c) =>
+              c.id === item.id ? { ...c, checked } : c
+            )
+          );
+          return;
+        }
+
+        // ✅ EVENTS
         setEventData((prev) =>
-          prev.map((ev) => ({
-            ...ev,
-            children: ev.children?.map((child) => {
-              if (child.id === item.id) {
-                child.markets = child.markets.map((m) => {
-                  if (m.type === parent.type) {
-                    m.items = m.items.map((it) =>
-                      it.id === item.id ? { ...it, checked } : it
-                    );
+          prev.map((sport) => {
+            const isSport = item.id === sport.id;
+
+            if (isSport) {
+              return {
+                ...sport,
+                checked,
+                children: sport.children.map((comp) => ({
+                  ...comp,
+                  children: comp.children.map((match) => ({
+                    ...match,
+                    markets: match.markets.map((m) => ({
+                      ...m,
+                      items: m.items.map((it) => ({
+                        ...it,
+                        checked,
+                      })),
+                    })),
+                  })),
+                })),
+              };
+            }
+
+            return {
+              ...sport,
+              children: sport.children.map((comp) => ({
+                ...comp,
+                children: comp.children.map((match) => {
+                  if (match.id === item.id) {
+                    return {
+                      ...match,
+                      markets: match.markets.map((m) => ({
+                        ...m,
+                        items: m.items.map((it) =>
+                          it.id === item.id
+                            ? { ...it, checked }
+                            : it
+                        ),
+                      })),
+                    };
                   }
-                  return m;
-                });
-              }
-              return child;
-            }),
-          }))
+                  return match;
+                }),
+              })),
+            };
+          })
         );
-      } else {
-        setCasinoData((prev) =>
-          prev.map((c) => (c.id === item.id ? { ...c, checked } : c))
-        );
+      } catch (err) {
+        console.log(err);
       }
-    } catch (err) {
-      console.log(err);
-    }
-  };
+    };
 
   return (
     <div>

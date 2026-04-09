@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { accountTransaction } from "../api/API";
 
 const WithdrawModal = ({ user, onClose }) => {
   const [formData, setFormData] = useState({
@@ -8,6 +9,8 @@ const WithdrawModal = ({ user, onClose }) => {
   });
 
   const [errors, setErrors] = useState({});
+
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('modal-open');
@@ -26,8 +29,9 @@ const WithdrawModal = ({ user, onClose }) => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const newErrors = {};
     if (!formData.amount) newErrors.amount = true;
     if (!formData.remark) newErrors.remark = true;
@@ -38,9 +42,40 @@ const WithdrawModal = ({ user, onClose }) => {
       return;
     }
 
-    console.log('Withdraw Submitted:', { user, formData });
-    // Add logic here
-    onClose();
+    try {
+      setLoading(true);
+
+      const payload = {
+        user_name: user.id,                 // ✅ important
+        transaction_type: 2,               // ✅ 2 = withdraw
+        transaction_points: formData.amount,
+        remark: formData.remark,
+        master_password: formData.mpassword
+      };
+
+      const res = await accountTransaction(payload);
+
+      if (res.status === "ok") {
+        alert(res.message || "Withdraw successful");
+
+        // reset form
+        setFormData({
+          amount: '',
+          remark: '',
+          mpassword: '',
+        });
+
+        onClose();
+      } else {
+        alert(res.message || "Something went wrong");
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Server error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -144,8 +179,8 @@ const WithdrawModal = ({ user, onClose }) => {
                     </div>
                     <div className="form-group row">
                       <div className="col-12 text-right">
-                        <button type="submit" className="btn btn-danger">
-                          submit
+                        <button type="submit" className="btn btn-danger" disabled={loading}>
+                          {loading ? "Processing..." : "submit"}
                           <i className="fas fa-sign-in-alt ml-1"></i>
                         </button>
                       </div>

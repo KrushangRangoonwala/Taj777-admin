@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import UserMoreModal from '../../components/UserMoreModal';
 import DepositModal from '../../components/DepositModal';
 import WithdrawModal from '../../components/WithdrawModal';
+import { getUserList } from "../../api/API";
 
 const ActiveUsers = () => {
   const [showModal, setShowModal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [users, setUsers] = useState([]);
 
   const handleMoreClick = (user) => {
     setSelectedUser(user);
@@ -23,6 +25,31 @@ const ActiveUsers = () => {
     setSelectedUser(user);
     setShowWithdrawModal(true);
   };
+
+  const fetchUserList = async () => {
+    try {
+      const payload = {
+        user_status: "1"
+      };
+
+      const res = await getUserList(payload);
+
+      if (res.status === "ok") {
+        const numbered = res.data.map((item, index) => ({
+          sr_no: index + 1,
+          ...item
+        }));
+
+        setUsers(numbered); // ✅ IMPORTANT
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserList();
+  }, []);
   const dummyData = [
     {
       id: '1',
@@ -225,7 +252,7 @@ const ActiveUsers = () => {
                         </tr>
                       </thead>
                       <tbody role="rowgroup">
-                        {dummyData.map((user) => (
+                        {users.map((user) => (
                           <tr key={user.id} role="row">
                             <td aria-colindex="1" role="cell">
                               <span title={user.fullName}>{user.username}</span>
