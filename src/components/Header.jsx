@@ -13,7 +13,7 @@ import ChangePasswordModal from './ChangePasswordModal';
 const Slider = SliderRaw && typeof SliderRaw === 'object' && SliderRaw.default ? SliderRaw.default : SliderRaw;
 const Select = SelectRaw && typeof SelectRaw === 'object' && SelectRaw.default ? SelectRaw.default : SelectRaw;
 
-const customSelectStyles = {
+export const customSelectStyles = {
     control: (provided, state) => ({
         ...provided,
         borderRadius: state.menuIsOpen ? '4px 4px 0 0' : '4px',

@@ -3,8 +3,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { login } from '../store/slices/userSlice';
-import { loginAdmin, getBannerImages } from '../api/API';
+import { apiGetUpcomingFixtures, loginAdmin } from '../api/API';
 import dayjs from 'dayjs';
+import { getBannerImages } from '../api/API_games';
 
 const AdminPage = () => {
   const [isLoginOpen, setIsLoginOpen] = useState(false);
@@ -14,6 +15,7 @@ const AdminPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [carouselBanners, setCarouselBanners] = useState([]);
   const [activeBannerIndex, setActiveBannerIndex] = useState(0);
+  const [upcoming, setUpcoming] = useState([]);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -26,27 +28,18 @@ const AdminPage = () => {
   }, [isLoggedIn, navigate]);
 
   useEffect(() => {
-    const fetchBanners = async () => {
-      try {
-        const banners = await getBannerImages();
-        if (banners && banners.length > 0) {
-          setCarouselBanners(banners);
-        } else {
-          // Fallback banners from user request
-          setCarouselBanners([
-            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775535285240.webp",
-            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775509048644.webp",
-            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775515932883.webp",
-            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775464523068.webp",
-            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775508829184.webp",
-            "https://sitethemedata.com/sitethemes/world777.com/front/banners/1775517246538.webp"
-          ]);
-        }
-      } catch (err) {
-        console.error("Error fetching banners on AdminPage:", err);
-      }
+    async function fetchBanners() {
+      const banners = await getBannerImages();
+      setCarouselBanners(banners);
     };
+
+    async function upcomingApi() {
+      const data = await apiGetUpcomingFixtures(dispatch);
+      setUpcoming(data);
+    };
+
     fetchBanners();
+    upcomingApi();
   }, []);
 
   useEffect(() => {
@@ -237,13 +230,13 @@ const AdminPage = () => {
             <div data-v-019a5d71="" className="fixure-title">Upcoming Fixtures</div>
             <marquee data-v-019a5d71="">
               <div data-v-019a5d71="" className="fixure-box-container">
-                {fixtures.map((fx, i) => (
+                {upcoming?.map((fx, i) => (
                   <div key={i} data-v-019a5d71="" className="fixure-box">
                     <div data-v-019a5d71="">
-                      <i data-v-019a5d71="" className={`d-icon mr-2 ${fx.icon}`}></i>
-                      {fx.title}
+                      <i data-v-019a5d71="" className={`d-icon mr-2 icon-${fx.sport_type}`}></i>
+                      {fx.event_name}
                     </div>
-                    <div data-v-019a5d71="">{fx.date}</div>
+                    <div data-v-019a5d71="">{fx.date || "13/02/2026 06:30:00 (UTC-08:00)"}</div>
                   </div>
                 ))}
               </div>

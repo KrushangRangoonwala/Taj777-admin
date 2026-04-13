@@ -41,6 +41,8 @@ import Turnover from './pages/reports/Turnover'
 import UserRegisterDetail from './pages/reports/UserRegisterDetail'
 import TotalProfitLoss from './pages/reports/TotalProfitLoss'
 import SecureAuth from './pages/reports/SecureAuth'
+import { logout } from './store/slices/userSlice'
+import UserWinLoss from './pages/reports/UserWinLoss'
 
 function putLiveFirst(arr) {
   if (arr && Array.isArray(arr)) {
@@ -56,12 +58,19 @@ function AppContent() {
   const dispatch = useDispatch();
   const socket = useSocket("casino");
   const activeTab = useSelector(state => state.match.activeTab);
+  const userdata = useSelector(state => state.user.userData);
   const game_id = activeTab?.id;
   const game_name = activeTab?.label;
 
   const [initialSocketData, setInitialSocketData] = useState();
   const [socketData, setSocketData] = useState();
   const [willCall, setWillCall] = useState(false);
+
+  useEffect(() => {
+    if (userdata?.user_type == 1) { // IT SHOULD NOT BE USER (user_type = 1 for role : User)
+      dispatch(logout());
+    }
+  }, [])
 
   const handleLiveEventName = (data) => {
     if (data?.sportId && data?.sport?.body?.length > 0) {
@@ -174,6 +183,7 @@ function AppContent() {
           <Route path="admin/reports/turnover" element={<Turnover />} />
           <Route path="admin/reports/userregisterdetail" element={<UserRegisterDetail />} />
           <Route path="admin/reports/totalprofitloss" element={<TotalProfitLoss />} />
+          <Route path="admin/reports/userwinloss" element={<UserWinLoss />} />
           <Route path="admin/createaccount" element={<CreateAccount />} />
           <Route path="admin/game/details" element={
             <EventPage
@@ -205,6 +215,7 @@ function AppContent() {
 
 function App() {
   return (
+    // <BrowserRouter basename="/admin_new/">
     <BrowserRouter>
       <AppContent />
     </BrowserRouter>

@@ -1,6 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
+import { insertUser } from "../../api/API";
 
 const InsertUser = () => {
+
+  const [loginUser, setLoginUser] = useState(null);
+
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem("userdata");
+    if (storedUser) {
+      setLoginUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   const [formData, setFormData] = useState({
     username: '',
     fullname: '',
@@ -13,9 +24,51 @@ const InsertUser = () => {
     spart1: '',
     remark: '',
     mpassword: '',
+    changePasswordLock: false,
   });
 
+  const [loginUserPower, setLoginUserPower] = useState(null);
   const [errors, setErrors] = useState({});
+  const [loading, setLoading] = useState(false);
+
+  const renderAccountTypeOptions = () => {
+    if (!loginUser) return null;
+
+    console.log("loginUser",loginUser);
+
+    const power = Number(loginUser.user_type);
+
+    return (
+      <>
+        <option value="0">Select User Type</option>
+
+        {/* Super Master */}
+        {power === 7 && (
+          <option value="4">Super Master</option>
+        )}
+
+        {/* Master */}
+        {(power < 5 || power === 7) && power >= 4 && (
+          <option value="3">Master</option>
+        )}
+
+        {/* Agent */}
+        {(power < 5 || power === 7) && power >= 3 && (
+          <option value="2">Agent</option>
+        )}
+
+        {/* User */}
+        {(power < 5 || power === 7) && (
+          <option value="1">User</option>
+        )}
+
+        {/* King Admin */}
+        {power === 5 && (
+          <option value="7">King Admin</option>
+        )}
+      </>
+    );
+  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -32,23 +85,101 @@ const InsertUser = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+
     const newErrors = {};
-    if (!formData.username) newErrors.username = 'The User Name field is required';
-    if (!formData.fullname) newErrors.fullname = 'The Full Name field is required';
-    if (!formData.password) newErrors.password = 'The Password field is required';
-    if (!formData.cpassword) newErrors.cpassword = 'The Confirm Password field is required';
-    if (!formData.mpassword) newErrors.mpassword = 'Transaction Code field is required';
+
+    const passwordRegex =
+      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+
+    // Required validations
+    if (!formData.username.trim()) {
+      newErrors.username = 'The User Name field is required';
+    }
+
+    if (!formData.fullname.trim()) {
+      newErrors.fullname = 'The Full Name field is required';
+    }
+
+    if (!formData.password) {
+      newErrors.password = 'The Password field is required';
+    } else if (!passwordRegex.test(formData.password)) {
+      newErrors.password =
+        'Password must be at least 8 characters and contain uppercase, lowercase and number';
+    }
+
+    if (!formData.cpassword) {
+      newErrors.cpassword = 'The Confirm Password field is required';
+    } else if (formData.password !== formData.cpassword) {
+      newErrors.cpassword =
+        'The Confirm Password confirmation does not match';
+    }
+
+    if (!formData.newlvlno || formData.newlvlno === '0') {
+      newErrors.newlvlno = 'Please select User Type';
+    }
+
+    if (!formData.mpassword.trim()) {
+      newErrors.mpassword = 'Transaction Code field is required';
+    }
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
       return;
     }
 
-    console.log('Form Submitted:', formData);
-    // Add submission logic here
+    try {
+      setLoading(true);
+
+      const payload = {
+        user_full_name: formData.fullname,
+        user_username: formData.username,
+        user_password: formData.password,
+        user_cpassword: formData.cpassword,
+        user_phone: formData.mono || '',
+        user_city: formData.city || '',
+        user_account_type: formData.newlvlno,
+        user_credit_reference: formData.camt || 0,
+        user_exposure_limit: 0,
+        min_stake: 0,
+        max_stake: 0,
+        partnership: formData.spart1 || 0,
+        master_password: formData.mpassword,
+      };
+
+      const res = await insertUser(payload);
+
+      if (res?.status === 'ok') {
+        alert(res?.message || 'User created successfully');
+
+        setFormData({
+          username: '',
+          fullname: '',
+          password: '',
+          cpassword: '',
+          city: '',
+          mono: '',
+          camt: '',
+          newlvlno: '0',
+          spart1: '',
+          remark: '',
+          mpassword: '',
+        });
+
+        setErrors({});
+      } else {
+        alert(res?.message || 'Failed to create user');
+      }
+    } catch (error) {
+      console.error(error);
+      alert('Something went wrong');
+    } finally {
+      setLoading(false);
+    }
   };
+
+  const isUserTypeSelected = String(formData.newlvlno) === "1";
 
   return (
     <div data-v-5a10e370="">
@@ -208,45 +339,44 @@ const InsertUser = () => {
 
                   <div className="form-group tag-select">
                     <label>User Type: <span className="text-danger">*</span></label>
-                    <select
-                      name="newlvlno"
-                      label="label"
-                      data-vv-as="User Type"
-                      className="form-control"
-                      aria-required="true"
-                      aria-invalid="false"
-                      value={formData.newlvlno}
-                      onChange={handleChange}
-                    >
-                      <option value="0">Select User Type</option>
-                      <option value="4">Super Master</option>
-                      <option value="5">Master</option>
-                      <option value="6">Agent</option>
-                      <option value="7">User</option>
-                    </select>
-                  </div>
-
-                  <h4 className="card-title">Partnership Information</h4>
-                  <div>
-                    <div className="form-group">
-                      <label>Partnership With No Return:</label>
-                      <input
-                        placeholder="Partnership With No Return"
-                        type="text"
-                        name="spart1"
-                        data-vv-as="Partnership With No Return"
-                        maxLength="4"
-                        className="form-control animation"
-                        aria-required="true"
-                        aria-invalid="false"
-                        value={formData.spart1}
+                      <select
+                        name="newlvlno"
+                        className="form-control"
+                        value={formData.newlvlno}
                         onChange={handleChange}
-                      />
-                      <p className="help is-success m-0 d-inline-block">
-                        Our : 77.5 | Down Line: 0
-                      </p>
-                    </div>
+                      >
+                        {renderAccountTypeOptions()}
+                      </select>
+                      {errors.newlvlno && (
+                        <small className="error">{errors.newlvlno}</small>
+                      )}
                   </div>
+                    
+                  {!isUserTypeSelected && (
+                    <>
+                      <h4 className="card-title">Partnership Information</h4>
+                      <div>
+                        <div className="form-group">
+                          <label>Partnership With No Return:</label>
+                          <input
+                            placeholder="Partnership With No Return"
+                            type="text"
+                            name="spart1"
+                            data-vv-as="Partnership With No Return"
+                            maxLength="4"
+                            className="form-control animation"
+                            aria-required="true"
+                            aria-invalid="false"
+                            value={formData.spart1}
+                            onChange={handleChange}
+                          />
+                          <p className="help is-success m-0 d-inline-block">
+                            Our : 77.5 | Down Line: 0
+                          </p>
+                        </div>
+                      </div>
+                    </>
+                  )}
 
                   <div className="form-group">
                     <label>Remark:</label>
@@ -262,6 +392,31 @@ const InsertUser = () => {
                     ></textarea>
                   </div>
 
+                  {isUserTypeSelected && (
+                    <div className="form-group mb-3">
+                      <div className="mb-2 custom-control custom-switch">
+                        <input
+                          type="checkbox"
+                          className="custom-control-input"
+                          id="change-password-lock"
+                          checked={formData.changePasswordLock || false}
+                          onChange={(e) =>
+                            setFormData({
+                              ...formData,
+                              changePasswordLock: e.target.checked,
+                            })
+                          }
+                        />
+                        <label
+                          className="custom-control-label"
+                          htmlFor="change-password-lock"
+                        >
+                          Change Password Lock
+                        </label>
+                      </div>
+                    </div>
+                  )}
+
                   <div className="d-flex justify-content-end align-items-center">
                     <input
                       placeholder="Transaction Code"
@@ -273,8 +428,18 @@ const InsertUser = () => {
                       value={formData.mpassword}
                       onChange={handleChange}
                     />
-                    <button type="submit" id="spinner-dark-8" className="btn btn-primary ml-2">
-                      Submit
+                    {errors.mpassword && (
+                      <small className="error d-block mt-1">
+                        {errors.mpassword}
+                      </small>
+                    )}
+                    <button
+                      type="submit"
+                      id="spinner-dark-8"
+                      className="btn btn-primary ml-2"
+                      disabled={loading}
+                    >
+                      {loading ? 'Submitting...' : 'Submit'}
                     </button>
                   </div>
                 </div>

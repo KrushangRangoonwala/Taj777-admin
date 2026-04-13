@@ -21,11 +21,14 @@ const AccountStatement = () => {
   const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
 
+  const [type, setType] = useState("2");        // default selected
+  const [statement, setStatement] = useState("all");
+
   const [fromDate, setFromDate] = useState(
-        new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0]
-    );
+    new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0]
+  );
   const [toDate, setToDate] = useState(
-      new Date().toISOString().split("T")[0]
+    new Date().toISOString().split("T")[0]
   );
 
   const [search, setSearch] = useState('');
@@ -38,7 +41,7 @@ const AccountStatement = () => {
   // 🔹 Fetch clients
   const fetchClients = async (value) => {
     try {
-      console.log("value-----",value)
+      console.log("value-----", value)
       const res = await getClients(value);
       setClientList(res.results || []);
     } catch (err) {
@@ -49,12 +52,14 @@ const AccountStatement = () => {
   // 🔹 Fetch statement
   const fetchStatement = async (page = currentPage) => {
     try {
-       setLoading(true);
+      setLoading(true);
 
       const payload = {
         client_name: selectedClient,
         from_date: fromDate ? new Date(fromDate).toISOString().split("T")[0] : "",
         to_date: toDate ? new Date(toDate).toISOString().split("T")[0] : "",
+        report_type: type,
+        game_name: statement,
         search: search,
         page: page,
         per_page: perPage
@@ -251,6 +256,7 @@ const AccountStatement = () => {
                         <label>Select Date Range</label>
                         <div className="mb-3">
                           <RangePicker
+                            className="custom-range-picker"
                             value={
                               fromDate && toDate
                                 ? [dayjs(fromDate), dayjs(toDate)]
@@ -270,13 +276,13 @@ const AccountStatement = () => {
                             suffixIcon={
                               <span style={{ pointerEvents: "none" }}>
                                 <svg
-                                    xmlns="http://www.w3.org/2000/svg"
-                                    viewBox="0 0 1024 1024"
-                                    width="1em"
-                                    height="1em"
-                                    fill="currentColor"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                  viewBox="0 0 1024 1024"
+                                  width="1em"
+                                  height="1em"
+                                  fill="currentColor"
                                 >
-                                    <path d="M940.218182 107.054545h-209.454546V46.545455h-65.163636v60.50909H363.054545V46.545455H297.890909v60.50909H83.781818c-18.618182 0-32.581818 13.963636-32.581818 32.581819v805.236363c0 18.618182 13.963636 32.581818 32.581818 32.581818h861.090909c18.618182 0 32.581818-13.963636 32.581818-32.581818V139.636364c-4.654545-18.618182-18.618182-32.581818-37.236363-32.581819zM297.890909 172.218182V232.727273h65.163636V172.218182h307.2V232.727273h65.163637V172.218182h176.872727v204.8H116.363636V172.218182h181.527273zM116.363636 912.290909V442.181818h795.927273v470.109091H116.363636z" />
+                                  <path d="M940.218182 107.054545h-209.454546V46.545455h-65.163636v60.50909H363.054545V46.545455H297.890909v60.50909H83.781818c-18.618182 0-32.581818 13.963636-32.581818 32.581819v805.236363c0 18.618182 13.963636 32.581818 32.581818 32.581818h861.090909c18.618182 0 32.581818-13.963636 32.581818-32.581818V139.636364c-4.654545-18.618182-18.618182-32.581818-37.236363-32.581819zM297.890909 172.218182V232.727273h65.163636V172.218182h307.2V232.727273h65.163637V172.218182h176.872727v204.8H116.363636V172.218182h181.527273zM116.363636 912.290909V442.181818h795.927273v470.109091H116.363636z" />
                                 </svg>
                               </span>
                             }
@@ -288,8 +294,12 @@ const AccountStatement = () => {
                       <div className="col-lg-2">
                         <div className="form-group">
                           <label>Type</label>
-                          <select className="form-control">
-                            <option>Deposit/Withdraw Report</option>
+                          <select className="form-control" value={type} onChange={(e) => setType(e.target.value)}>
+                            <option value="2">Deposit/Withdraw Report</option>
+                            <option value="4">Sports Report</option>
+                            <option value="5">Casino Report</option>
+                            <option value="6">Third Party Casino Report</option>
+                            <option value="1">Sportbook</option>
                           </select>
                         </div>
                       </div>
@@ -297,8 +307,14 @@ const AccountStatement = () => {
                       <div className="col-lg-2">
                         <div className="form-group">
                           <label>Statement</label>
-                          <select className="form-control">
-                            <option>All</option>
+                          <select className="form-control" value={statement} onChange={(e) => setStatement(e.target.value)}>
+                            <option value="all">All</option>
+                            <option value="credit_all">Credit - All</option>
+                            <option value="credit_upper">Credit - Upper</option>
+                            <option value="credit_down">Credit - Down</option>
+                            <option value="pts_all">pts - All</option>
+                            <option value="pts_upper">pts - Upper</option>
+                            <option value="pts_down">pts - Down</option>
                           </select>
                         </div>
                       </div>
@@ -324,8 +340,8 @@ const AccountStatement = () => {
                           Reset
                         </button>
                         <div id="export_1774426765439" className="d-inline-block">
-                          <button 
-                            type="button" 
+                          <button
+                            type="button"
                             className="btn btn-success"
                             disabled={!isDataAvailable}
                             onClick={exportToExcel}
@@ -333,8 +349,8 @@ const AccountStatement = () => {
                             <i className="fas fa-file-excel"></i>
                           </button>
                         </div>
-                        <button 
-                          type="button" 
+                        <button
+                          type="button"
                           className="btn btn-danger"
                           disabled={!isDataAvailable}
                           onClick={exportToPDF}
@@ -373,7 +389,7 @@ const AccountStatement = () => {
                           className="form-control form-control-sm ml-2"
                           value={search}
                           onChange={(e) => setSearch(e.target.value)}
-                          onKeyUp={(e) => {fetchStatement(1)}}
+                          onKeyUp={(e) => { fetchStatement(1) }}
                         />
                       </label>
                     </div>
@@ -385,7 +401,10 @@ const AccountStatement = () => {
                   <table className="table table-bordered">
                     <thead>
                       <tr>
-                        <th>Date</th>
+                        <th role="columnheader" scope="col" tabindex="0" aria-colindex="1" aria-sort="ascending" class="position-relative">
+                          <div>Date</div>
+                          <span className="sr-only"> (Click to sort descending)</span>
+                        </th>
                         <th className="text-right">Sr No</th>
                         <th className="text-right">Credit</th>
                         <th className="text-right">Debit</th>
@@ -432,7 +451,7 @@ const AccountStatement = () => {
                         <button className="page-link" onClick={() => changePage(currentPage - 1)}>‹</button>
                       </li>
 
-                     {/*  {[...Array(totalPages)].map((_, i) => (
+                      {/*  {[...Array(totalPages)].map((_, i) => (
                         <li key={i} className={`page-item ${currentPage === i + 1 ? 'active' : ''}`}>
                           <button className="page-link" onClick={() => changePage(i + 1)}>
                             {i + 1}

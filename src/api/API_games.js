@@ -23,7 +23,7 @@ export const fetchCasinoList = async () => {
 export const apiGetSports = async () => {
     try {
         const payload = { ...getDefaultParams() };
-        const response = await apiGames.post('/sport_list.php',payload);
+        const response = await apiGames.post('/sport_list.php', payload);
         return response.data;
     } catch (error) {
         console.error('Error fetching list:', error);
@@ -34,7 +34,7 @@ export const apiGetSports = async () => {
 export const apiGetGameType = async () => {
     try {
         const payload = { ...getDefaultParams() };
-        const response = await apiGames.post('/game_type_list.php',payload);
+        const response = await apiGames.post('/game_type_list.php', payload);
         return response.data;
     } catch (error) {
         console.error('Error fetching list:', error);
@@ -92,5 +92,22 @@ export async function fetchResultById(eventId, gameType) {
     } catch (error) {
         console.error("Error fetching teenpatti results:", error);
         return null;
+    }
+}
+
+
+export async function getBannerImages() {
+    try {
+        const payload = getDefaultParams();
+        const { data } = await apiGames.post("/main_slider", payload);
+
+        const imgArr = [];
+        data.data?.forEach((item) => {
+            imgArr.push(item.image);
+        });
+        return imgArr || [];
+    } catch (error) {
+        console.error("Error fetching banner images:", error);
+        return [];
     }
 }

@@ -9,6 +9,12 @@ export function normalizeNumber(value) {
     return isNaN(q) ? '-' : q;
 }
 
+export function formatNumAfterDot(num) {
+    if (num === null || num === undefined) return num;
+
+    return parseFloat(Number(num).toFixed(2));
+}
+
 export function formatWithTimezone(dateString, showUTC = false) {
     if (!dateString) return '';
     const date = new Date(dateString);

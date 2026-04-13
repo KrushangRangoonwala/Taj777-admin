@@ -257,20 +257,17 @@ export async function changeUserStatus(payload) {
     throw error;
   }
 }
-
-export async function getBannerImages() {
+export async function insertUser(payload) {
   try {
-    const payload = getDefaultParams();
-    const { data } = await apiConfigUserData.post("/main_slider", payload);
-
-    const imgArr = [];
-    data.data?.forEach((item) => {
-      imgArr.push(item.image);
-    });
-    return imgArr || [];
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await apiConfigUserData.post("add_user", fullPayload);
+    return data;
   } catch (error) {
-    console.error("Error fetching banner images:", error);
-    return [];
+    console.error("Error changing password:", error);
+    throw error;
   }
 }
 

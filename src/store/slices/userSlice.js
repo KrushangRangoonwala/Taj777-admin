@@ -18,7 +18,7 @@ const userSlice = createSlice({
         login: (state, action) => {
             state.name = action.payload.user_name;
             state.userData = action.payload;
-            state.isLoggedIn = true;
+            state.isLoggedIn = action.payload.user_type != 1; // IT SHOULD NOT USER(user_type = 1 for role : User)
         },
         logout: (state) => {
             state.name = "";

@@ -8,6 +8,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { customSelectStyles } from '../../components/Header';
+import Select from 'react-select';
 
 const UserRegisterDetail = () => {
 
@@ -32,38 +34,38 @@ const UserRegisterDetail = () => {
 
   // 🔹 Fetch Clients
   const fetchClients = async (value) => {
-        try {
-        const res = await getClients(value);
-        setClientList(res.results || []);
-        } catch (err) {
-        console.log(err);
-        }
-    };
-
-    // 🔹 Fetch Data
-    const fetchData = async (page = 1) => {
     try {
-        setLoading(true);
+      const res = await getClients(value);
+      setClientList(res.results || []);
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
-        const payload = {
+  // 🔹 Fetch Data
+  const fetchData = async (page = 1) => {
+    try {
+      setLoading(true);
+
+      const payload = {
         selected_user_id: selectedClient,
 
         // ✅ DATE FILTERS
         join_from:
-            filterType === "2" && dateRange[0]
+          filterType === "2" && dateRange[0]
             ? dayjs(dateRange[0]).format("YYYY-MM-DD")
             : "",
         join_to:
-            filterType === "2" && dateRange[1]
+          filterType === "2" && dateRange[1]
             ? dayjs(dateRange[1]).format("YYYY-MM-DD")
             : "",
 
         login_from:
-            filterType === "3" && dateRange[0]
+          filterType === "3" && dateRange[0]
             ? dayjs(dateRange[0]).format("YYYY-MM-DD")
             : "",
         login_to:
-            filterType === "3" && dateRange[1]
+          filterType === "3" && dateRange[1]
             ? dayjs(dateRange[1]).format("YYYY-MM-DD")
             : "",
 
@@ -72,21 +74,21 @@ const UserRegisterDetail = () => {
         // ✅ PAGINATION
         page: page,
         per_page: perPage
-        };
+      };
 
-        const res = await getUserRegisterDetail(payload);
+      const res = await getUserRegisterDetail(payload);
 
-        setData(res?.data || []);
-        setTotalRecords(res?.total || 0);
-        setCurrentPage(page);
+      setData(res?.data || []);
+      setTotalRecords(res?.total || 0);
+      setCurrentPage(page);
 
     } catch (err) {
-        console.log(err);
-        setData([]);
+      console.log(err);
+      setData([]);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
-    };
+  };
 
   // 🔹 Pagination
   const changePage = (page) => {
@@ -112,72 +114,72 @@ const UserRegisterDetail = () => {
   };
 
   const exportToExcel = () => {
-        if (!data.length) return;
+    if (!data.length) return;
 
-        const formattedData = data.map((row, index) => ({
-            "User Name": row.name || "-",
-            "Agent Name": row.parent_name || "-",
-            "Mobile": row.phone || "-",
-            "Created Date": row.join_date || "-",
-            "Last Login": row.last_login || "-",
-            "First Deposit Date": row.first_entry || "-",
-            "Last Deposit Date": row.last_entry || "-",
-            "Deposit": row.total_deposit || 0,
-            "Sports Balance": row.total_game_0 || 0,
-            "Casino Balance": row.total_game_1 || 0,
-            "Third Party Credit Balance": 0,
-            "Sport Book Balance": 0,
-        }));
+    const formattedData = data.map((row, index) => ({
+      "User Name": row.name || "-",
+      "Agent Name": row.parent_name || "-",
+      "Mobile": row.phone || "-",
+      "Created Date": row.join_date || "-",
+      "Last Login": row.last_login || "-",
+      "First Deposit Date": row.first_entry || "-",
+      "Last Deposit Date": row.last_entry || "-",
+      "Deposit": row.total_deposit || 0,
+      "Sports Balance": row.total_game_0 || 0,
+      "Casino Balance": row.total_game_1 || 0,
+      "Third Party Credit Balance": 0,
+      "Sport Book Balance": 0,
+    }));
 
-        const ws = XLSX.utils.json_to_sheet(formattedData);
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "UserRegisterDetail");
+    const ws = XLSX.utils.json_to_sheet(formattedData);
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, "UserRegisterDetail");
 
-        XLSX.writeFile(
-            wb,
-            `UserRegister_${new Date().toISOString().slice(0, 19)}.xlsx`
-        );
-    };
+    XLSX.writeFile(
+      wb,
+      `UserRegister_${new Date().toISOString().slice(0, 19)}.xlsx`
+    );
+  };
 
-    const exportToPDF = () => {
-        if (!data.length) return;
+  const exportToPDF = () => {
+    if (!data.length) return;
 
-        const doc = new jsPDF("l"); // 👉 landscape (important for many columns)
+    const doc = new jsPDF("l"); // 👉 landscape (important for many columns)
 
-        const tableRows = data.map((row, index) => [
-            row.name || "-",
-            row.parent_name || "-",
-            row.join_date || "-",
-            row.last_login || "-",
-            row.first_entry || "-",
-            row.last_entry || "-",
-            row.total_deposit || 0,
-            row.total_game_0 || 0,
-            row.total_game_1 || 0,
-            0,
-            0,
-        ]);
+    const tableRows = data.map((row, index) => [
+      row.name || "-",
+      row.parent_name || "-",
+      row.join_date || "-",
+      row.last_login || "-",
+      row.first_entry || "-",
+      row.last_entry || "-",
+      row.total_deposit || 0,
+      row.total_game_0 || 0,
+      row.total_game_1 || 0,
+      0,
+      0,
+    ]);
 
-        autoTable(doc, {
-            head: [[
-            "User Name",
-            "Agent Name",
-            "Created Date",
-            "Last Login",
-            "First Deposit",
-            "Last Deposit",
-            "Deposit",
-            "Sports Balance",
-            "Casino Balance",
-            "Third Party",
-            "Sport Book"
-            ]],
-            body: tableRows,
-            styles: { fontSize: 7 }, // 👈 important for fitting
-        });
+    autoTable(doc, {
+      head: [[
+        "User Name",
+        "Agent Name",
+        "Created Date",
+        "Last Login",
+        "First Deposit",
+        "Last Deposit",
+        "Deposit",
+        "Sports Balance",
+        "Casino Balance",
+        "Third Party",
+        "Sport Book"
+      ]],
+      body: tableRows,
+      styles: { fontSize: 7 }, // 👈 important for fitting
+    });
 
-        doc.save(`UserRegister_${new Date().toISOString().slice(0, 19)}.pdf`);
-    };
+    doc.save(`UserRegister_${new Date().toISOString().slice(0, 19)}.pdf`);
+  };
 
   return (
     <div>
@@ -215,15 +217,22 @@ const UserRegisterDetail = () => {
                         <div className="form-group user-lock-search" style={{ position: "relative" }}>
                           <label>Search By Client Name</label>
 
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={clientSearch}
+                          <Select
+                            options={[]}
                             placeholder="Select option"
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                            components={{
+                              DropdownIndicator: () => null,
+                              IndicatorSeparator: () => null
+                            }}
+                            noOptionsMessage={() => "List is empty."}
+                            value={clientSearch}
                             onChange={(e) => {
                               setClientSearch(e.target.value);
                               fetchClients(e.target.value);
                             }}
+                            styles={customSelectStyles}
                           />
 
                           {clientList.length > 0 && (
@@ -269,19 +278,19 @@ const UserRegisterDetail = () => {
                       </div>
 
                       {/* DATE RANGE */}
-                        {(filterType === "2" || filterType === "3") && (
+                      {(filterType === "2" || filterType === "3") && (
                         <div className="col-3">
-                            <div className="form-group">
+                          <div className="form-group">
                             <label>Select Date Range</label>
                             <RangePicker
-                                value={dateRange}
-                                onChange={(dates) => setDateRange(dates || [])}
-                                format="DD/MM/YYYY"
-                                style={{ width: "100%" }}
+                              value={dateRange}
+                              onChange={(dates) => setDateRange(dates || [])}
+                              format="DD/MM/YYYY"
+                              style={{ width: "100%" }}
                             />
-                            </div>
+                          </div>
                         </div>
-                        )}
+                      )}
 
                       {/* BUTTONS */}
                       <div className="col-3">
@@ -314,7 +323,7 @@ const UserRegisterDetail = () => {
                         >
                           <i className="fas fa-file-excel"></i>
                         </button>
-                          &nbsp;
+                        &nbsp;
                         <button
                           type="button"
                           className="btn btn-danger"
@@ -391,9 +400,9 @@ const UserRegisterDetail = () => {
                     </thead>
 
                     <tbody>
-                    {data.length > 0 ? (
+                      {data.length > 0 ? (
                         data.map((row, i) => (
-                        <tr key={i}>
+                          <tr key={i}>
                             <td>{row.name || "-"}</td>
                             <td>{row.parent_name || "-"}</td>
                             {/* <td>{row.phone || "-"}</td> */}
@@ -407,29 +416,29 @@ const UserRegisterDetail = () => {
                             <td>{row.total_deposit || 0}</td>
 
                             <td className="text-right" style={{ color: getColor(row.total_game_0) }}>
-                                {row.total_game_0 || 0}
+                              {row.total_game_0 || 0}
                             </td>
 
                             <td className="text-right" style={{ color: getColor(row.total_game_1) }}>
-                                {row.total_game_1 || 0}
+                              {row.total_game_1 || 0}
                             </td>
 
                             <td className="text-right" style={{ color: getColor(0) }}>
-                                0
+                              0
                             </td>
 
                             <td className="text-right" style={{ color: getColor(0) }}>
-                                0
+                              0
                             </td>
-                        </tr>
+                          </tr>
                         ))
-                    ) : (
+                      ) : (
                         <tr>
-                        <td colSpan="12" className="text-center">
+                          <td colSpan="12" className="text-center">
                             {loading ? "Loading..." : "There are no records to show"}
-                        </td>
+                          </td>
                         </tr>
-                    )}
+                      )}
                     </tbody>
                   </table>
                 </div>

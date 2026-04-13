@@ -18,7 +18,7 @@ const UserHistory = () => {
   const [dateRange, setDateRange] = useState([dayjs().subtract(7, "day"), dayjs()]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-   const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
 
   const [perPage, setPerPage] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
@@ -94,9 +94,9 @@ const UserHistory = () => {
   };
 
   // 🔹 On load
- /*  useEffect(() => {
-    fetchUserHistory();
-  }, []); */
+  /*  useEffect(() => {
+     fetchUserHistory();
+   }, []); */
 
   // 🔹 On tab change auto reload
   /* useEffect(() => {
@@ -201,7 +201,7 @@ const UserHistory = () => {
                 <ul className="nav nav-tabs">
                   <li className="nav-item">
                     <button
-                      className={`nav-link ${activeTab === "login" ? "active tab-bg-primary" : ""}`}
+                      className={`nav-link ${activeTab === "login" ? "active tab-bg-primary" : "bg-white"}`}
                       onClick={() => handleTabChange("login")}
                     >
                       Login History
@@ -209,7 +209,7 @@ const UserHistory = () => {
                   </li>
                   <li className="nav-item">
                     <button
-                      className={`nav-link ${activeTab === "password" ? "active tab-bg-primary" : ""}`}
+                      className={`nav-link ${activeTab === "password" ? "active tab-bg-primary" : "bg-white"}`}
                       onClick={() => handleTabChange("password")}
                     >
                       Change Password History
@@ -333,7 +333,7 @@ const UserHistory = () => {
                               className="form-control form-control-sm ml-2"
                               value={search}
                               onChange={(e) => setSearch(e.target.value)}
-                              onKeyUp={(e) => {fetchUserHistory(1)}}
+                              onKeyUp={(e) => { fetchUserHistory(1) }}
                             />
                           </label>
                         </div>
@@ -372,7 +372,7 @@ const UserHistory = () => {
                           )) : (
                             <tr>
                               <td colSpan="4" className="text-center">
-                                {loading ? "Loading..." : "No records to show"}
+                                {loading ? "Loading..." : "There are no records to show"}
                               </td>
                             </tr>
                           )}
@@ -530,7 +530,7 @@ const UserHistory = () => {
                               className="form-control form-control-sm ml-2"
                               value={search}
                               onChange={(e) => setSearch(e.target.value)}
-                              onKeyUp={(e) => {fetchUserHistory(1)}}
+                              onKeyUp={(e) => { fetchUserHistory(1) }}
                             />
                           </label>
                         </div>
@@ -621,75 +621,75 @@ const UserHistory = () => {
       </div>
 
       {showModal && modalData && (
-      <div style={{ position: "fixed", zIndex: 1040, top: 0, left: 0, width: "100%" }}>
-        <div
-          className="modal fade show"
-          style={{ display: "block" }}
-        >
-          <div className="modal-dialog modal-sm">
-            <div className="modal-content">
-              
-              {/* HEADER */}
-              <div className="modal-header bg-success">
-                <h5 className="modal-title text-uppercase text-white">
-                  Ip Detail
-                </h5>
-                <button
-                  type="button"
-                  className="close text-white"
-                  onClick={() => setShowModal(false)}
-                >
-                  ×
-                </button>
-              </div>
+        <div style={{ position: "fixed", zIndex: 1040, top: 0, left: 0, width: "100%" }}>
+          <div
+            className="modal fade show"
+            style={{ display: "block" }}
+          >
+            <div className="modal-dialog modal-sm">
+              <div className="modal-content">
 
-              {/* BODY */}
-              <div className="modal-body">
-                <div className="table-responsive">
-                  <table className="table table-striped table-hover table-bordered table-sm">
-                    <thead className="thead-dark">
-                      <tr>
-                        <th>Key</th>
-                        <th>Value</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      <tr>
-                        <td><b>IP:</b></td>
-                        <td>{modalData.ip}</td>
-                      </tr>
-
-                      <tr>
-                        <td><b>City:</b></td>
-                        <td>-</td>
-                      </tr>
-
-                      <tr>
-                        <td><b>Country:</b></td>
-                        <td>-</td>
-                      </tr>
-
-                      <tr>
-                        <td><b>Browser:</b></td>
-                        <td>{modalData.browser}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                {/* HEADER */}
+                <div className="modal-header bg-success">
+                  <h5 className="modal-title text-uppercase text-white">
+                    Ip Detail
+                  </h5>
+                  <button
+                    type="button"
+                    className="close text-white"
+                    onClick={() => setShowModal(false)}
+                  >
+                    ×
+                  </button>
                 </div>
-              </div>
 
+                {/* BODY */}
+                <div className="modal-body">
+                  <div className="table-responsive">
+                    <table className="table table-striped table-hover table-bordered table-sm">
+                      <thead className="thead-dark">
+                        <tr>
+                          <th>Key</th>
+                          <th>Value</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        <tr>
+                          <td><b>IP:</b></td>
+                          <td>{modalData.ip}</td>
+                        </tr>
+
+                        <tr>
+                          <td><b>City:</b></td>
+                          <td>-</td>
+                        </tr>
+
+                        <tr>
+                          <td><b>Country:</b></td>
+                          <td>-</td>
+                        </tr>
+
+                        <tr>
+                          <td><b>Browser:</b></td>
+                          <td>{modalData.browser}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* BACKDROP */}
-        <div
-          className="modal-backdrop show"
-          onClick={() => setShowModal(false)}
-        ></div>
-      </div>
-    )}
+          {/* BACKDROP */}
+          <div
+            className="modal-backdrop show"
+            onClick={() => setShowModal(false)}
+          ></div>
+        </div>
+      )}
     </div>
   );
 };

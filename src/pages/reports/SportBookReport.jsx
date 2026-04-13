@@ -7,6 +7,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { customSelectStyles } from "../../components/Header";
+import Select from "react-select";
 
 const { RangePicker } = DatePicker;
 
@@ -15,10 +17,11 @@ const SportBookReport = () => {
   const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
   const [clientSearch, setClientSearch] = useState('');
+  const [date, setDate] = useState(dayjs());
   const [dateRange, setDateRange] = useState([dayjs().subtract(7, "day"), dayjs()]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-   const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
 
   const [perPage, setPerPage] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,6 +38,7 @@ const SportBookReport = () => {
     setSelectedClient("");
     setClientSearch("");
     setClientList([]);
+    setDate(dayjs());
     setDateRange([dayjs().subtract(7, "day"), dayjs()]);
     setSearch("");
     setData([]);
@@ -56,8 +60,8 @@ const SportBookReport = () => {
   const fetchUserHistory = async (page = 1) => {
     setLoading(true);
     try {
-      const fromDate = dateRange[0] ? dayjs(dateRange[0]).format("YYYY-MM-DD") : "";
-      const toDate = dateRange[1] ? dayjs(dateRange[1]).format("YYYY-MM-DD") : "";
+      const fromDate = dayjs(date).format("YYYY-MM-DD");
+      const toDate = dayjs(date).format("YYYY-MM-DD");
 
       const payload = {
         sEcho: 1,
@@ -94,9 +98,9 @@ const SportBookReport = () => {
   };
 
   // 🔹 On load
- /*  useEffect(() => {
-    fetchUserHistory();
-  }, []); */
+  /*  useEffect(() => {
+     fetchUserHistory();
+   }, []); */
 
   // 🔹 On tab change auto reload
   /* useEffect(() => {
@@ -178,14 +182,14 @@ const SportBookReport = () => {
       <div className="row">
         <div className="col-12">
           <div className="page-title-box d-flex align-items-center justify-content-between">
-            <h4 className="mb-0 font-size-18">Live Casino Result</h4>
+            <h4 className="mb-0 font-size-18">SportBook Report</h4>
             <div className="page-title-right">
               <ol className="breadcrumb m-0">
                 <li className="breadcrumb-item">
                   <a href="/admin/home">Home</a>
                 </li>
                 <li className="breadcrumb-item active">
-                  <span>Casino Result</span>
+                  <span>SportBook Report</span>
                 </li>
               </ol>
             </div>
@@ -202,7 +206,7 @@ const SportBookReport = () => {
               <ul className="nav nav-tabs">
                 <li className="nav-item">
                   <button
-                    className={`nav-link ${activeTab === "login" ? "active tab-bg-primary" : ""}`}
+                    className={`nav-link ${activeTab === "login" ? "active tab-bg-primary" : "bg-white"}`}
                     onClick={() => handleTabChange("login")}
                   >
                     Settled Bets
@@ -210,7 +214,7 @@ const SportBookReport = () => {
                 </li>
                 <li className="nav-item">
                   <button
-                    className={`nav-link ${activeTab === "password" ? "active tab-bg-primary" : ""}`}
+                    className={`nav-link ${activeTab === "password" ? "active tab-bg-primary" : "bg-white"}`}
                     onClick={() => handleTabChange("password")}
                   >
                     Unsettled Bets
@@ -228,7 +232,7 @@ const SportBookReport = () => {
 
                       {/* CLIENT */}
                       <div className="col-xl-2">
-                        <input
+                        {/* <input
                           type="text"
                           className="form-control"
                           placeholder="Select option"
@@ -237,16 +241,39 @@ const SportBookReport = () => {
                             setClientSearch(e.target.value);
                             fetchClients(e.target.value);
                           }}
+                        /> */}
+                        <Select
+                          options={[]}
+                          placeholder="Select option"
+                          value={clientSearch}
+                          onChange={(e) => {
+                            setClientSearch(e.target.value);
+                            fetchClients(e.target.value);
+                          }}
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                          components={{
+                            DropdownIndicator: () => null,
+                            IndicatorSeparator: () => null
+                          }}
+                          noOptionsMessage={() => "List is empty."}
+                          styles={customSelectStyles}
                         />
                       </div>
 
                       {/* DATE */}
                       <div className="col-xl-2">
-                        <RangePicker
+                        {/* <RangePicker
                           style={{ width: "100%" }}
                           value={dateRange}
                           onChange={handleDateChange}
                           format="DD/MM/YYYY"
+                        /> */}
+                        <DatePicker
+                          value={date}
+                          onChange={(d) => setDate(d)}
+                          format="DD/MM/YYYY"
+                          style={{ width: "100%" }}
                         />
                       </div>
 
@@ -254,7 +281,7 @@ const SportBookReport = () => {
                       <div className="col-xl-2">
                         <select className="form-control">
                           <option value="">Select</option>
-                          <option value="sportbook1">Sport Book1</option>
+                          {/* <option value="sportbook1">Sport Book1</option> */}
                         </select>
                       </div>
 
@@ -294,6 +321,40 @@ const SportBookReport = () => {
 
                     </div>
                   </form>
+
+                  {/* TOP BAR */}
+                  <div className="row">
+                    <div className="col-6">
+                      <label className="d-inline-flex align-items-center">
+                        Show&nbsp;
+                        <select
+                          className="custom-select custom-select-sm"
+                          onChange={(e) => setPerPage(Number(e.target.value))}
+                        >
+                          <option>25</option>
+                          <option>50</option>
+                          <option>75</option>
+                          <option>100</option>
+                        </select>
+                        &nbsp;entries
+                      </label>
+                    </div>
+
+                    <div className="col-6 text-right">
+                      <div id="tickets-table_filter" className="dataTables_filter text-md-right">
+                        <label className="d-inline-flex align-items-center">
+                          <input
+                            type="search"
+                            placeholder="Search..."
+                            className="form-control form-control-sm ml-2"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                          // onKeyUp={(e) => { fetchStatement(1) }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* TABLE */}
                   <div className="table-responsive mb-0">
@@ -340,17 +401,29 @@ const SportBookReport = () => {
                     <div className="row row5 mb-3">
 
                       <div className="col-xl-2">
-                        <input
+                        {/* <input
                           type="text"
                           className="form-control"
                           placeholder="Select option"
+                        /> */}
+                        <Select
+                          options={[]}
+                          placeholder="Select option"
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                          components={{
+                            DropdownIndicator: () => null,
+                            IndicatorSeparator: () => null
+                          }}
+                          noOptionsMessage={() => "List is empty."}
+                          styles={customSelectStyles}
                         />
                       </div>
 
                       <div className="col-xl-2">
                         <select className="form-control">
                           <option value="">Select</option>
-                          <option value="sportbook1">Sport Book1</option>
+                          {/* <option value="sportbook1">Sport Book1</option> */}
                         </select>
                       </div>
 

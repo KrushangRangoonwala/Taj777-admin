@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { DatePicker } from "antd";
+import Select from "react-select";
 import "antd/dist/reset.css";
 import { getClients, getCasinoResult } from "../../api/API";
 import dayjs from "dayjs";
@@ -7,6 +8,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { customSelectStyles } from "../../components/Header";
 
 const { RangePicker } = DatePicker;
 
@@ -15,10 +17,11 @@ const LiveCasinoResult = () => {
   const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
   const [clientSearch, setClientSearch] = useState('');
+  const [date, setDate] = useState(dayjs());
   const [dateRange, setDateRange] = useState([dayjs().subtract(7, "day"), dayjs()]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
-   const [search, setSearch] = useState("");
+  const [search, setSearch] = useState("");
 
   const [perPage, setPerPage] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,6 +38,7 @@ const LiveCasinoResult = () => {
     setSelectedClient("");
     setClientSearch("");
     setClientList([]);
+    setDate(dayjs());
     setDateRange([dayjs().subtract(7, "day"), dayjs()]);
     setSearch("");
     setData([]);
@@ -56,8 +60,8 @@ const LiveCasinoResult = () => {
   const fetchUserHistory = async (page = 1) => {
     setLoading(true);
     try {
-      const fromDate = dateRange[0] ? dayjs(dateRange[0]).format("YYYY-MM-DD") : "";
-      const toDate = dateRange[1] ? dayjs(dateRange[1]).format("YYYY-MM-DD") : "";
+      const fromDate = dayjs(date).format("YYYY-MM-DD");
+      const toDate = dayjs(date).format("YYYY-MM-DD");
 
       const payload = {
         sEcho: 1,
@@ -94,9 +98,9 @@ const LiveCasinoResult = () => {
   };
 
   // 🔹 On load
- /*  useEffect(() => {
-    fetchUserHistory();
-  }, []); */
+  /*  useEffect(() => {
+     fetchUserHistory();
+   }, []); */
 
   // 🔹 On tab change auto reload
   /* useEffect(() => {
@@ -202,7 +206,7 @@ const LiveCasinoResult = () => {
               <ul className="nav nav-tabs">
                 <li className="nav-item">
                   <button
-                    className={`nav-link ${activeTab === "login" ? "active tab-bg-primary" : ""}`}
+                    className={`nav-link ${activeTab === "login" ? "active tab-bg-primary" : "bg-white"}`}
                     onClick={() => handleTabChange("login")}
                   >
                     Settled Bets
@@ -210,7 +214,7 @@ const LiveCasinoResult = () => {
                 </li>
                 <li className="nav-item">
                   <button
-                    className={`nav-link ${activeTab === "password" ? "active tab-bg-primary" : ""}`}
+                    className={`nav-link ${activeTab === "password" ? "active tab-bg-primary" : "bg-white"}`}
                     onClick={() => handleTabChange("password")}
                   >
                     Unsettled Bets
@@ -228,7 +232,7 @@ const LiveCasinoResult = () => {
 
                       {/* CLIENT */}
                       <div className="col-xl-2">
-                        <input
+                        {/* <input
                           type="text"
                           className="form-control"
                           placeholder="Select option"
@@ -237,16 +241,39 @@ const LiveCasinoResult = () => {
                             setClientSearch(e.target.value);
                             fetchClients(e.target.value);
                           }}
+                        /> */}
+                        <Select
+                          options={[]}
+                          placeholder="Select option"
+                          value={clientSearch}
+                          onChange={(e) => {
+                            setClientSearch(e.target.value);
+                            fetchClients(e.target.value);
+                          }}
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                          components={{
+                            DropdownIndicator: () => null,
+                            IndicatorSeparator: () => null
+                          }}
+                          noOptionsMessage={() => "List is empty."}
+                          styles={customSelectStyles}
                         />
                       </div>
 
                       {/* DATE */}
                       <div className="col-xl-2">
-                        <RangePicker
+                        {/* <RangePicker
                           style={{ width: "100%" }}
                           value={dateRange}
                           onChange={handleDateChange}
                           format="DD/MM/YYYY"
+                        /> */}
+                        <DatePicker
+                          value={date}
+                          onChange={(d) => setDate(d)}
+                          format="DD/MM/YYYY"
+                          style={{ width: "100%" }}
                         />
                       </div>
 
@@ -254,10 +281,10 @@ const LiveCasinoResult = () => {
                       <div className="col-xl-2">
                         <select className="form-control">
                           <option value="">Select</option>
-                          <option value="ezugi">Ezugi</option>
+                          {/* <option value="ezugi">Ezugi</option>
                           <option value="ss">Super Spade</option>
                           <option value="qt">Slot 3 | Holi</option>
-                          <option value="evo">Evolution</option>
+                          <option value="evo">Evolution</option> */}
                         </select>
                       </div>
 
@@ -345,21 +372,33 @@ const LiveCasinoResult = () => {
                     <div className="row row5 mb-3">
 
                       <div className="col-xl-2">
-                        <input
+                        {/* <input
                           type="text"
                           className="form-control"
                           placeholder="Select option"
+                        /> */}
+                        <Select
+                          options={[]}
+                          placeholder="Select option"
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                          components={{
+                            DropdownIndicator: () => null,
+                            IndicatorSeparator: () => null
+                          }}
+                          noOptionsMessage={() => "List is empty."}
+                          styles={customSelectStyles}
                         />
                       </div>
 
                       <div className="col-xl-2">
                         <select className="form-control">
                           <option value="">Select</option>
-                          <option value="ezugi">Ezugi</option>
+                          {/* <option value="ezugi">Ezugi</option>
                           <option value="ss">Super Spade</option>
                           <option value="qt">Slot 3 | Holi</option>
                           <option value="evo">Evolution</option>
-                          <option value="cockfight">CockFight</option>
+                          <option value="cockfight">CockFight</option> */}
                         </select>
                       </div>
 
@@ -375,6 +414,7 @@ const LiveCasinoResult = () => {
                     <table className="table b-table table-bordered">
                       <thead>
                         <tr>
+                          <th>Game Name</th>
                           <th>Type</th>
                           <th className="text-right">Amount</th>
                           <th className="text-right">Total</th>

@@ -8,6 +8,7 @@ const { RangePicker } = DatePicker;
 
 const CurrentBets = () => {
   const [data, setData] = useState([]);
+  const [sportType, setSportType] = useState("sport");
   const [filteredData, setFilteredData] = useState([]);
   const [clients, setClients] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
@@ -17,6 +18,9 @@ const CurrentBets = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const perPage = 25;
 
+  const [matchDeleted, setMatchDeleted] = useState("matchbet");
+  const [betType, setBetType] = useState("all");
+
   // 🔹 Fetch profit-loss
   const fetchProfitLoss = async () => {
     try {
@@ -24,6 +28,9 @@ const CurrentBets = () => {
         client_name: selectedClient,
         from_date: fromDate,
         to_date: toDate,
+        sport_type: sportType,
+        matchDeleted: matchDeleted,
+        bet_type: betType
       };
 
       const res = await getCurrentBets(payload);
@@ -46,21 +53,16 @@ const CurrentBets = () => {
     }
   };
 
-  // 🔹 Fetch clients
-  const fetchClients = async () => {
-    try {
-      const res = await fetch("/api/clients.php");
-      const json = await res.json();
-      setClients(json.results || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  useEffect(() => {
+    /* fetchProfitLoss(); */
+  }, []);
 
   useEffect(() => {
-    fetchProfitLoss();
-    fetchClients();
-  }, []);
+    setMatchDeleted("matchbet");
+    setBetType("all");
+    setData([]);
+    setFilteredData([]);
+  }, [sportType]);
 
   // 🔹 Global search filter
   useEffect(() => {
@@ -107,167 +109,231 @@ const CurrentBets = () => {
         <div className="casino-report-tabs">
           <ul className="nav nav-tabs">
             <li className="nav-item">
-              <a href="javascript:void(0)" className="nav-link active">Sports</a>
+              <a
+                href="javascript:void(0)"
+                className={`nav-link ${sportType === "sport" ? "active" : ""}`}
+                onClick={() => setSportType("sport")}
+              >
+                Sports
+              </a>
             </li>
             <li className="nav-item">
-              <a href="javascript:void(0)" className="nav-link">Casino</a>
+              <a
+                href="javascript:void(0)"
+                className={`nav-link ${sportType === "casino" ? "active" : ""}`}
+                onClick={() => setSportType("casino")}
+              >
+                Casino
+              </a>
             </li>
           </ul>
         </div>
 
-        <div className="row">
-          <div className="col-12">
-            <div className="card">
-              <div className="card-body">
+          <div className="row">
+            <div className="col-12">
+              <div className="card">
+                <div className="card-body">
 
-                <div className="report-form mb-3 row align-items-center">
+                  <div className="report-form mb-3 row align-items-center">
                   
-                  <div className="col-md-4 col-lg-3">
-                    <div className="custom-control custom-radio custom-control-inline">
-                      <input type="radio" id="customRadio" name="example" value="matchbet" defaultChecked className="custom-control-input" />
-                      <label htmlFor="customRadio" className="custom-control-label">Matched</label>
+                    <div className="col-md-4 col-lg-3">
+                      {sportType === "sport" && (
+                        <>
+                        <div className="custom-control custom-radio custom-control-inline">
+                          <input
+                            type="radio"
+                            name="example"
+                            value="matchbet"
+                            checked={matchDeleted === "matchbet"}
+                            onChange={(e) => setMatchDeleted(e.target.value)}
+                            className="custom-control-input"
+                          />
+                          <label htmlFor="customRadio" className="custom-control-label">Matched</label>
+                        </div>
+
+                        <div className="custom-control custom-radio custom-control-inline">
+                          <input
+                            type="radio"
+                            name="example"
+                            value="deletebet"
+                            checked={matchDeleted === "deletebet"}
+                            onChange={(e) => setMatchDeleted(e.target.value)}
+                            className="custom-control-input"
+                          />
+                          <label htmlFor="customRadio2" className="custom-control-label">Deleted</label>
+                        </div>
+                        </>
+                      )}
                     </div>
 
-                    <div className="custom-control custom-radio custom-control-inline">
-                      <input type="radio" id="customRadio2" name="example" value="deletebet" className="custom-control-input" />
-                      <label htmlFor="customRadio2" className="custom-control-label">Deleted</label>
-                    </div>
-                  </div>
+                    <div className="col-md-8 col-lg-4 d-flex">
+                      <div className="custom-control custom-radio custom-control-inline pl-0">
+                        
+                        <div className="custom-control custom-radio custom-control-inline">
+                          <input
+                            type="radio"
+                            name="bettype"
+                            value="all"
+                            checked={betType === "all"}
+                            onChange={(e) => setBetType(e.target.value)}
+                            className="custom-control-input"
+                          />
+                          <label htmlFor="soda-all" className="custom-control-label">All</label>
+                        </div>
 
-                  <div className="col-md-8 col-lg-4 d-flex">
-                    <div className="custom-control custom-radio custom-control-inline pl-0">
-                      
-                      <div className="custom-control custom-radio custom-control-inline">
-                        <input type="radio" id="soda-all" name="bettype" value="all" defaultChecked className="custom-control-input" />
-                        <label htmlFor="soda-all" className="custom-control-label">All</label>
+                        <div className="custom-control custom-radio custom-control-inline">
+                          <input
+                            type="radio"
+                            name="bettype"
+                            value="back"
+                            checked={betType === "back"}
+                            onChange={(e) => setBetType(e.target.value)}
+                            className="custom-control-input"
+                          />
+                          <label htmlFor="soda-back" className="custom-control-label">Back</label>
+                        </div>
+
+                        <div className="custom-control custom-radio custom-control-inline">
+                          <input
+                            type="radio"
+                            name="bettype"
+                            value="lay"
+                            checked={betType === "lay"}
+                            onChange={(e) => setBetType(e.target.value)}
+                            className="custom-control-input"
+                          />
+                          <label htmlFor="soda-lay" className="custom-control-label">Lay</label>
+                        </div>
                       </div>
 
-                      <div className="custom-control custom-radio custom-control-inline">
-                        <input type="radio" id="soda-back" name="bettype" value="back" className="custom-control-input" />
-                        <label htmlFor="soda-back" className="custom-control-label">Back</label>
-                      </div>
+                      <div className="custom-control-inline">
+                        <button
+                          title="Refresh Data"
+                          type="button"
+                          className="btn mr-2 btn-primary"
+                          onClick={fetchProfitLoss}
+                        >
+                          Load
+                        </button>
 
-                      <div className="custom-control custom-radio custom-control-inline">
-                        <input type="radio" id="soda-lay" name="bettype" value="lay" className="custom-control-input" />
-                        <label htmlFor="soda-lay" className="custom-control-label">Lay</label>
-                      </div>
-                    </div>
+                        <div id="export_1774524830826" className="d-inline-block disabled">
+                          <button type="button" disabled className="btn mr-1 btn-success disabled">
+                            <i className="fas fa-file-excel"></i>
+                          </button>
+                        </div>
 
-                    <div className="custom-control-inline">
-                      <button title="Refresh Data" type="button" className="btn mr-2 btn-primary">
-                        Load
-                      </button>
-
-                      <div id="export_1774524830826" className="d-inline-block disabled">
-                        <button type="button" disabled className="btn mr-1 btn-success disabled">
-                          <i className="fas fa-file-excel"></i>
+                        <button type="button" disabled className="btn btn-danger disabled">
+                          <i className="fas fa-file-pdf"></i>
                         </button>
                       </div>
+                    </div>
 
-                      <button type="button" disabled className="btn btn-danger disabled">
-                        <i className="fas fa-file-pdf"></i>
-                      </button>
+                    <div className="col-md-12 col-lg-5 text-right">
+                      <div className="custom-control-inlinemr-0 mt-1">
+                        <h5>
+                          Total Soda: <span className="mr-2">0</span> Total Amount: <span>0</span>
+                        </h5>
+                      </div>
+                    </div>
+
+                  </div>
+
+                  <div className="row w-100">
+                    <div className="col-6">
+                      <div className="dataTables_length">
+                        <label className="d-inline-flex align-items-center">
+                          Show&nbsp;
+                          <select className="custom-select custom-select-sm">
+                            <option value="25">25</option>
+                            <option value="50">50</option>
+                            <option value="75">75</option>
+                            <option value="100">100</option>
+                            <option value="125">125</option>
+                            <option value="150">150</option>
+                          </select>
+                          &nbsp;entries
+                        </label>
+                      </div>
+                    </div>
+
+                    <div className="col-6 text-right">
+                      <div className="dataTables_filter text-md-right">
+                        <label className="d-inline-flex align-items-center">
+                          <input type="search" placeholder="Search..." className="form-control form-control-sm ml-2 form-control" />
+                        </label>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="col-md-12 col-lg-5 text-right">
-                    <div className="custom-control-inlinemr-0 mt-1">
-                      <h5>
-                        Total Soda: <span className="mr-2">0</span> Total Amount: <span>0</span>
-                      </h5>
+                  <div className="table-responsive mb-0">
+                    <div className="table no-footer table-responsive-sm">
+                      <table className="table b-table table-bordered">
+                        <thead>
+                          <tr>
+                            {sportType === "sport" && (
+                            <th>Event Type
+                              <span class="sr-only"> (Click to sort ascending)</span>
+                            </th>
+                            )}
+                            <th>Event Name</th>
+                            <th>User Name</th>
+                            {sportType === "sport" && (
+                            <th>M Name</th>
+                            )}
+                            <th>Nation</th>
+                            <th className="text-right">U Rate</th>
+                            <th className="text-right">Amount</th>
+                            <th>Place Date</th>
+                            <th>IP</th>
+                            <th>Browser</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+
+                        <tbody>
+                          <tr>
+                            <td colSpan="11">
+                              <div className="text-center my-2">
+                                There are no records to show
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+
+                      </table>
+                    </div>
+                  </div>
+
+                  <div className="row pt-3">
+                    <div className="col">
+                      <div className="dataTables_paginate paging_simple_numbers float-right">
+                        <ul className="pagination pagination-rounded mb-0">
+                          <li className="page-item disabled">
+                            <span className="page-link">«</span>
+                          </li>
+                          <li className="page-item disabled">
+                            <span className="page-link">‹</span>
+                          </li>
+                          <li className="page-item active">
+                            <button type="button" className="page-link">1</button>
+                          </li>
+                          <li className="page-item disabled">
+                            <span className="page-link">›</span>
+                          </li>
+                          <li className="page-item disabled">
+                            <span className="page-link">»</span>
+                          </li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
 
                 </div>
-
-                <div className="row w-100">
-                  <div className="col-6">
-                    <div className="dataTables_length">
-                      <label className="d-inline-flex align-items-center">
-                        Show&nbsp;
-                        <select className="custom-select custom-select-sm">
-                          <option value="25">25</option>
-                          <option value="50">50</option>
-                          <option value="75">75</option>
-                          <option value="100">100</option>
-                          <option value="125">125</option>
-                          <option value="150">150</option>
-                        </select>
-                        &nbsp;entries
-                      </label>
-                    </div>
-                  </div>
-
-                  <div className="col-6 text-right">
-                    <div className="dataTables_filter text-md-right">
-                      <label className="d-inline-flex align-items-center">
-                        <input type="search" placeholder="Search..." className="form-control form-control-sm ml-2 form-control" />
-                      </label>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="table-responsive mb-0">
-                  <div className="table no-footer table-responsive-sm">
-                    <table className="table b-table table-bordered">
-                      <thead>
-                        <tr>
-                          <th>Event Type</th>
-                          <th>Event Name</th>
-                          <th>User Name</th>
-                          <th>M Name</th>
-                          <th>Nation</th>
-                          <th className="text-right">U Rate</th>
-                          <th className="text-right">Amount</th>
-                          <th>Place Date</th>
-                          <th>IP</th>
-                          <th>Browser</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        <tr>
-                          <td colSpan="11">
-                            <div className="text-center my-2">
-                              There are no records to show
-                            </div>
-                          </td>
-                        </tr>
-                      </tbody>
-
-                    </table>
-                  </div>
-                </div>
-
-                <div className="row pt-3">
-                  <div className="col">
-                    <div className="dataTables_paginate paging_simple_numbers float-right">
-                      <ul className="pagination pagination-rounded mb-0">
-                        <li className="page-item disabled">
-                          <span className="page-link">«</span>
-                        </li>
-                        <li className="page-item disabled">
-                          <span className="page-link">‹</span>
-                        </li>
-                        <li className="page-item active">
-                          <button type="button" className="page-link">1</button>
-                        </li>
-                        <li className="page-item disabled">
-                          <span className="page-link">›</span>
-                        </li>
-                        <li className="page-item disabled">
-                          <span className="page-link">»</span>
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
               </div>
             </div>
           </div>
-        </div>
+
+      
 
       </div>
     </div>

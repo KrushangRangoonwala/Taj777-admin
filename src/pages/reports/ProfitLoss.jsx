@@ -5,6 +5,7 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { formatNumAfterDot } from "../../utilies/helpers";
 
 const ProfitLoss = () => {
   const [data, setData] = useState([]);
@@ -175,6 +176,7 @@ const ProfitLoss = () => {
                         onChange={(e) => setSelectedClient(e.target.value)}
                       >
                         <option value="">All</option>
+                        <option value="1">User</option>
                         {clients.map(c => (
                           <option key={c.id} value={c.id}>{c.name}</option>
                         ))}
@@ -271,10 +273,10 @@ const ProfitLoss = () => {
                           <td>{row.sr_no}</td>
                           <td>{row.email}</td>
                           <td>{row.role}</td>
-                          <td className="text-right">{row.casino_amount.toFixed(2)}</td>
-                          <td className="text-right">{row.sports_amount.toFixed(2)}</td>
-                          <td className="text-right">0.00</td>
-                          <td className="text-right">{row.total_amount.toFixed(2)}</td>
+                          <td className="text-right">{formatNumAfterDot(row.casino_amount)}</td>
+                          <td className="text-right">{formatNumAfterDot(row.sports_amount)}</td>
+                          <td className="text-right">0</td>
+                          <td className="text-right">{formatNumAfterDot(row.total_amount)}</td>
                           <td>-</td>
                         </tr>
                       )) : (
@@ -292,10 +294,10 @@ const ProfitLoss = () => {
                         <th></th>
                         <th></th>
                         <th></th>
-                        <th className="text-right">{filteredData.reduce((a,b)=>a+b.casino_amount,0).toFixed(2)}</th>
-                        <th className="text-right">{filteredData.reduce((a,b)=>a+b.sports_amount,0).toFixed(2)}</th>
-                        <th className="text-right">0.00</th>
-                        <th className="text-right">{filteredData.reduce((a,b)=>a+b.total_amount,0).toFixed(2)}</th>
+                        <th className="text-right">{formatNumAfterDot(filteredData.reduce((a, b) => a + b.casino_amount, 0))}</th>
+                        <th className="text-right">{formatNumAfterDot(filteredData.reduce((a, b) => a + b.sports_amount, 0))}</th>
+                        <th className="text-right">0</th>
+                        <th className="text-right">{formatNumAfterDot(filteredData.reduce((a, b) => a + b.total_amount, 0))}</th>
                         <th></th>
                       </tr>
                     </tfoot>
@@ -304,36 +306,36 @@ const ProfitLoss = () => {
 
                 {/* Pagination */}
                 <div className="row pt-3">
-                    <div className="col">
-                      <ul className="pagination pagination-rounded mb-0 float-right">
+                  <div className="col">
+                    <ul className="pagination pagination-rounded mb-0 float-right">
 
-                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                          <button className="page-link" onClick={() => changePage(1)}>«</button>
+                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                        <button className="page-link" onClick={() => changePage(1)}>«</button>
+                      </li>
+
+                      <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                        <button className="page-link" onClick={() => changePage(currentPage - 1)}>‹</button>
+                      </li>
+
+                      {getPageNumbers().map((page) => (
+                        <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
+                          <button className="page-link" onClick={() => changePage(page)}>
+                            {page}
+                          </button>
                         </li>
+                      ))}
 
-                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
-                          <button className="page-link" onClick={() => changePage(currentPage - 1)}>‹</button>
-                        </li>
+                      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                        <button className="page-link" onClick={() => changePage(currentPage + 1)}>›</button>
+                      </li>
 
-                        {getPageNumbers().map((page) => (
-                          <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                            <button className="page-link" onClick={() => changePage(page)}>
-                              {page}
-                            </button>
-                          </li>
-                        ))}
+                      <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                        <button className="page-link" onClick={() => changePage(totalPages)}>»</button>
+                      </li>
 
-                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                          <button className="page-link" onClick={() => changePage(currentPage + 1)}>›</button>
-                        </li>
-
-                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
-                          <button className="page-link" onClick={() => changePage(totalPages)}>»</button>
-                        </li>
-
-                      </ul>
-                    </div>
+                    </ul>
                   </div>
+                </div>
 
               </div>
             </div>

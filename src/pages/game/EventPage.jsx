@@ -445,7 +445,8 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
         marketClass = "market-6",
         column = [{ type: "back", title: "Back" }, { type: "lay", title: "Lay" }],
         inMinMax = true,
-        suspendClass = "suspendedtext"
+        suspendClass = "suspendedtext",
+        isMarketNameHaveNum = false,
     }) {
         addSectionIfNotExist(sectionId);
         if (!data?.length) return null;
@@ -468,13 +469,13 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                         <div className="fancy-tripple" key={index}>
                             <div className="bet-table-mobile-row d-none-desktop">
                                 <div className="bet-table-mobile-team-name">
-                                    <span>{item.RunnerName}</span>
+                                    <span>{item.RunnerName} {isMarketNameHaveNum ? ` - ${item.LayPrice1}` : ""}</span>
                                     <ExposureMob />
                                 </div>
                             </div>
                             <div className={`bet-table-row ${isSuspendedMarker ? suspendClass : ""}`} data-title={item.Active}>
                                 <div className="nation-name d-none-mobile">
-                                    <p className="two-line-text">{item.RunnerName}</p>
+                                    <p className="two-line-text">{item.RunnerName} {isMarketNameHaveNum ? ` - ${item.LayPrice1}` : ""}</p>
                                     <Exposure />
                                 </div>
 
@@ -803,7 +804,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                                     column={[{ type: "back", title: "Back" }]}
                                     suspendClass=" "
                                     marketClass="market-10"
-
+                                    isMarketNameHaveNum={true}
                                 />
 
                                 <Double_Column_Section

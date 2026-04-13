@@ -241,79 +241,79 @@ const GeneralLock = () => {
 
   // CHECKBOX TOGGLE HANDLER (Events + Casino)
   const handleCheckbox = async (item, checked) => {
-      const isSportLevel = item.id === item.sportId;
+    const isSportLevel = item.id === item.sportId;
 
-      try {
-        await updateUserLockStatus({
-          child_id: isSportLevel ? "all" : item.id,
-          sport_type: item.sportId,
-          status: checked ? 1 : 0,
-          username: selectedClient?.value || null,
-        });
+    try {
+      await updateUserLockStatus({
+        child_id: isSportLevel ? "all" : item.id,
+        sport_type: item.sportId,
+        status: checked ? 1 : 0,
+        username: selectedClient?.value || null,
+      });
 
-        // ✅ CASINO
-        if (!item.sportId) {
-          setCasinoData((prev) =>
-            prev.map((c) =>
-              c.id === item.id ? { ...c, checked } : c
-            )
-          );
-          return;
-        }
+      // ✅ CASINO
+      if (!item.sportId) {
+        setCasinoData((prev) =>
+          prev.map((c) =>
+            c.id === item.id ? { ...c, checked } : c
+          )
+        );
+        return;
+      }
 
-        // ✅ EVENTS
-        setEventData((prev) =>
-          prev.map((sport) => {
-            const isSport = item.id === sport.id;
+      // ✅ EVENTS
+      setEventData((prev) =>
+        prev.map((sport) => {
+          const isSport = item.id === sport.id;
 
-            if (isSport) {
-              return {
-                ...sport,
-                checked,
-                children: sport.children.map((comp) => ({
-                  ...comp,
-                  children: comp.children.map((match) => ({
-                    ...match,
-                    markets: match.markets.map((m) => ({
-                      ...m,
-                      items: m.items.map((it) => ({
-                        ...it,
-                        checked,
-                      })),
+          if (isSport) {
+            return {
+              ...sport,
+              checked,
+              children: sport.children.map((comp) => ({
+                ...comp,
+                children: comp.children.map((match) => ({
+                  ...match,
+                  markets: match.markets.map((m) => ({
+                    ...m,
+                    items: m.items.map((it) => ({
+                      ...it,
+                      checked,
                     })),
                   })),
                 })),
-              };
-            }
-
-            return {
-              ...sport,
-              children: sport.children.map((comp) => ({
-                ...comp,
-                children: comp.children.map((match) => {
-                  if (match.id === item.id) {
-                    return {
-                      ...match,
-                      markets: match.markets.map((m) => ({
-                        ...m,
-                        items: m.items.map((it) =>
-                          it.id === item.id
-                            ? { ...it, checked }
-                            : it
-                        ),
-                      })),
-                    };
-                  }
-                  return match;
-                }),
               })),
             };
-          })
-        );
-      } catch (err) {
-        console.log(err);
-      }
-    };
+          }
+
+          return {
+            ...sport,
+            children: sport.children.map((comp) => ({
+              ...comp,
+              children: comp.children.map((match) => {
+                if (match.id === item.id) {
+                  return {
+                    ...match,
+                    markets: match.markets.map((m) => ({
+                      ...m,
+                      items: m.items.map((it) =>
+                        it.id === item.id
+                          ? { ...it, checked }
+                          : it
+                      ),
+                    })),
+                  };
+                }
+                return match;
+              }),
+            })),
+          };
+        })
+      );
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   return (
     <div>
@@ -341,6 +341,11 @@ const GeneralLock = () => {
                       isClearable
                       value={selectedClient}
                       onChange={(selected) => setSelectedClient(selected)}
+                      components={{
+                        DropdownIndicator: () => null,
+                        IndicatorSeparator: () => null
+                      }}
+                      noOptionsMessage={() => "List is empty."}
                       onInputChange={(inputValue) => {
                         setClientSearch(inputValue);
                         fetchClients(inputValue);

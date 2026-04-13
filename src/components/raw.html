@@ -1,33 +1,177 @@
-<div data-v-5a10e370="">
-    <div data-v-5a10e370="" class="security-auth">
-        <div class="row">
-            <div class="col-12">
-                <div class="page-title-box d-flex align-items-center justify-content-between">
-                    <h4 class="mb-0 font-size-18">Secure Auth Verification</h4>
-                    <div class="page-title-right">
-                        <ol class="breadcrumb m-0">
-                            <li class="breadcrumb-item"><a href="/admin/home" class="" target="_self">Home</a></li>
-                            <li class="breadcrumb-item active"><span aria-current="location">Secure Auth</span></li>
-                        </ol>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div>
-            <div class="card-body">
-                <div class="text-center"><b>Secure Auth Verification Status:</b> <span
-                        class="badge badge-danger">Disabled</span></div>
-                <div class="mt-2 text-center">
-                    Please select below option to enable secure auth verification
-                </div>
-                <div class="casino-report-tabs mt-3">
-                    <ul class="nav nav-tabs">
-                        <li class="nav-item pointer"><a class="nav-link">Enable Using Mobile App</a></li>
-                        <li class="nav-item pointer"><a class="nav-link">Enable Using Telegram</a></li>
-                    </ul>
-                </div>
-                <div class="tab-content mt-4"><!----> <!----> <!----></div>
-            </div>
-        </div>
+<!-- when records are not availlable -->
+<div class="table-responsive mb-0">
+    <div class="table no-footer table-hover table-responsive-sm">
+        <table id="accStmtTable" role="table" aria-busy="false" aria-colcount="7" class="table b-table table-bordered">
+            <!---->
+            <colgroup>
+                <col style="width: auto;">
+                <col style="width: 100px;">
+                <col style="width: auto;">
+                <col style="width: auto;">
+                <col style="width: auto;">
+                <col style="width: 350px;">
+                <col style="width: auto;">
+            </colgroup>
+            <thead role="rowgroup" class=""><!---->
+                <tr role="row" class="">
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="1" aria-sort="none"
+                        class="position-relative">
+                        <div>Date</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="2" aria-sort="none"
+                        class="position-relative text-right">
+                        <div>Sr No</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="3" aria-sort="none"
+                        class="position-relative text-right">
+                        <div>Credit</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="4" aria-sort="none"
+                        class="position-relative text-right">
+                        <div>Debit</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="5" aria-sort="none"
+                        class="position-relative text-right">
+                        <div>pts</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="6" aria-sort="none"
+                        class="position-relative">
+                        <div>Remark</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="7" aria-sort="none"
+                        class="position-relative">
+                        <div>Fromto</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody role="rowgroup"><!---->
+                <tr role="row" class="b-table-empty-row">
+                    <td colspan="7" role="cell" class="">
+                        <div role="alert" aria-live="polite">
+                            <div class="text-center my-2">There are no records to show</div>
+                        </div>
+                    </td>
+                </tr><!---->
+            </tbody><!---->
+        </table>
+    </div>
+</div>
+
+
+<!-- when records are availlable -->
+<div class="table-responsive mb-0">
+    <div class="table no-footer table-hover table-responsive-sm">
+        <table id="accStmtTable" role="table" aria-busy="false" aria-colcount="7" class="table b-table table-bordered">
+            <!---->
+            <colgroup>
+                <col style="width: auto;">
+                <col style="width: 100px;">
+                <col style="width: auto;">
+                <col style="width: auto;">
+                <col style="width: auto;">
+                <col style="width: 350px;">
+                <col style="width: auto;">
+            </colgroup>
+            <thead role="rowgroup" class=""><!---->
+                <tr role="row" class="">
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="1" aria-sort="none"
+                        class="position-relative">
+                        <div>Date</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="2" aria-sort="none"
+                        class="position-relative text-right">
+                        <div>Sr No</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="3" aria-sort="none"
+                        class="position-relative text-right">
+                        <div>Credit</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="4" aria-sort="none"
+                        class="position-relative text-right">
+                        <div>Debit</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="5" aria-sort="none"
+                        class="position-relative text-right">
+                        <div>pts</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="6" aria-sort="none"
+                        class="position-relative">
+                        <div>Remark</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                    <th role="columnheader" scope="col" tabindex="0" aria-colindex="7" aria-sort="none"
+                        class="position-relative">
+                        <div>Fromto</div><span class="sr-only"> (Click to sort ascending)</span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody role="rowgroup"><!---->
+                <tr role="row" tabindex="0" aria-rowindex="1" class="nocursor">
+                    <td aria-colindex="1" role="cell" class="">06/04/2026 00:00:00</td>
+                    <td aria-colindex="2" role="cell" class="">
+                        <div class="text-right">1</div>
+                    </td>
+                    <td aria-colindex="3" role="cell" class="">
+                        <div class="text-right text-success"><span>14,900</span></div>
+                    </td>
+                    <td aria-colindex="4" role="cell" class="">
+                        <div class="text-right"><span></span></div>
+                    </td>
+                    <td aria-colindex="5" role="cell" class="">
+                        <div class="text-right text-success"><span>14,900</span></div>
+                    </td>
+                    <td aria-colindex="6" role="cell" class="">
+                        <div>
+                            Opening pts
+                            <!---->
+                        </div>
+                    </td>
+                    <td aria-colindex="7" role="cell" class=""></td>
+                </tr>
+                <tr role="row" tabindex="0" aria-rowindex="2" class="nocursor">
+                    <td aria-colindex="1" role="cell" class="">09/04/2026 02:14:34</td>
+                    <td aria-colindex="2" role="cell" class="">
+                        <div class="text-right">2</div>
+                    </td>
+                    <td aria-colindex="3" role="cell" class="">
+                        <div class="text-right"><span></span></div>
+                    </td>
+                    <td aria-colindex="4" role="cell" class="">
+                        <div class="text-right text-danger"><span>-10</span></div>
+                    </td>
+                    <td aria-colindex="5" role="cell" class="">
+                        <div class="text-right text-success"><span>14,890</span></div>
+                    </td>
+                    <td aria-colindex="6" role="cell" class="">
+                        <div>
+                            t
+                            <!---->
+                        </div>
+                    </td>
+                    <td aria-colindex="7" role="cell" class="">Arpit526/Ras46</td>
+                </tr>
+                <tr role="row" tabindex="0" aria-rowindex="3" class="nocursor">
+                    <td aria-colindex="1" role="cell" class="">09/04/2026 02:17:41</td>
+                    <td aria-colindex="2" role="cell" class="">
+                        <div class="text-right">3</div>
+                    </td>
+                    <td aria-colindex="3" role="cell" class="">
+                        <div class="text-right"><span></span></div>
+                    </td>
+                    <td aria-colindex="4" role="cell" class="">
+                        <div class="text-right text-danger"><span>-10</span></div>
+                    </td>
+                    <td aria-colindex="5" role="cell" class="">
+                        <div class="text-right text-success"><span>14,880</span></div>
+                    </td>
+                    <td aria-colindex="6" role="cell" class="">
+                        <div>
+                            t
+                            <!---->
+                        </div>
+                    </td>
+                    <td aria-colindex="7" role="cell" class="">Arpit526/Ras46</td>
+                </tr><!----><!---->
+            </tbody><!---->
+        </table>
     </div>
 </div>

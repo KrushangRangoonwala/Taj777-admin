@@ -54,3 +54,14 @@
         display: none;
     }
 }
+
+.bg-white{
+    background-color: white;
+}
+
+.custom-range-picker input {
+    font-family: inherit !important;
+    font-size: 13.5px !important;
+    color: #495057 !important;
+    font-weight: 400 !important;
+}

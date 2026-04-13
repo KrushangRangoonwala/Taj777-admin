@@ -8,6 +8,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import Select from 'react-select';
+import { customSelectStyles } from '../../components/Header';
 
 const TotalProfitLoss = () => {
 
@@ -59,8 +61,8 @@ const TotalProfitLoss = () => {
         selected_user_id: selectedClient,
         selected_type:
           type === "2" ? "sports" :
-          type === "3" ? "casino" :
-          "all",
+            type === "3" ? "casino" :
+              "all",
         from_date: fromDate.format("YYYY-MM-DD"),
         to_date: toDate.format("YYYY-MM-DD"),
         page: 1,
@@ -106,7 +108,7 @@ const TotalProfitLoss = () => {
     } catch (err) {
       console.log(err);
     } finally {
-        setLoading(false);
+      setLoading(false);
     }
   };
 
@@ -125,76 +127,76 @@ const TotalProfitLoss = () => {
   };
 
   const exportToExcel = () => {
-  let excelData = [];
+    let excelData = [];
 
-  // Sports
-  data.sports.forEach((row) => {
-    excelData.push({
-      Type: "Sports",
-      Name: row.event_name,
-      GameType: row.game_type,
-      Opening: row.opening,
-      Closing: row.closing,
-      ProfitLoss: row.pl
+    // Sports
+    data.sports.forEach((row) => {
+      excelData.push({
+        Type: "Sports",
+        Name: row.event_name,
+        GameType: row.game_type,
+        Opening: row.opening,
+        Closing: row.closing,
+        ProfitLoss: row.pl
+      });
     });
-  });
 
-  // Casino
-  data.casino.forEach((row) => {
-    excelData.push({
-      Type: "Casino",
-      Name: row.name,
-      GameType: "-",
-      Opening: row.opening,
-      Closing: row.closing,
-      ProfitLoss: row.pl
+    // Casino
+    data.casino.forEach((row) => {
+      excelData.push({
+        Type: "Casino",
+        Name: row.name,
+        GameType: "-",
+        Opening: row.opening,
+        Closing: row.closing,
+        ProfitLoss: row.pl
+      });
     });
-  });
 
-  const worksheet = XLSX.utils.json_to_sheet(excelData);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "TotalPL");
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "TotalPL");
 
-  const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  const file = new Blob([buffer], { type: "application/octet-stream" });
+    const buffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    const file = new Blob([buffer], { type: "application/octet-stream" });
 
-  saveAs(file, "Total_Profit_Loss.xlsx");
-};
+    saveAs(file, "Total_Profit_Loss.xlsx");
+  };
 
-const exportToPDF = () => {
-  const doc = new jsPDF();
+  const exportToPDF = () => {
+    const doc = new jsPDF();
 
-  let rows = [];
+    let rows = [];
 
-  data.sports.forEach((row) => {
-    rows.push([
-      "Sports",
-      row.event_name,
-      row.game_type,
-      row.opening,
-      row.closing,
-      row.pl
-    ]);
-  });
+    data.sports.forEach((row) => {
+      rows.push([
+        "Sports",
+        row.event_name,
+        row.game_type,
+        row.opening,
+        row.closing,
+        row.pl
+      ]);
+    });
 
-  data.casino.forEach((row) => {
-    rows.push([
-      "Casino",
-      row.name,
-      "-",
-      row.opening,
-      row.closing,
-      row.pl
-    ]);
-  });
+    data.casino.forEach((row) => {
+      rows.push([
+        "Casino",
+        row.name,
+        "-",
+        row.opening,
+        row.closing,
+        row.pl
+      ]);
+    });
 
-  autoTable(doc, {
-    head: [["Type", "Name", "Game Type", "Opening", "Closing", "P/L"]],
-    body: rows
-  });
+    autoTable(doc, {
+      head: [["Type", "Name", "Game Type", "Opening", "Closing", "P/L"]],
+      body: rows
+    });
 
-  doc.save("Total_Profit_Loss.pdf");
-};
+    doc.save("Total_Profit_Loss.pdf");
+  };
 
   return (
     <div>
@@ -223,19 +225,19 @@ const exportToPDF = () => {
             <div className="card-body">
 
               <div className="report-form mb-3">
-                <form onSubmit={(e) => { 
-                    e.preventDefault(); if (!fromDate || !toDate) return;
+                <form onSubmit={(e) => {
+                  e.preventDefault(); if (!fromDate || !toDate) return;
 
-                    const diffDays = toDate.diff(fromDate, "day") + 1;
+                  const diffDays = toDate.diff(fromDate, "day") + 1;
 
-                    if (diffDays > 10) {
-                        alert("You can see maximum 10 days of data only");
-                        return;
-                    }
+                  if (diffDays > 10) {
+                    alert("You can see maximum 10 days of data only");
+                    return;
+                  }
 
-                    fetchData(); 
-                    
-                    }}>
+                  fetchData();
+
+                }}>
 
                   <div className="row row5">
 
@@ -244,16 +246,24 @@ const exportToPDF = () => {
                       <div className="form-group user-lock-search" style={{ position: "relative" }}>
                         <label>Search By Client Name</label>
 
-                        <input
-                          type="text"
-                          className="form-control"
+                        <Select
+                          options={[]}
                           placeholder="Select option"
+                          className="react-select-container"
+                          classNamePrefix="react-select"
+                          components={{
+                            DropdownIndicator: () => null,
+                            IndicatorSeparator: () => null
+                          }}
+                          noOptionsMessage={() => "List is empty."}
                           value={clientSearch}
                           onChange={(e) => {
                             setClientSearch(e.target.value);
                             fetchClients(e.target.value);
                           }}
+                          styles={customSelectStyles}
                         />
+
 
                         {clientList.length > 0 && (
                           <div style={{
@@ -327,11 +337,11 @@ const exportToPDF = () => {
                       </button>
 
                       <button type="button" className="btn btn-success" disabled={!isDataAvailable} onClick={exportToExcel}>
-                        Excel
+                        <i className="fas fa-file-excel"></i>
                       </button>
 
                       <button type="button" className="btn btn-danger" disabled={!isDataAvailable} onClick={exportToPDF}>
-                        PDF
+                        <i className="fas fa-file-pdf"></i>
                       </button>
                     </div>
                   </div>
@@ -341,9 +351,9 @@ const exportToPDF = () => {
 
               {loading && (
                 <div style={{ textAlign: "center", padding: "20px" }}>
-                    <div className="spinner-border text-primary" role="status" />
+                  <div className="spinner-border text-primary" role="status" />
                 </div>
-                )}
+              )}
 
               {/* ================= TABLES ================= */}
 
@@ -393,7 +403,7 @@ const exportToPDF = () => {
               {/* CASINO */}
               {(type === "0" || type === "3") && (
                 <>
-                  <h4>Casino Report</h4>
+                  {/* <h4>Casino Report</h4> */}
                   <div className="table-responsive">
                     <table className="table table-bordered">
                       <tbody>
