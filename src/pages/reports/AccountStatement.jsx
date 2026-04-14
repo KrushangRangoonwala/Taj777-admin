@@ -8,6 +8,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Table } from 'react-bootstrap';
+
 
 const AccountStatement = () => {
 
@@ -35,6 +37,8 @@ const AccountStatement = () => {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [perPage, setPerPage] = useState(25);
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('none');
 
   const isDataAvailable = data && data.length > 0;
 
@@ -134,6 +138,29 @@ const AccountStatement = () => {
     }
 
     return pages;
+  };
+
+  const handleSort = (colIndex) => {
+    if (sortColumn === colIndex) {
+      if (sortDirection === 'none') {
+        setSortDirection('ascending');
+      } else if (sortDirection === 'ascending') {
+        setSortDirection('descending');
+      } else {
+        setSortDirection('ascending');
+      }
+    } else {
+      setSortColumn(colIndex);
+      setSortDirection('ascending');
+    }
+  };
+
+  const getSortValueText = (colIndex) => {
+    const currentDirection = sortColumn === colIndex ? sortDirection : 'none';
+    if (currentDirection === 'none') return 'ascending';
+    if (currentDirection === 'ascending') return 'descending';
+    if (currentDirection === 'descending') return 'ascending';
+    return 'ascending';
   };
 
   const exportToExcel = () => {
@@ -398,45 +425,90 @@ const AccountStatement = () => {
 
                 {/* TABLE */}
                 <div className="table-responsive mb-0">
-                  <table className="table table-bordered">
-                    <thead>
-                      <tr>
-                        <th role="columnheader" scope="col" tabindex="0" aria-colindex="1" aria-sort="ascending" class="position-relative">
-                          <div>Date</div>
-                          <span className="sr-only"> (Click to sort descending)</span>
-                        </th>
-                        <th className="text-right">Sr No</th>
-                        <th className="text-right">Credit</th>
-                        <th className="text-right">Debit</th>
-                        <th className="text-right">pts</th>
-                        <th>Remark</th>
-                        <th>Fromto</th>
-                      </tr>
-                    </thead>
-
-                    <tbody>
-                      {data.length > 0 ? (
-                        data.map((row, index) => (
-                          <tr key={index}>
-                            <td>{new Date(row.created_at * 1000).toLocaleString()}</td>
-                            <td className="text-right">{indexOfFirst + index + 1}</td>
-                            <td className="text-right">{row.account_entryType == 1 ? row.account_amount : '-'}</td>
-                            <td className="text-right">{row.account_entryType == 2 ? row.account_amount : '-'}</td>
-                            <td className="text-right">{row.balance}</td>
-                            <td>{row.remark}</td>
-                            <td>{row.from_to}</td>
-                          </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="7" className="text-center">
-                            There are no records to show
-                          </td>
+                  <div className="table no-footer table-hover table-responsive-sm">
+                    <Table id="accStmtTable" role="table" aria-busy="false" aria-colcount="7" className="b-table" bordered>
+                      <colgroup>
+                        <col style={{ width: "auto" }} />
+                        <col style={{ width: "100px" }} />
+                        <col style={{ width: "auto" }} />
+                        <col style={{ width: "auto" }} />
+                        <col style={{ width: "auto" }} />
+                        <col style={{ width: "350px" }} />
+                        <col style={{ width: "auto" }} />
+                      </colgroup>
+                      <thead role="rowgroup">
+                        <tr role="row">
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="1" aria-sort={sortColumn === 1 ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort(1)}>
+                            <div>Date</div><span className="sr-only"> (Click to sort {getSortValueText(1)})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="2" aria-sort={sortColumn === 2 ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort(2)}>
+                            <div>Sr No</div><span className="sr-only"> (Click to sort {getSortValueText(2)})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="3" aria-sort={sortColumn === 3 ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort(3)}>
+                            <div>Credit</div><span className="sr-only"> (Click to sort {getSortValueText(3)})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="4" aria-sort={sortColumn === 4 ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort(4)}>
+                            <div>Debit</div><span className="sr-only"> (Click to sort {getSortValueText(4)})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="5" aria-sort={sortColumn === 5 ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort(5)}>
+                            <div>pts</div><span className="sr-only"> (Click to sort {getSortValueText(5)})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="6" aria-sort={sortColumn === 6 ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort(6)}>
+                            <div>Remark</div><span className="sr-only"> (Click to sort {getSortValueText(6)})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="7" aria-sort={sortColumn === 7 ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort(7)}>
+                            <div>Fromto</div><span className="sr-only"> (Click to sort {getSortValueText(7)})</span>
+                          </th>
                         </tr>
-                      )}
-                    </tbody>
-                  </table>
+                      </thead>
+
+                      <tbody role="rowgroup">
+                        {data.length > 0 ? (
+                          data.map((row, index) => (
+                            <tr key={index} role="row" tabIndex="0" aria-rowindex={indexOfFirst + index + 1} className="nocursor">
+                              <td aria-colindex="1" role="cell">
+                                {new Date(row.created_at * 1000).toLocaleString()}
+                              </td>
+                              <td aria-colindex="2" role="cell">
+                                <div className="text-right">{indexOfFirst + index + 1}</div>
+                              </td>
+                              <td aria-colindex="3" role="cell">
+                                <div className="text-right text-success">
+                                  <span>{row.account_entryType == 1 ? Number(row.account_amount).toLocaleString('en-IN') : ''}</span>
+                                </div>
+                              </td>
+                              <td aria-colindex="4" role="cell">
+                                <div className={row.account_entryType == 2 ? "text-right text-danger" : "text-right"}>
+                                  <span>{row.account_entryType == 2 ? Number(row.account_amount).toLocaleString('en-IN') : ''}</span>
+                                </div>
+                              </td>
+                              <td aria-colindex="5" role="cell">
+                                <div className="text-right text-success">
+                                  <span>{Number(row.balance).toLocaleString('en-IN')}</span>
+                                </div>
+                              </td>
+                              <td aria-colindex="6" role="cell">
+                                <div>{row.remark}</div>
+                              </td>
+                              <td aria-colindex="7" role="cell">
+                                {row.from_to}
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr role="row" className="b-table-empty-row">
+                            <td colSpan="7" role="cell">
+                              <div role="alert" aria-live="polite">
+                                <div className="text-center my-2">There are no records to show</div>
+                              </div>
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </Table>
+                  </div>
                 </div>
+
 
                 {/* PAGINATION */}
                 <div className="row pt-3">

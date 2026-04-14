@@ -1,5 +1,5 @@
 import axios from "axios";
-import { apiConfigUserData, apiGames } from "./axiosConfig";
+import { ajax_adm, ajax_files } from "./axiosConfig";
 import { successToast } from "../utils/toast";
 
 export const isApp = {
@@ -23,7 +23,7 @@ export const loginAdmin = async (email, password) => {
   params.append('login-password', password);
 
   try {
-    const response = await apiConfigUserData.post('login.php', params);
+    const response = await ajax_adm.post('login.php', params);
 
     if (response.data.status === "ok") {
       successToast("success");
@@ -47,7 +47,7 @@ export const loginAdmin = async (email, password) => {
 export async function getAccountStatement(extraPayload = {}) {
   try {
     const payload = { ...getDefaultParams(), ...extraPayload };
-    const { data } = await apiConfigUserData.post(
+    const { data } = await ajax_adm.post(
       "get_account_statement",
       payload
     );
@@ -64,7 +64,7 @@ export async function getClients(search = "") {
       search,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("get_clients.php", payload);
+    const { data } = await ajax_adm.post("get_clients.php", payload);
 
     return data;
   } catch (error) {
@@ -79,7 +79,7 @@ export async function getProfitLoss(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("profit_loss", fullPayload);
+    const { data } = await ajax_adm.post("profit_loss", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching profit loss:", error);
@@ -93,7 +93,7 @@ export async function getCurrentBets(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("current_bets", fullPayload);
+    const { data } = await ajax_adm.post("current_bets", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching profit loss:", error);
@@ -107,7 +107,7 @@ export async function getUserHistory(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("user_history", fullPayload);
+    const { data } = await ajax_adm.post("user_history", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching history:", error);
@@ -120,7 +120,7 @@ export async function getCasinoResult(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("casino_result", fullPayload);
+    const { data } = await ajax_adm.post("casino_result", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching history:", error);
@@ -133,7 +133,7 @@ export async function checkUserLockPwd(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("check_pwd", fullPayload);
+    const { data } = await ajax_adm.post("check_pwd", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching history:", error);
@@ -146,7 +146,7 @@ export async function updateUserLockStatus(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("update_status", fullPayload);
+    const { data } = await ajax_adm.post("update_status", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching history:", error);
@@ -159,7 +159,7 @@ export async function getAuthList(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("auth_list", fullPayload);
+    const { data } = await ajax_adm.post("auth_list", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching history:", error);
@@ -172,7 +172,7 @@ export async function getUserRegisterDetail(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("get_user_register_detail", fullPayload);
+    const { data } = await ajax_adm.post("get_user_register_detail", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -185,7 +185,7 @@ export async function getTurnover(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("get_turnover", fullPayload);
+    const { data } = await ajax_adm.post("get_turnover", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -198,7 +198,7 @@ export async function getTotalProfitLoss(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("total_profit_loss", fullPayload);
+    const { data } = await ajax_adm.post("total_profit_loss", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -211,7 +211,7 @@ export async function getUserList(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("get_user_list", fullPayload);
+    const { data } = await ajax_adm.post("get_user_list", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -224,7 +224,7 @@ export async function accountTransaction(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("account_transaction", fullPayload);
+    const { data } = await ajax_adm.post("account_transaction", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -237,7 +237,7 @@ export async function changeUserPassword(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("change_password", fullPayload);
+    const { data } = await ajax_adm.post("change_password", fullPayload);
     return data;
   } catch (error) {
     console.error("Error changing password:", error);
@@ -250,7 +250,7 @@ export async function changeUserStatus(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("change_status", fullPayload);
+    const { data } = await ajax_adm.post("change_status", fullPayload);
     return data;
   } catch (error) {
     console.error("Error changing password:", error);
@@ -263,7 +263,7 @@ export async function insertUser(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await apiConfigUserData.post("add_user", fullPayload);
+    const { data } = await ajax_adm.post("add_user", fullPayload);
     return data;
   } catch (error) {
     console.error("Error changing password:", error);
@@ -279,7 +279,7 @@ export async function fetchResultById(eventId, gameType) {
       ...getDefaultParams(),
     };
 
-    const { data } = await apiConfigUserData.post("teenpatti_result", requestBody);
+    const { data } = await ajax_adm.post("teenpatti_result", requestBody);
     isApiSuccess(data);
     return data;
   } catch (error) {
@@ -290,10 +290,27 @@ export async function fetchResultById(eventId, gameType) {
 
 export async function apiGetUpcomingFixtures(dispatch) {
   try {
-    const { data } = await apiGames.post("/upcoming_fixture", isApp);
+    const { data } = await ajax_files.post("/upcoming_fixture", isApp);
     return data?.all_data || [];
   } catch (error) {
     console.log('error', error);
     return [];
   }
 };
+
+
+export async function fetchExposureList({ eventId, exposureType }) {
+  try {
+    const payload = { ...getDefaultParams(), ...(eventId && { eventId }), exposureType };
+    const { data } = await ajax_adm.post("/exposure_list", payload);
+    return data || [];
+  } catch (error) {
+    console.error("Error fetching exposure list:", error);
+    throw error;
+  }
+}
+
+export const getEventPage_Exposure = (eventId) => fetchExposureList({ eventId, exposureType: "eventsList" })
+
+export const getMarketPage_Exposure = () => fetchExposureList({ exposureType: "marketList" })
+

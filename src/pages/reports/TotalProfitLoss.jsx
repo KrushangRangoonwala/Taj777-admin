@@ -10,6 +10,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import Select from 'react-select';
 import { customSelectStyles } from '../../components/Header';
+import { Table } from 'react-bootstrap';
+
 
 const TotalProfitLoss = () => {
 
@@ -30,6 +32,33 @@ const TotalProfitLoss = () => {
     third_party: [],
     sportbook: []
   });
+
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('none');
+
+  const handleSort = (colKey) => {
+    if (sortColumn === colKey) {
+      if (sortDirection === 'none') {
+        setSortDirection('ascending');
+      } else if (sortDirection === 'ascending') {
+        setSortDirection('descending');
+      } else {
+        setSortDirection('ascending');
+      }
+    } else {
+      setSortColumn(colKey);
+      setSortDirection('ascending');
+    }
+  };
+
+  const getSortValueText = (colKey) => {
+    const currentDirection = sortColumn === colKey ? sortDirection : 'none';
+    if (currentDirection === 'none') return 'ascending';
+    if (currentDirection === 'ascending') return 'descending';
+    if (currentDirection === 'descending') return 'ascending';
+    return 'ascending';
+  };
+
 
   const isDataAvailable =
     data.sports.length ||
@@ -362,74 +391,226 @@ const TotalProfitLoss = () => {
                 <>
                   <h4>Sports Report</h4>
                   <div className="table-responsive">
-                    <table className="table table-bordered">
-                      <thead>
-                        <tr>
-                          <th>Event Name</th>
-                          <th>Game Type</th>
-                          <th className="text-right">Opening</th>
-                          <th className="text-right">Closing</th>
-                          <th className="text-right">Profit/Loss</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {data.sports.length > 0 ? (
-                          data.sports.map((row, i) => (
-                            <tr key={i}>
-                              <td>{row.event_name}</td>
-                              <td>{row.game_type}</td>
-                              <td className="text-right">{row.opening}</td>
-                              <td className="text-right">{row.closing}</td>
-                              <td className="text-right">{row.pl}</td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan="5" className="text-center">There are no records to show</td>
+                    <div className="table no-footer table-responsive-sm">
+                      <Table role="table" aria-busy="false" aria-colcount="5" className="b-table" bordered hover>
+                        <thead role="rowgroup">
+                          <tr role="row">
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'eventName' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('eventName')}>
+                              <div>Event Name</div><span className="sr-only"> (Click to sort {getSortValueText('eventName')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'gameType' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('gameType')}>
+                              <div>Game Type</div><span className="sr-only"> (Click to sort {getSortValueText('gameType')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'opening' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('opening')}>
+                              <div>Opening</div><span className="sr-only"> (Click to sort {getSortValueText('opening')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'closing' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('closing')}>
+                              <div>Closing</div><span className="sr-only"> (Click to sort {getSortValueText('closing')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'pl' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('pl')}>
+                              <div>Profit/Loss</div><span className="sr-only"> (Click to sort {getSortValueText('pl')})</span>
+                            </th>
                           </tr>
-                        )}
-                      </tbody>
-                      <tfoot>
-                        <tr>
-                          <td colSpan="4" className="text-right"><strong>Total Profit/Loss</strong></td>
-                          <td className="text-right"><strong>{getTotalPL(data.sports)}</strong></td>
-                        </tr>
-                      </tfoot>
-                    </table>
+                        </thead>
+                        <tbody role="rowgroup">
+                          {data.sports.length > 0 ? (
+                            data.sports.map((row, i) => (
+                              <tr key={i} role="row" tabIndex="0" className="nocursor">
+                                <td role="cell">{row.event_name}</td>
+                                <td role="cell">{row.game_type}</td>
+                                <td role="cell" className="text-right">{row.opening}</td>
+                                <td role="cell" className="text-right">{row.closing}</td>
+                                <td role="cell" className="text-right">{row.pl}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr role="row" className="b-table-empty-row">
+                              <td colSpan="5" role="cell">
+                                <div role="alert" aria-live="polite">
+                                  <div className="text-center my-2">There are no records to show</div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                        <tfoot>
+                          <tr role="row">
+                            <td colSpan="4" className="text-right" role="cell"><strong>Total Profit/Loss</strong></td>
+                            <td className="text-right" role="cell"><strong>{getTotalPL(data.sports)}</strong></td>
+                          </tr>
+                        </tfoot>
+                      </Table>
+                    </div>
                   </div>
                 </>
+
               )}
 
               {/* CASINO */}
               {(type === "0" || type === "3") && (
                 <>
-                  {/* <h4>Casino Report</h4> */}
+                  <h4>Casino Report</h4>
                   <div className="table-responsive">
-                    <table className="table table-bordered">
-                      <tbody>
-                        {data.casino.length > 0 ? (
-                          data.casino.map((row, i) => (
-                            <tr key={i}>
-                              <td>{row.name}</td>
-                              <td className="text-right">{row.opening}</td>
-                              <td className="text-right">{row.closing}</td>
-                              <td className="text-right">{row.pl}</td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan="4" className="text-center">There are no records to show</td>
+                    <div className="table no-footer table-responsive-sm">
+                      <Table role="table" aria-busy="false" aria-colcount="4" className="b-table" bordered hover>
+                        <thead role="rowgroup">
+                          <tr role="row">
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'casinoName' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('casinoName')}>
+                              <div>Casino Name</div><span className="sr-only"> (Click to sort {getSortValueText('casinoName')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'casinoOpening' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('casinoOpening')}>
+                              <div>Opening</div><span className="sr-only"> (Click to sort {getSortValueText('casinoOpening')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'casinoClosing' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('casinoClosing')}>
+                              <div>Closing</div><span className="sr-only"> (Click to sort {getSortValueText('casinoClosing')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'casinoPL' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('casinoPL')}>
+                              <div>Profit/Loss</div><span className="sr-only"> (Click to sort {getSortValueText('casinoPL')})</span>
+                            </th>
                           </tr>
-                        )}
-                      </tbody>
-                      <tfoot>
-                        <tr>
-                          <td colSpan="3" className="text-right"><strong>Total Profit/Loss</strong></td>
-                          <td className="text-right"><strong>{getTotalPL(data.casino)}</strong></td>
-                        </tr>
-                      </tfoot>
-                    </table>
+                        </thead>
+                        <tbody role="rowgroup">
+                          {data.casino.length > 0 ? (
+                            data.casino.map((row, i) => (
+                              <tr key={i} role="row" tabIndex="0" className="nocursor">
+                                <td role="cell">{row.name}</td>
+                                <td role="cell" className="text-right">{row.opening}</td>
+                                <td role="cell" className="text-right">{row.closing}</td>
+                                <td role="cell" className="text-right">{row.pl}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr role="row" className="b-table-empty-row">
+                              <td colSpan="4" role="cell">
+                                <div role="alert" aria-live="polite">
+                                  <div className="text-center my-2">There are no records to show</div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                        <tfoot>
+                          <tr role="row">
+                            <td colSpan="3" className="text-right" role="cell"><strong>Total Profit/Loss</strong></td>
+                            <td className="text-right" role="cell"><strong>{getTotalPL(data.casino)}</strong></td>
+                          </tr>
+                        </tfoot>
+                      </Table>
+                    </div>
                   </div>
+
+                </>
+              )}
+              
+              {/* THIRD PARTY */}
+              {(type === "0" || type === "4") && (
+                <>
+                  <h4>Third Party Report</h4>
+                  <div className="table-responsive">
+                    <div className="table no-footer table-responsive-sm">
+                      <Table role="table" aria-busy="false" aria-colcount="4" className="b-table" bordered hover>
+                        <thead role="rowgroup">
+                          <tr role="row">
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'ThirdPartyName' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('ThirdPartyName')}>
+                              <div>Third Party Name</div><span className="sr-only"> (Click to sort {getSortValueText('ThirdPartyName')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'ThirdPartyOpening' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('ThirdPartyOpening')}>
+                              <div>Opening</div><span className="sr-only"> (Click to sort {getSortValueText('ThirdPartyOpening')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'ThirdPartyClosing' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('ThirdPartyClosing')}>
+                              <div>Closing</div><span className="sr-only"> (Click to sort {getSortValueText('ThirdPartyClosing')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'ThirdPartyPL' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('ThirdPartyPL')}>
+                              <div>Profit/Loss</div><span className="sr-only"> (Click to sort {getSortValueText('ThirdPartyPL')})</span>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody role="rowgroup">
+                          {data.third_party.length > 0 ? (
+                            data.third_party.map((row, i) => (
+                              <tr key={i} role="row" tabIndex="0" className="nocursor">
+                                <td role="cell">{row.name}</td>
+                                <td role="cell" className="text-right">{row.opening}</td>
+                                <td role="cell" className="text-right">{row.closing}</td>
+                                <td role="cell" className="text-right">{row.pl}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr role="row" className="b-table-empty-row">
+                              <td colSpan="4" role="cell">
+                                <div role="alert" aria-live="polite">
+                                  <div className="text-center my-2">There are no records to show</div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                        <tfoot>
+                          <tr role="row">
+                            <td colSpan="3" className="text-right" role="cell"><strong>Total Profit/Loss</strong></td>
+                            <td className="text-right" role="cell"><strong>{getTotalPL(data.third_party)}</strong></td>
+                          </tr>
+                        </tfoot>
+                      </Table>
+                    </div>
+                  </div>
+
+                </>
+              )}
+
+              {/* THIRD PARTY */}
+              {(type === "0" || type === "5") && (
+                <>
+                  <h4>Sportbook Report</h4>
+                  <div className="table-responsive">
+                    <div className="table no-footer table-responsive-sm">
+                      <Table role="table" aria-busy="false" aria-colcount="4" className="b-table" bordered hover>
+                        <thead role="rowgroup">
+                          <tr role="row">
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'SportbookName' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('SportbookName')}>
+                              <div>Sportbook Name</div><span className="sr-only"> (Click to sort {getSortValueText('SportbookName')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'SportbookOpening' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('SportbookOpening')}>
+                              <div>Opening</div><span className="sr-only"> (Click to sort {getSortValueText('SportbookOpening')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'SportbookClosing' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('SportbookClosing')}>
+                              <div>Closing</div><span className="sr-only"> (Click to sort {getSortValueText('SportbookClosing')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'SportbookPL' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('SportbookPL')}>
+                              <div>Profit/Loss</div><span className="sr-only"> (Click to sort {getSortValueText('SportbookPL')})</span>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody role="rowgroup">
+                          {data.sportbook.length > 0 ? (
+                            data.sportbook.map((row, i) => (
+                              <tr key={i} role="row" tabIndex="0" className="nocursor">
+                                <td role="cell">{row.name}</td>
+                                <td role="cell" className="text-right">{row.opening}</td>
+                                <td role="cell" className="text-right">{row.closing}</td>
+                                <td role="cell" className="text-right">{row.pl}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr role="row" className="b-table-empty-row">
+                              <td colSpan="4" role="cell">
+                                <div role="alert" aria-live="polite">
+                                  <div className="text-center my-2">There are no records to show</div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                        <tfoot>
+                          <tr role="row">
+                            <td colSpan="3" className="text-right" role="cell"><strong>Total Profit/Loss</strong></td>
+                            <td className="text-right" role="cell"><strong>{getTotalPL(data.sportbook)}</strong></td>
+                          </tr>
+                        </tfoot>
+                      </Table>
+                    </div>
+                  </div>
+
                 </>
               )}
 

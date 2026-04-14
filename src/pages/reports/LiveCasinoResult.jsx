@@ -9,6 +9,8 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { customSelectStyles } from "../../components/Header";
+import { Table } from 'react-bootstrap';
+
 
 const { RangePicker } = DatePicker;
 
@@ -29,6 +31,33 @@ const LiveCasinoResult = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState(null);
+
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('none');
+
+  const handleSort = (colKey) => {
+    if (sortColumn === colKey) {
+      if (sortDirection === 'none') {
+        setSortDirection('ascending');
+      } else if (sortDirection === 'ascending') {
+        setSortDirection('descending');
+      } else {
+        setSortDirection('ascending');
+      }
+    } else {
+      setSortColumn(colKey);
+      setSortDirection('ascending');
+    }
+  };
+
+  const getSortValueText = (colKey) => {
+    const currentDirection = sortColumn === colKey ? sortDirection : 'none';
+    if (currentDirection === 'none') return 'ascending';
+    if (currentDirection === 'ascending') return 'descending';
+    if (currentDirection === 'descending') return 'ascending';
+    return 'ascending';
+  };
+
 
   // 🔹 Handle tab change
   const handleTabChange = (tab) => {
@@ -327,42 +356,62 @@ const LiveCasinoResult = () => {
 
                   {/* TABLE */}
                   <div className="table-responsive mb-0">
-                    <table className="table b-table table-bordered">
-                      <thead>
-                        <tr>
-                          <th>Game Name</th>
-                          <th>Type</th>
-                          <th className="text-right">Amount</th>
-                          <th className="text-right">Total</th>
-                          <th>Date</th>
-                          <th>Round Id</th>
-                          <th>Transaction Id</th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        {data.length > 0 ? (
-                          data.map((row, i) => (
-                            <tr key={i}>
-                              <td>{row.game_name || "-"}</td>
-                              <td>{row.type || "-"}</td>
-                              <td className="text-right">{row.amount || "-"}</td>
-                              <td className="text-right">{row.total || "-"}</td>
-                              <td>{row.date || "-"}</td>
-                              <td>{row.round_id || "-"}</td>
-                              <td>{row.transaction_id || "-"}</td>
-                            </tr>
-                          ))
-                        ) : (
-                          <tr>
-                            <td colSpan="7" className="text-center">
-                              {loading ? "Loading..." : "There are no records to show"}
-                            </td>
+                    <div className="table no-footer table-responsive-sm">
+                      <Table role="table" aria-busy="false" aria-colcount="7" className="b-table" bordered>
+                        <thead role="rowgroup">
+                          <tr role="row">
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'gameName' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('gameName')}>
+                              <div>Game Name</div><span className="sr-only"> (Click to sort {getSortValueText('gameName')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'type' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('type')}>
+                              <div>Type</div><span className="sr-only"> (Click to sort {getSortValueText('type')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'amount' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('amount')}>
+                              <div>Amount</div><span className="sr-only"> (Click to sort {getSortValueText('amount')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'total' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('total')}>
+                              <div>Total</div><span className="sr-only"> (Click to sort {getSortValueText('total')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'date' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('date')}>
+                              <div>Date</div><span className="sr-only"> (Click to sort {getSortValueText('date')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'roundId' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('roundId')}>
+                              <div>Round Id</div><span className="sr-only"> (Click to sort {getSortValueText('roundId')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'transactionId' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('transactionId')}>
+                              <div>Transaction Id</div><span className="sr-only"> (Click to sort {getSortValueText('transactionId')})</span>
+                            </th>
                           </tr>
-                        )}
-                      </tbody>
-                    </table>
+                        </thead>
+                        <tbody role="rowgroup">
+                          {data.length > 0 ? (
+                            data.map((row, i) => (
+                              <tr key={i} role="row" tabIndex="0" className="nocursor">
+                                <td role="cell">{row.game_name || "-"}</td>
+                                <td role="cell">{row.type || "-"}</td>
+                                <td role="cell" className="text-right">{row.amount || "-"}</td>
+                                <td role="cell" className="text-right">{row.total || "-"}</td>
+                                <td role="cell">{row.date || "-"}</td>
+                                <td role="cell">{row.round_id || "-"}</td>
+                                <td role="cell">{row.transaction_id || "-"}</td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr role="row" className="b-table-empty-row">
+                              <td colSpan="7" role="cell">
+                                <div role="alert" aria-live="polite">
+                                  <div className="text-center my-2">
+                                    {loading ? "Loading..." : "There are no records to show"}
+                                  </div>
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </Table>
+                    </div>
                   </div>
+
                 </div>
 
                 {/* ================= UNSETTLED ================= */}
@@ -411,28 +460,46 @@ const LiveCasinoResult = () => {
                   </form>
 
                   <div className="table-responsive mb-0">
-                    <table className="table b-table table-bordered">
-                      <thead>
-                        <tr>
-                          <th>Game Name</th>
-                          <th>Type</th>
-                          <th className="text-right">Amount</th>
-                          <th className="text-right">Total</th>
-                          <th>Date</th>
-                          <th>Round Id</th>
-                          <th>Transaction Id</th>
-                        </tr>
-                      </thead>
-
-                      <tbody>
-                        <tr>
-                          <td colSpan="6" className="text-center">
-                            There are no records to show
-                          </td>
-                        </tr>
-                      </tbody>
-                    </table>
+                    <div className="table no-footer table-responsive-sm">
+                      <Table role="table" aria-busy="false" aria-colcount="7" className="b-table" bordered>
+                        <thead role="rowgroup">
+                          <tr role="row">
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'gameName' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('gameName')}>
+                              <div>Game Name</div><span className="sr-only"> (Click to sort {getSortValueText('gameName')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'type' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('type')}>
+                              <div>Type</div><span className="sr-only"> (Click to sort {getSortValueText('type')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'amount' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('amount')}>
+                              <div>Amount</div><span className="sr-only"> (Click to sort {getSortValueText('amount')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'total' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('total')}>
+                              <div>Total</div><span className="sr-only"> (Click to sort {getSortValueText('total')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'date' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('date')}>
+                              <div>Date</div><span className="sr-only"> (Click to sort {getSortValueText('date')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'roundId' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('roundId')}>
+                              <div>Round Id</div><span className="sr-only"> (Click to sort {getSortValueText('roundId')})</span>
+                            </th>
+                            <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'transactionId' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('transactionId')}>
+                              <div>Transaction Id</div><span className="sr-only"> (Click to sort {getSortValueText('transactionId')})</span>
+                            </th>
+                          </tr>
+                        </thead>
+                        <tbody role="rowgroup">
+                          <tr role="row" className="b-table-empty-row">
+                            <td colSpan="7" role="cell">
+                              <div role="alert" aria-live="polite">
+                                <div className="text-center my-2">There are no records to show</div>
+                              </div>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </Table>
+                    </div>
                   </div>
+
 
                 </div>
 

@@ -240,13 +240,13 @@ const CreateAccount = () => {
 
                 <div className="outer mt-4">
                   <div className="inner">
-                    <div className="table-responsive">
+                    <div className="table table-bordered">
                       <table className="table table-bordered">
                         <thead>
                           <tr>
                             <th className="fixed-col-1">Action</th>
                             <th className="fixed-col-2">Username</th>
-                            <th className="fixed-col-3">Full Name</th>
+                            <th className="fixed-col-3">isAuth</th>
                             {privileges.map((p) => (
                               <th key={p.id}>{p.name}</th>
                             ))}

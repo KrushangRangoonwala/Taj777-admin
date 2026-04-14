@@ -1,51 +1,70 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import SimpleBar from 'simplebar-react';
 import 'simplebar-react/dist/simplebar.min.css';
+import { getMarketPage_Exposure } from '../../api/API';
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { setSelectedMatch } from '../../store/slices/matchSlice';
 
 const MarketAnalysis = () => {
-    const marketData = [
-        {
-            id: 1,
-            title: "Indian Premier League",
-            link: "/admin/game/details/SeK7puKGhm+IDlF%2FzygDVg==/DYTXxH0ZjsIP6DMfL%2FpBCw==",
-            dateTime: "28/03/2026 19:30:00",
-            marketTitle: "IPL Cup Winner Bookmaker",
-            teams: [
-                { name: "Mumbai Indians", value: "77.5" },
-                { name: "Royal Challengers Bengaluru", value: "-441.75" },
-                { name: "Chennai Super Kings", value: "77.5" },
-                { name: "Sunrisers Hyderabad", value: "77.5" },
-                { name: "Delhi Capitals", value: "77.5" },
-                { name: "Punjab Kings", value: "77.5" },
-                { name: "Gujarat Titans", value: "77.5" },
-                { name: "Lucknow Super Giants", value: "77.5" },
-                { name: "Kolkata Knight Riders", value: "77.5" },
-                { name: "Rajasthan Royals", value: "77.5" },
-            ]
-        },
-        {
-            id: 2,
-            title: "Li Tu v Overbeck",
-            link: "/admin/game/details/ZMsVdzACxXZhtFWzJX9BDA==/1syNqHyxELKYUWSTAssMDw==",
-            dateTime: "24/03/2026 09:45:00",
-            marketTitle: "MATCH_ODDS",
-            teams: [
-                { name: "Li Tu", value: "-186" },
-                { name: "Carl Emil Overbeck", value: "77.5" },
-            ]
-        },
-        {
-            id: 3,
-            title: "Max Jones v Uchiyama",
-            link: "/admin/game/details/ZMsVdzACxXZhtFWzJX9BDA==/%2F1adoPIDLG09cAOPxf6UjA==",
-            dateTime: "24/03/2026 09:30:00",
-            marketTitle: "MATCH_ODDS",
-            teams: [
-                { name: "Maximus Jones", value: "-410.75" },
-                { name: "Yasutaka Uchiyama", value: "98.43" },
-            ]
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const liveDataBySport = useSelector((state) => state.match.liveDataBySport);
+    const [marketExp, setMarketExp] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [loading, setLoading] = useState(false);
+
+    async function getMarketExposure(isLoading = false) {
+        isLoading ? setLoading(true) : setLoading(false); // SHOW LOADER ONLY ON 1ST RENDER, otherwise hide it
+        try {
+            const res = await getMarketPage_Exposure();
+            setMarketExp(res?.results || []);
+        } finally {
+            isLoading ? setLoading(false) : setLoading(false);
         }
-    ];
+    }
+
+    useEffect(() => {
+        getMarketExposure(true);
+        const intervalId = setInterval(getMarketExposure, 10000);
+
+        return () => clearInterval(intervalId);
+    }, [])
+
+    const filteredEvents = marketExp.filter(event =>
+        event.event_name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+
+    const handleMatchClick = (match) => {
+        var selected = null;
+        Object.values(liveDataBySport).forEach(sport => sport.sportData.body.forEach(m => {
+            if (m.matchid == match.event_id && m.marketid == match.oddsmarketId) {
+                selected = m;
+            }
+        }))
+
+        console.log('match', match)
+        console.log('selected', selected);
+        // console.log('liveDataBySport', liveDataBySport)
+
+        const aaa = {
+            marketid: match.oddsmarketId,
+            matchName: match.event_name,
+            SportId: match.event_type,
+            // matchdate
+            // inPlay
+        }
+        const selectedMatch = selected || { ...match, ...aaa }
+        // console.log('selectedMatch', selectedMatch);
+        sessionStorage.setItem('selectedMatch', JSON.stringify(selectedMatch));
+        dispatch(setSelectedMatch(selectedMatch));
+
+        setTimeout(() => {
+            navigate(`/admin/game/${selectedMatch.SportId}`, { state: { match: selectedMatch } });
+        }, 500);
+    };
+
 
     return (
         <div data-v-5a10e370="">
@@ -55,7 +74,15 @@ const MarketAnalysis = () => {
                         <div className="page-title-box d-flex align-items-center justify-content-between">
                             <h4 className="mb-0 font-size-18">
                                 Market Analysis
-                                <a href="javascript:void(0)" title="Refresh Data" className="text-dark pl-2">
+                                <a
+                                    href="javascript:void(0)"
+                                    title="Refresh Data"
+                                    className={`text-dark pl-2 ${loading ? 'fa-spin' : ''}`}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        getMarketExposure();
+                                    }}
+                                >
                                     <i className="fa fa-sync"></i>
                                 </a>
                             </h4>
@@ -63,7 +90,8 @@ const MarketAnalysis = () => {
                                 <input
                                     type="text"
                                     name="searchMarktetText"
-                                    defaultValue=""
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Search Event"
                                     className="form-control"
                                 />
@@ -72,44 +100,72 @@ const MarketAnalysis = () => {
                     </div>
                 </div>
                 <div className="market-analysis-container">
-                    {marketData.map((market) => (
-                        <div key={market.id} className="market-analysis-container">
-                            <div className="market-analysis-title">
-                                <div>
-                                    <a href={market.link} className="ma-link">
-                                        {market.title}
-                                    </a>
-                                </div>
-                                <div>{market.dateTime}</div>
-                            </div>
-                            <div className="market-analysis-content">
-                                <div className="row row5">
-                                    <div className="col-lg-4">
-                                        <SimpleBar
-                                            className="market-analysis-content-detail"
-                                            style={{ maxHeight: '250px' }}
-                                        >
-                                            <table className="table">
-                                                <thead>
-                                                    <tr>
-                                                        <th colSpan="2">{market.marketTitle}</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {market.teams.map((team, index) => (
-                                                        <tr key={team.name + index}>
-                                                            <td>{team.name}</td>
-                                                            <td className="text-right">{team.value}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                            </table>
-                                        </SimpleBar>
+                    {loading ? (
+                        <div className="text-center p-5">
+                            <i className="fa fa-spinner fa-spin fa-2x"></i>
+                            <div className="mt-2">Loading data...</div>
+                        </div>
+                    ) : filteredEvents && filteredEvents.length > 0 ? (
+                        filteredEvents.map((event, eventIdx) => {
+                            // Group market_pl by market_type
+                            const groupedMarkets = event.market_pl.reduce((acc, curr) => {
+                                if (!acc[curr.market_type]) {
+                                    acc[curr.market_type] = [];
+                                }
+                                acc[curr.market_type].push(curr);
+                                return acc;
+                            }, {});
+
+                            return (
+                                <div key={event.event_id || eventIdx} className="market-analysis-container">
+                                    <div className="market-analysis-title">
+                                        <div>
+                                            <Link onClick={() => handleMatchClick(event)} className="ma-link">
+                                                {event.event_name}
+                                            </Link>
+                                        </div>
+                                        <div>
+                                            {/* TIME */}
+                                        </div>
+                                    </div>
+                                    <div className="market-analysis-content">
+                                        <div className="row row5">
+                                            {Object.entries(groupedMarkets).map(([marketType, markets], groupIdx) => (
+                                                <div key={marketType + groupIdx} className="col-lg-4">
+                                                    <SimpleBar
+                                                        className="market-analysis-content-detail"
+                                                        style={{ maxHeight: '250px' }}
+                                                    >
+                                                        <table className="table">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th colSpan="2">{marketType}</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                {markets.map((m, mIdx) => (
+                                                                    <tr key={m.market_id || mIdx}>
+                                                                        <td>{m.market_name}</td>
+                                                                        <td className={`text-right ${m.pl >= 0 ? 'text-success' : 'text-danger'}`}>
+                                                                            {m.pl}
+                                                                        </td>
+                                                                    </tr>
+                                                                ))}
+                                                            </tbody>
+                                                        </table>
+                                                    </SimpleBar>
+                                                </div>
+                                            ))}
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
+                            );
+                        })
+                    ) : (
+                        <div className="text-center p-4">
+                            {searchTerm ? `No results found for "${searchTerm}"` : "No data available"}
                         </div>
-                    ))}
+                    )}
                 </div>
             </div>
         </div>

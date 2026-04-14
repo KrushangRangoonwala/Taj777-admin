@@ -7,6 +7,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Table } from 'react-bootstrap';
+
 
 const { RangePicker } = DatePicker;
 
@@ -26,6 +28,33 @@ const UserHistory = () => {
 
   const [showModal, setShowModal] = useState(false);
   const [modalData, setModalData] = useState(null);
+
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('none');
+
+  const handleSort = (colKey) => {
+    if (sortColumn === colKey) {
+      if (sortDirection === 'none') {
+        setSortDirection('ascending');
+      } else if (sortDirection === 'ascending') {
+        setSortDirection('descending');
+      } else {
+        setSortDirection('ascending');
+      }
+    } else {
+      setSortColumn(colKey);
+      setSortDirection('ascending');
+    }
+  };
+
+  const getSortValueText = (colKey) => {
+    const currentDirection = sortColumn === colKey ? sortDirection : 'none';
+    if (currentDirection === 'none') return 'ascending';
+    if (currentDirection === 'ascending') return 'descending';
+    if (currentDirection === 'descending') return 'ascending';
+    return 'ascending';
+  };
+
 
   // 🔹 Handle tab change
   const handleTabChange = (tab) => {
@@ -341,44 +370,59 @@ const UserHistory = () => {
                     </div>
 
                     <div className="table-responsive mb-0">
-                      <table className="table table-hover">
-                        <thead>
-                          <tr>
-                            <th>Username</th>
-                            <th>Date</th>
-                            <th>IP</th>
-                            <th>Detail</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {data.length > 0 ? data.map((row, idx) => (
-                            <tr key={idx}>
-                              <td>{row.user}</td>
-                              <td>{row.date}</td>
-                              <td>{row.ip}</td>
-                              <td>
-                                <p className="text-center mb-0">
-                                  <i
-                                    className="fas fa-eye"
-                                    style={{ cursor: "pointer" }}
-                                    onClick={() => {
-                                      setModalData(row);
-                                      setShowModal(true);
-                                    }}
-                                  ></i>
-                                </p>
-                              </td>
+                      <div className="table no-footer table-responsive-sm">
+                        <Table role="table" aria-busy="false" aria-colcount="4" className="b-table" bordered hover>
+                          <thead role="rowgroup">
+                            <tr role="row">
+                              <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'username' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('username')}>
+                                <div>Username</div><span className="sr-only"> (Click to sort {getSortValueText('username')})</span>
+                              </th>
+                              <th role="columnheader" scope="col" tabIndex="0" className="position-relative">
+                                <div>Date</div>
+                              </th>
+                              <th role="columnheader" scope="col" tabIndex="0" className="position-relative">
+                                <div>IP</div>
+                              </th>
+                              <th role="columnheader" scope="col" tabIndex="0" className="position-relative">
+                                <div>Detail</div>
+                              </th>
                             </tr>
-                          )) : (
-                            <tr>
-                              <td colSpan="4" className="text-center">
-                                {loading ? "Loading..." : "There are no records to show"}
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody role="rowgroup">
+                            {data.length > 0 ? data.map((row, idx) => (
+                              <tr key={idx} role="row" tabIndex="0" className="nocursor">
+                                <td role="cell">{row.user}</td>
+                                <td role="cell">{row.date}</td>
+                                <td role="cell">{row.ip}</td>
+                                <td role="cell">
+                                  <p className="text-center mb-0">
+                                    <i
+                                      className="fas fa-eye"
+                                      style={{ cursor: "pointer" }}
+                                      onClick={() => {
+                                        setModalData(row);
+                                        setShowModal(true);
+                                      }}
+                                    ></i>
+                                  </p>
+                                </td>
+                              </tr>
+                            )) : (
+                              <tr role="row" className="b-table-empty-row">
+                                <td colSpan="4" role="cell">
+                                  <div role="alert" aria-live="polite">
+                                    <div className="text-center my-2">
+                                      {loading ? "Loading..." : "There are no records to show"}
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </Table>
+                      </div>
                     </div>
+
 
                     {/* 🔹 PAGINATION */}
                     <div className="row pt-3">
@@ -538,44 +582,59 @@ const UserHistory = () => {
                     </div>
 
                     <div className="table-responsive mb-0">
-                      <table className="table table-hover">
-                        <thead>
-                          <tr>
-                            <th>Username</th>
-                            <th>Date</th>
-                            <th>IP</th>
-                            <th>Detail</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {data.length > 0 ? data.map((row, idx) => (
-                            <tr key={idx}>
-                              <td>{row.user}</td>
-                              <td>{row.date}</td>
-                              <td>{row.ip}</td>
-                              <td>
-                                <p className="text-center mb-0">
-                                  <i
-                                    className="fas fa-eye"
-                                    style={{ cursor: "pointer" }}
-                                    onClick={() => {
-                                      setModalData(row);
-                                      setShowModal(true);
-                                    }}
-                                  ></i>
-                                </p>
-                              </td>
+                      <div className="table no-footer table-responsive-sm">
+                        <Table role="table" aria-busy="false" aria-colcount="4" className="b-table" bordered hover>
+                          <thead role="rowgroup">
+                            <tr role="row">
+                              <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'username' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('username')}>
+                                <div>Username</div><span className="sr-only"> (Click to sort {getSortValueText('username')})</span>
+                              </th>
+                              <th role="columnheader" scope="col" tabIndex="0" className="position-relative">
+                                <div>Date</div>
+                              </th>
+                              <th role="columnheader" scope="col" tabIndex="0" className="position-relative">
+                                <div>IP</div>
+                              </th>
+                              <th role="columnheader" scope="col" tabIndex="0" className="position-relative">
+                                <div>Detail</div>
+                              </th>
                             </tr>
-                          )) : (
-                            <tr>
-                              <td colSpan="4" className="text-center">
-                                {loading ? "Loading..." : "No records to show"}
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
+                          </thead>
+                          <tbody role="rowgroup">
+                            {data.length > 0 ? data.map((row, idx) => (
+                              <tr key={idx} role="row" tabIndex="0" className="nocursor">
+                                <td role="cell">{row.user}</td>
+                                <td role="cell">{row.date}</td>
+                                <td role="cell">{row.ip}</td>
+                                <td role="cell">
+                                  <p className="text-center mb-0">
+                                    <i
+                                      className="fas fa-eye"
+                                      style={{ cursor: "pointer" }}
+                                      onClick={() => {
+                                        setModalData(row);
+                                        setShowModal(true);
+                                      }}
+                                    ></i>
+                                  </p>
+                                </td>
+                              </tr>
+                            )) : (
+                              <tr role="row" className="b-table-empty-row">
+                                <td colSpan="4" role="cell">
+                                  <div role="alert" aria-live="polite">
+                                    <div className="text-center my-2">
+                                      {loading ? "Loading..." : "No records to show"}
+                                    </div>
+                                  </div>
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </Table>
+                      </div>
                     </div>
+
 
                     {/* 🔹 PAGINATION */}
                     <div className="row pt-3">

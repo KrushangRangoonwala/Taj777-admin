@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Collapse from 'react-bootstrap/Collapse';
 import { formatNumber, sanitizeNumber } from '../../../utilies/helpers';
 
@@ -31,13 +31,20 @@ export const MarketTable = ({
     remark,
     marketClass = "market-6",
     column = [{ type: "back", title: "Back" }, { type: "lay", title: "Lay" }],
+    isSectionOpen,
+    toggleSection,
+    dataLen,
 }) => {
     const [isOpen, setIsOpen] = useState(true);
+
+    if (!dataLen) return null;
+
 
     return (
         <div className={marketClass}>
             <div className="bet-table">
                 <div className="bet-table-header" onClick={() => setIsOpen(!isOpen)} style={{ cursor: 'pointer' }}>
+                    {/* <div className="bet-table-header" onClick={() => toggleSection(id)} style={{ cursor: 'pointer' }}> */}
                     <div className="nation-name">
                         <span title={title}>
                             <a href="javascript:void(0)" title="">
@@ -60,6 +67,7 @@ export const MarketTable = ({
                     </div>
                 </div>
                 <Collapse in={isOpen}>
+                    {/* <Collapse in={isSectionOpen}> */}
                     <div id={id}>
                         <div className="bet-table-body">
                             <div className="bet-table-row bet-table-row-top">

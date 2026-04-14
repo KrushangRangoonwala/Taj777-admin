@@ -5,6 +5,8 @@ import dayjs from "dayjs";
 import * as XLSX from "xlsx";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+import { Table } from 'react-bootstrap';
+
 
 // 👉 Replace with your API
 import { getAuthList } from "../../api/API";
@@ -29,7 +31,34 @@ const AuthList = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
 
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('none');
+
+  const handleSort = (colKey) => {
+    if (sortColumn === colKey) {
+      if (sortDirection === 'none') {
+        setSortDirection('ascending');
+      } else if (sortDirection === 'ascending') {
+        setSortDirection('descending');
+      } else {
+        setSortDirection('ascending');
+      }
+    } else {
+      setSortColumn(colKey);
+      setSortDirection('ascending');
+    }
+  };
+
+  const getSortValueText = (colKey) => {
+    const currentDirection = sortColumn === colKey ? sortDirection : 'none';
+    if (currentDirection === 'none') return 'ascending';
+    if (currentDirection === 'ascending') return 'descending';
+    if (currentDirection === 'descending') return 'ascending';
+    return 'ascending';
+  };
+
   const totalPages = Math.ceil(totalRecords / perPage);
+
 
   // 🔹 FETCH DATA (ONLY ON LOAD)
   const fetchAuthList = async (page = 1, customPerPage = perPage) => {
@@ -225,38 +254,47 @@ const AuthList = () => {
 
                 {/* 🔹 TABLE */}
                 <div className="table-responsive mb-0">
-                <div className="table no-footer table-hover table-responsive-sm">
-                    <table className="table b-table table-bordered b-table-fixed">
-                    <thead>
-                        <tr>
-                        <th><div>Username</div></th>
-                        <th><div>Authentication</div></th>
+                  <div className="table no-footer table-responsive-sm">
+                    <Table role="table" aria-busy="false" aria-colcount="2" className="b-table" bordered hover>
+                      <thead role="rowgroup">
+                        <tr role="row">
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'username' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('username')}>
+                            <div>Username</div><span className="sr-only"> (Click to sort {getSortValueText('username')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'auth' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('auth')}>
+                            <div>Authentication</div><span className="sr-only"> (Click to sort {getSortValueText('auth')})</span>
+                          </th>
                         </tr>
-                    </thead>
+                      </thead>
 
-                    <tbody>
+                      <tbody role="rowgroup">
                         {data.length > 0 ? (
-                        data.map((row, i) => (
-                            <tr key={i}>
-                            <td>{row.text || "-"}</td>
-                            <td>
-                            {row.authStatus === "ENABLED"
-                                ? "authenticated"
-                                : "no authentication"}
-                            </td>
+                          data.map((row, i) => (
+                            <tr key={i} role="row" tabIndex="0" className="nocursor">
+                              <td role="cell">{row.text || "-"}</td>
+                              <td role="cell">
+                                {row.authStatus === "ENABLED"
+                                  ? "authenticated"
+                                  : "no authentication"}
+                              </td>
                             </tr>
-                        ))
+                          ))
                         ) : (
-                        <tr>
-                            <td colSpan="2" className="text-center">
-                            {loading ? "Loading..." : "No records to show"}
+                          <tr role="row" className="b-table-empty-row">
+                            <td colSpan="2" role="cell">
+                              <div role="alert" aria-live="polite">
+                                <div className="text-center my-2">
+                                  {loading ? "Loading..." : "No records to show"}
+                                </div>
+                              </div>
                             </td>
-                        </tr>
+                          </tr>
                         )}
-                    </tbody>
-                    </table>
+                      </tbody>
+                    </Table>
+                  </div>
                 </div>
-                </div>
+
 
                 {/* 🔹 PAGINATION */}
                 <div className="row pt-3">

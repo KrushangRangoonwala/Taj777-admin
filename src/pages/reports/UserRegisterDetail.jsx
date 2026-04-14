@@ -10,6 +10,8 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { customSelectStyles } from '../../components/Header';
 import Select from 'react-select';
+import { Table } from 'react-bootstrap';
+
 
 const UserRegisterDetail = () => {
 
@@ -27,6 +29,33 @@ const UserRegisterDetail = () => {
 
   const [filterType, setFilterType] = useState("1");
   const [dateRange, setDateRange] = useState([]);
+
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('none');
+
+  const handleSort = (colKey) => {
+    if (sortColumn === colKey) {
+      if (sortDirection === 'none') {
+        setSortDirection('ascending');
+      } else if (sortDirection === 'ascending') {
+        setSortDirection('descending');
+      } else {
+        setSortDirection('ascending');
+      }
+    } else {
+      setSortColumn(colKey);
+      setSortDirection('ascending');
+    }
+  };
+
+  const getSortValueText = (colKey) => {
+    const currentDirection = sortColumn === colKey ? sortDirection : 'none';
+    if (currentDirection === 'none') return 'ascending';
+    if (currentDirection === 'ascending') return 'descending';
+    if (currentDirection === 'descending') return 'ascending';
+    return 'ascending';
+  };
+
 
   const totalPages = Math.ceil(totalRecords / perPage);
 
@@ -381,67 +410,115 @@ const UserRegisterDetail = () => {
 
                 {/* 🔹 TABLE */}
                 <div className="table-responsive mb-0" style={{ whiteSpace: "nowrap" }}>
-                  <table className="table b-table table-bordered">
-                    <thead>
-                      <tr>
-                        <th>User Name</th>
-                        <th>Agent Name</th>
-                        {/* <th>Mobile</th> */}
-                        <th>Created Date</th>
-                        <th>Last Login</th>
-                        <th>First Deposit Date</th>
-                        <th>Last Deposit Date</th>
-                        <th>Deposit</th>
-                        <th className="text-right">Sports Balance</th>
-                        <th className="text-right">Casino Balance</th>
-                        <th className="text-right">Third Party Credit Balance</th>
-                        <th className="text-right">Sport Book Balance</th>
-                      </tr>
-                    </thead>
+                  <div className="table no-footer table-responsive-sm">
+                    <Table role="table" aria-busy="false" aria-colcount="11" className="b-table" bordered hover>
+                      <thead role="rowgroup">
+                        <tr role="row">
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'userName' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('userName')}>
+                            <div>User Name</div><span className="sr-only"> (Click to sort {getSortValueText('userName')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'agentName' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('agentName')}>
+                            <div>Agent Name</div><span className="sr-only"> (Click to sort {getSortValueText('agentName')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'phone' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('phone')}>
+                            <div>Mobile</div><span className="sr-only"> (Click to sort {getSortValueText('phone')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'createdDate' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('createdDate')}>
+                            <div>Created Date</div><span className="sr-only"> (Click to sort {getSortValueText('createdDate')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'lastLogin' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('lastLogin')}>
+                            <div>Last Login</div><span className="sr-only"> (Click to sort {getSortValueText('lastLogin')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'firstDepositDate' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('firstDepositDate')}>
+                            <div>First Deposit Date</div><span className="sr-only"> (Click to sort {getSortValueText('firstDepositDate')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'lastDepositDate' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('lastDepositDate')}>
+                            <div>Last Deposit Date</div><span className="sr-only"> (Click to sort {getSortValueText('lastDepositDate')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'deposit' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('deposit')}>
+                            <div>Deposit</div><span className="sr-only"> (Click to sort {getSortValueText('deposit')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'sportsBalance' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('sportsBalance')}>
+                            <div>Sports Balance</div><span className="sr-only"> (Click to sort {getSortValueText('sportsBalance')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'casinoBalance' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('casinoBalance')}>
+                            <div>Casino Balance</div><span className="sr-only"> (Click to sort {getSortValueText('casinoBalance')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'thirdPartyBalance' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('thirdPartyBalance')}>
+                            <div>Third Party Credit Balance</div><span className="sr-only"> (Click to sort {getSortValueText('thirdPartyBalance')})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'sportBookBalance' ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort('sportBookBalance')}>
+                            <div>Sport Book Balance</div><span className="sr-only"> (Click to sort {getSortValueText('sportBookBalance')})</span>
+                          </th>
+                        </tr>
+                      </thead>
 
-                    <tbody>
-                      {data.length > 0 ? (
-                        data.map((row, i) => (
-                          <tr key={i}>
-                            <td>{row.name || "-"}</td>
-                            <td>{row.parent_name || "-"}</td>
-                            {/* <td>{row.phone || "-"}</td> */}
-
-                            <td>{row.join_date || "-"}</td>
-                            <td>{row.last_login || "-"}</td>
-
-                            <td>{row.first_entry || "-"}</td>
-                            <td>{row.last_entry || "-"}</td>
-
-                            <td>{row.total_deposit || 0}</td>
-
-                            <td className="text-right" style={{ color: getColor(row.total_game_0) }}>
-                              {row.total_game_0 || 0}
-                            </td>
-
-                            <td className="text-right" style={{ color: getColor(row.total_game_1) }}>
-                              {row.total_game_1 || 0}
-                            </td>
-
-                            <td className="text-right" style={{ color: getColor(0) }}>
-                              0
-                            </td>
-
-                            <td className="text-right" style={{ color: getColor(0) }}>
-                              0
+                      <tbody role="rowgroup">
+                        {data.length > 0 ? (
+                          data.map((row, i) => (
+                            <tr key={i} role="row" tabIndex="0" className="nocursor">
+                              <td role="cell">{row.name || "-"}</td>
+                              <td role="cell">{row.parent_name || "-"}</td>
+                              <td role="cell">{row.phone || "-"}</td>
+                              <td role="cell">
+                                {
+                                  row.join_date && dayjs(row.join_date).isValid()
+                                    ? dayjs(row.join_date).format("DD/MM/YYYY HH:mm:ss")
+                                    : "-"
+                                }
+                              </td>
+                              <td role="cell">
+                                {
+                                  row.last_login && dayjs(row.last_login).isValid()
+                                    ? dayjs(row.last_login).format("DD/MM/YYYY HH:mm:ss")
+                                    : "-"
+                                }
+                                </td>
+                              <td role="cell">
+                                {
+                                  row.first_entry && dayjs(row.first_entry).isValid()
+                                    ? dayjs(row.first_entry).format("DD/MM/YYYY HH:mm:ss")
+                                    : "-"
+                                }
+                              </td>
+                              <td role="cell">
+                                {
+                                  row.last_entry && dayjs(row.last_entry).isValid()
+                                    ? dayjs(row.last_entry).format("DD/MM/YYYY HH:mm:ss")
+                                    : "-"
+                                }
+                              </td>
+                              <td role="cell">{row.total_deposit || 0}</td>
+                              <td role="cell" className="text-right" style={{ color: getColor(row.total_game_0) }}>
+                                {row.total_game_0 || 0}
+                              </td>
+                              <td role="cell" className="text-right" style={{ color: getColor(row.total_game_1) }}>
+                                {row.total_game_1 || 0}
+                              </td>
+                              <td role="cell" className="text-right" style={{ color: getColor(0) }}>
+                                0
+                              </td>
+                              <td role="cell" className="text-right" style={{ color: getColor(0) }}>
+                                0
+                              </td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr role="row" className="b-table-empty-row">
+                            <td colSpan="11" role="cell">
+                              <div role="alert" aria-live="polite">
+                                <div className="text-center my-2">
+                                  {loading ? "Loading..." : "There are no records to show"}
+                                </div>
+                              </div>
                             </td>
                           </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan="12" className="text-center">
-                            {loading ? "Loading..." : "There are no records to show"}
-                          </td>
-                        </tr>
-                      )}
-                    </tbody>
-                  </table>
+                        )}
+                      </tbody>
+                    </Table>
+                  </div>
                 </div>
+
 
                 {/* 🔹 PAGINATION */}
                 <div className="row pt-3">

@@ -314,3 +314,7 @@ export function capitalize_1st_letter(str) {
         ?.map(word => word.charAt(0).toUpperCase() + word.slice(1))
         ?.join(" ");
 }
+
+export const isPageAtTop = () => {
+    return window.scrollY === 0;
+};

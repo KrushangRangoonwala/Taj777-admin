@@ -179,8 +179,8 @@ function AppContent() {
           <Route path="admin/reports/casinoresult" element={<CasinoResult />} />
           <Route path="admin/reports/livecasinoreport" element={<LiveCasinoResult />} />
           <Route path="admin/reports/sportbookreport" element={<SportBookReport />} />
-          <Route path="admin/reports/authlist" element={<AuthList />} />
           <Route path="admin/reports/turnover" element={<Turnover />} />
+          <Route path="admin/reports/authlist" element={<AuthList />} />
           <Route path="admin/reports/userregisterdetail" element={<UserRegisterDetail />} />
           <Route path="admin/reports/totalprofitloss" element={<TotalProfitLoss />} />
           <Route path="admin/reports/userwinloss" element={<UserWinLoss />} />

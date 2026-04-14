@@ -1,5 +1,5 @@
 import axios from "axios";
-import { apiGames } from "./axiosConfig";
+import { ajax_adm, ajax_files } from "./axiosConfig";
 import { getDefaultParams } from "./API";
 
 export function isApiSuccess(response) {
@@ -12,7 +12,7 @@ export function isApiSuccess(response) {
 
 export const fetchCasinoList = async () => {
     try {
-        const response = await apiGames.get('/casino_list.php');
+        const response = await ajax_files.get('/casino_list.php');
         return response.data;
     } catch (error) {
         console.error('Error fetching casino list:', error);
@@ -23,7 +23,7 @@ export const fetchCasinoList = async () => {
 export const apiGetSports = async () => {
     try {
         const payload = { ...getDefaultParams() };
-        const response = await apiGames.post('/sport_list.php', payload);
+        const response = await ajax_files.post('/sport_list.php', payload);
         return response.data;
     } catch (error) {
         console.error('Error fetching list:', error);
@@ -34,7 +34,7 @@ export const apiGetSports = async () => {
 export const apiGetGameType = async () => {
     try {
         const payload = { ...getDefaultParams() };
-        const response = await apiGames.post('/game_type_list.php', payload);
+        const response = await ajax_files.post('/game_type_list.php', payload);
         return response.data;
     } catch (error) {
         console.error('Error fetching list:', error);
@@ -55,7 +55,7 @@ export async function fetchCasinoExposureApi(payload) {
         ...getDefaultParams(),
     };
     try {
-        const { data } = await apiGames.post(
+        const { data } = await ajax_files.post(
             "get_casino_on_page_exposure",
             fullPayload
         );
@@ -70,7 +70,7 @@ export async function fetchCasinoExposureApi(payload) {
 export async function fetchDashboardData() {
     try {
         const payload = { ...getDefaultParams() };
-        const { data } = await apiGames.post("get_dashboard_data.php", payload);  // DUMMY URL
+        const { data } = await ajax_files.post("get_dashboard_data.php", payload);  // DUMMY URL
         return data;
     } catch (error) {
         console.error("Error fetching dashboard data:", error);
@@ -86,7 +86,7 @@ export async function fetchResultById(eventId, gameType) {
             ...getDefaultParams(),
         };
 
-        const { data } = await apiGames.post("/teenpatti_result", requestBody);
+        const { data } = await ajax_files.post("/teenpatti_result", requestBody);
         isApiSuccess(data);
         return data;
     } catch (error) {
@@ -99,7 +99,7 @@ export async function fetchResultById(eventId, gameType) {
 export async function getBannerImages() {
     try {
         const payload = getDefaultParams();
-        const { data } = await apiGames.post("/main_slider", payload);
+        const { data } = await ajax_files.post("/main_slider", payload);
 
         const imgArr = [];
         data.data?.forEach((item) => {
@@ -109,5 +109,16 @@ export async function getBannerImages() {
     } catch (error) {
         console.error("Error fetching banner images:", error);
         return [];
+    }
+}
+
+export async function getEventActiveBets(eventId) {
+    try {
+        const { data } = await ajax_adm.post("events_active_bets", { ...getDefaultParams(), eventId });
+        console.log('data', data)
+        return data || [];
+    } catch (error) {
+        console.error("Error fetching event active bets:", error);
+        throw error;
     }
 }

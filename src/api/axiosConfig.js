@@ -11,73 +11,43 @@ function handleUnauthorized() {
     window.location.href = "/admin";
 }
 
+const createApiInstance = (baseURL) => {
+    const instance = axios.create({
+        baseURL,
+        withCredentials: true,
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+        },
+    });
 
-const apiConfigUserData = axios.create({
-    baseURL: "http://159.65.143.49/~sevennew/ajax_adm/",
-    // baseURL: "https://worlds777.app/ajax_adm/",
-    withCredentials: true,
-    headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-    },
-});
+    instance.interceptors.response.use(
+        (response) => {
+            if (response?.data?.message === "Unauthorised Access") {
+                handleUnauthorized();
+            }
+            return response;
+        },
+        (error) => {
+            const message = error?.response?.data?.message;
 
-// 🔸 Response Interceptor — handles errors globally
-apiConfigUserData.interceptors.response.use(
-    (response) => {
-        if (response?.data?.message === "Unauthorised Access") {
-            handleUnauthorized();
+            if (message === "Unauthorised Access") {
+                handleUnauthorized();
+            }
+
+            if (error.response?.status === 401) {
+                handleUnauthorized();
+            }
+
+            console.error("API Error:", error.response?.data || error.message);
+            return Promise.reject(error);
         }
-        return response;
-    },
-    (error) => {
-        const message = error?.response?.data?.message;
+    );
 
-        if (message === "Unauthorised Access") {
-            handleUnauthorized();
-        }
+    return instance;
+};
 
-        // Handle token expiry or unauthorized access
-        if (error.response && error.response.status === 401) {
-            handleUnauthorized();
-        }
+export const ajax_adm = createApiInstance("http://159.65.143.49/~sevennew/ajax_adm/");
+export const ajax_files = createApiInstance("http://159.65.143.49/~sevennew/ajaxfiles/");
 
-        console.error("API Error:", error.response?.data || error.message);
-        return Promise.reject(error);
-    }
-);
-
-const apiGames = axios.create({
-    baseURL: "http://159.65.143.49/~sevennew/ajaxfiles/",
-    // baseURL: "https://worlds777.app/ajaxfiles/",
-    withCredentials: true,
-    headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-    },
-});
-
-// 🔸 Response Interceptor — handles errors globally
-apiGames.interceptors.response.use(
-    (response) => {
-        if (response?.data?.message === "Unauthorised Access") {
-            handleUnauthorized();
-        }
-        return response;
-    },
-    (error) => {
-        const message = error?.response?.data?.message;
-
-        if (message === "Unauthorised Access") {
-            handleUnauthorized();
-        }
-
-        // Handle token expiry or unauthorized access
-        if (error.response && error.response.status === 401) {
-            handleUnauthorized();
-        }
-
-        console.error("API Error:", error.response?.data || error.message);
-        return Promise.reject(error);
-    }
-);
-
-export { apiConfigUserData, apiGames };
+// export const ajax_adm = createApiInstance("https://worlds777.app/ajax_adm/");
+// export const ajax_files = createApiInstance("https://worlds777.app/ajaxfiles/");
