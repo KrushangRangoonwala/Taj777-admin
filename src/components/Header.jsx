@@ -9,6 +9,7 @@ import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
 import { apiGetUpcomingFixtures } from '../api/API';
 import ChangePasswordModal from './ChangePasswordModal';
+import useIsMobile from '../hooks/useIsMobile';
 
 const Slider = SliderRaw && typeof SliderRaw === 'object' && SliderRaw.default ? SliderRaw.default : SliderRaw;
 const Select = SelectRaw && typeof SelectRaw === 'object' && SelectRaw.default ? SelectRaw.default : SelectRaw;
@@ -55,11 +56,13 @@ export const customSelectStyles = {
 };
 
 export default function Header() {
+    const isMobile = useIsMobile(992)
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { name } = useSelector((state) => state.user);
     const [upcoming, setUpcoming] = useState([]);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(false);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -68,9 +71,18 @@ export default function Header() {
     };
 
     const toggleSidebar = () => {
-        document.body.classList.toggle('sidebar-enable');
-        document.body.classList.toggle('vertical-collpsed');
+        // document.body.classList.toggle('sidebar-enable');
+        // document.body.classList.toggle('vertical-collpsed');
+        if (isCollapsed) {
+            document.body.classList.remove('sidebar-enable');
+            !isMobile && document.body.classList.add('vertical-collpsed');
+        } else {
+            document.body.classList.add('sidebar-enable');
+            !isMobile && document.body.classList.remove('vertical-collpsed');
+        }
+        setIsCollapsed(!isCollapsed);
     };
+
     const sliderSettings = {
         dots: false,
         infinite: true,

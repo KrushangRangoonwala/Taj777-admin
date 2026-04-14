@@ -6,8 +6,10 @@ import { login } from '../store/slices/userSlice';
 import { apiGetUpcomingFixtures, loginAdmin } from '../api/API';
 import dayjs from 'dayjs';
 import { getBannerImages } from '../api/API_games';
+import { errorToast } from '../utils/toast';
 
 const AdminPage = () => {
+  const { isJustLogout } = useSelector((state) => state.notPersist);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
@@ -52,14 +54,24 @@ const AdminPage = () => {
 
   const toggleLogin = () => setIsLoginOpen(!isLoginOpen);
 
-  const handleLogin = async (e) => {
+  function handleLogin(e) {
+    let isError = false;
     e.preventDefault();
+    if (isJustLogout) {
+      errorToast("Please reload page and try !");
+      isError = true;
+    }
+
     if (!username || !password) {
       setError('Username and password are required');
       setIsLoading(false);
-      return;
+      isError = true;
     }
 
+    if (!isError) loginApi(e);
+  }
+
+  async function loginApi(e) {
     setError('');
     setIsLoading(true);
 
@@ -69,7 +81,10 @@ const AdminPage = () => {
       if (result.status === "ok") {
         dispatch(login(result.data));
         sessionStorage.setItem('userdata', JSON.stringify(result.data));
-        navigate('/admin/home');
+        setIsLoginOpen(false);
+        setTimeout(() => {
+          navigate('/admin/home');
+        }, 500);
       } else {
         setError(result.message || 'Login failed');
       }
@@ -97,21 +112,6 @@ const AdminPage = () => {
     }
   }, [isLoginOpen])
 
-  const fixtures = [
-    { title: "Ladislav Novotny - Petr Serak", date: "07/04/2026 11:30:00", icon: "icon-8" },
-    { title: "Yasmine Hamza - Anja Blazina", date: "07/04/2026 12:30:00", icon: "icon-22" },
-    { title: "Ringwood Hawks W - Nunawading W", date: "07/04/2026 13:30:00", icon: "icon-15" },
-    { title: "Peliwo v Wendelken", date: "07/04/2026 14:30:00", icon: "icon-2" },
-    { title: "Petra Saarnivaara - Natalia Slobodova", date: "07/04/2026 15:00:00", icon: "icon-22" },
-    { title: "Zhetysu W - Turan Turkestan W", date: "07/04/2026 16:30:00", icon: "icon-18" },
-    { title: "Hatayspor v Adana Demirspor", date: "07/04/2026 17:00:00", icon: "icon-1" },
-    { title: "Volynets v Vekic", date: "07/04/2026 18:30:00", icon: "icon-2" },
-    { title: "Rajasthan Royals v Mumbai Indians", date: "07/04/2026 19:30:00", icon: "icon-4" },
-    { title: "Deauville", date: "07/04/2026 20:20:00", icon: "icon-10" },
-    { title: "Carmen Maria Jimenez / Nikol Carulla - Debora Jille / Isabel Lohau", date: "07/04/2026 21:40:00", icon: "icon-22" },
-    { title: "Schweinfurt v Rot-Weiss Essen", date: "07/04/2026 22:30:00", icon: "icon-1" },
-    { title: "Ka Pliskova v A Sasnovich", date: "07/04/2026 23:00:00", icon: "icon-2" }
-  ];
   // --- slide ---
   const latestCasinos = [
     { src: "https://sitethemedata.com/casino_icons/lc/worli3.gif", alt: "Matka" },

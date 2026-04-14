@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createAccountApi } from "../../api/API";
 
 const CreateAccount = () => {
   const [formData, setFormData] = useState({
@@ -75,9 +76,10 @@ const CreateAccount = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitted(true);
+
     const newErrors = {};
     if (!formData.uname) newErrors.uname = 'The Client ID field is required';
     if (!formData.fullname) newErrors.fullname = 'The Full Name field is required';
@@ -91,7 +93,41 @@ const CreateAccount = () => {
       return;
     }
 
-    console.log('Form Submitted:', { formData, selectedPrivileges });
+    try {
+      const userdata = JSON.parse(sessionStorage.getItem("userdata"));
+
+      const payload = {
+        uname: formData.uname,
+        fullname: formData.fullname,
+        password: formData.password,
+        cpass: formData.cpass,
+        plist: selectedPrivileges,
+      };
+
+      const result = await createAccountApi(payload);
+
+      if (result.status === "success") {
+        alert(result.message);
+
+        setFormData({
+          uname: '',
+          fullname: '',
+          password: '',
+          cpass: '',
+          mpass: '',
+        });
+        setSelectedPrivileges([]);
+        setErrors({});
+        setSubmitted(false);
+
+      } else {
+        setErrors({ api: result.message });
+      }
+
+    } catch (err) {
+      console.error(err);
+      setErrors({ api: "API Error" });
+    }
   };
 
   return (

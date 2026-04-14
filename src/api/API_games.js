@@ -115,7 +115,7 @@ export async function getBannerImages() {
 export async function getEventActiveBets(eventId) {
     try {
         const { data } = await ajax_adm.post("events_active_bets", { ...getDefaultParams(), eventId });
-        console.log('data', data)
+        // console.log('data', data)
         return data || [];
     } catch (error) {
         console.error("Error fetching event active bets:", error);

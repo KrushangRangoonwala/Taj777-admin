@@ -11,6 +11,7 @@ import autoTable from "jspdf-autotable";
 import Select from 'react-select';
 import { customSelectStyles } from '../../components/Header';
 import { Table } from 'react-bootstrap';
+import { errorToast, successToast } from '../../utils/toast';
 
 
 const TotalProfitLoss = () => {
@@ -260,7 +261,7 @@ const TotalProfitLoss = () => {
                   const diffDays = toDate.diff(fromDate, "day") + 1;
 
                   if (diffDays > 10) {
-                    alert("You can see maximum 10 days of data only");
+                    errorToast("Sorry for inconvenience! You will see statement of 10 days date range in 3 months timeslot.");
                     return;
                   }
 

@@ -270,6 +270,19 @@ export async function insertUser(payload) {
     throw error;
   }
 }
+export async function createAccountApi(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("createaccount", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error changing password:", error);
+    throw error;
+  }
+}
 
 export async function fetchResultById(eventId, gameType) {
   try {

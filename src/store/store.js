@@ -6,13 +6,15 @@ import actionSlice from "./slices/actionSlice";
 import matchSlice from "./slices/matchSlice";
 import betSlice from "./slices/betSlice";
 import casinoReducer from "./slices/casinoSlice";
+import notPersistReducer from "./slices/notPersistSlice";
 
 const rootReducer = combineReducers({
-    user: userReducer,
     action: actionSlice,
+    user: userReducer,
     match: matchSlice,
     bet: betSlice,
     casino: casinoReducer,
+    notPersist: notPersistReducer,
 });
 
 const persistConfig = {

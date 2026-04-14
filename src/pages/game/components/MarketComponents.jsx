@@ -88,7 +88,7 @@ export const MarketTable = ({
                     </div>
                 </Collapse>
             </div>
-            {remark && <div className="remark">{remark}</div>}
+            {remark && <small className="remark">{remark}</small>}
         </div>
     );
 };

@@ -4,12 +4,14 @@ import { Link } from 'react-router-dom';
 import SafeIframe from '../../../components/SafeIframe';
 import ViewMoreModal from './ViewMoreModal';
 import { isPageAtTop } from '../../../utilies/helpers';
+import useIsMobile from '../../../hooks/useIsMobile';
 
 const EventRightSidebar = ({ tvUrl, liveScoreData, isLive, activeBets }) => {
     const [isTvOn, setIsTvOn] = useState(false);
     const [showViewMore, setShowViewMore] = useState(false);
     const [betList, setBetList] = useState([]);
     const [isSticky, setIsSticky] = useState(false);
+    const isMobile = useIsMobile(992)
 
     useEffect(() => {
         setBetList(activeBets);
@@ -24,7 +26,7 @@ const EventRightSidebar = ({ tvUrl, liveScoreData, isLive, activeBets }) => {
     }, []);
 
     return (
-        <div className={`right-sidebar ${isSticky ? 'sticky' : ''}`} data-simplebar="true">
+        <div className={`right-sidebar ${isSticky && !isMobile ? 'sticky' : ''}`} data-simplebar="true">
             {isLive &&
                 <div className="card m-b-10">
                     <div data-toggle="collapse" data-target=".video-tv" aria-expanded="true" className="card-header pointer" onClick={() => setIsTvOn(!isTvOn)}>

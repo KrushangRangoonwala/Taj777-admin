@@ -54,12 +54,16 @@ const CurrentBets = () => {
   const fetchProfitLoss = async () => {
     try {
       const payload = {
-        client_name: selectedClient,
         from_date: fromDate,
         to_date: toDate,
         sport_type: sportType,
-        matchDeleted: matchDeleted,
-        bet_type: betType
+        backlay: betType, // back / lay / all
+        bet_type:
+          matchDeleted === "deletebet"
+            ? "deleted"
+            : matchDeleted === "matchbet"
+            ? ""
+            : ""
       };
 
       const res = await getCurrentBets(payload);
@@ -96,14 +100,32 @@ const CurrentBets = () => {
   // 🔹 Global search filter
   useEffect(() => {
     let temp = [...data];
+
+    // 🔍 Search filter
     if (search) {
       temp = temp.filter(item =>
         Object.values(item).join(" ").toLowerCase().includes(search.toLowerCase())
       );
     }
+
+    // 🔽 Sorting
+    if (sortColumn && sortDirection !== 'none') {
+      temp.sort((a, b) => {
+        const valA = a[sortColumn] || '';
+        const valB = b[sortColumn] || '';
+
+        if (sortDirection === 'ascending') {
+          return valA > valB ? 1 : -1;
+        } else {
+          return valA < valB ? 1 : -1;
+        }
+      });
+    }
+
     setFilteredData(temp);
     setCurrentPage(1);
-  }, [search, data]);
+
+  }, [search, data, sortColumn, sortDirection]);
 
   // 🔹 Pagination
   const indexOfLast = currentPage * perPage;
@@ -356,16 +378,16 @@ const CurrentBets = () => {
                         {currentData.length > 0 ? (
                           currentData.map((row, index) => (
                             <tr key={index} role="row" tabIndex="0" className="nocursor">
-                              {sportType === "sport" && <td role="cell">{row.sport_name}</td>}
-                              <td role="cell">{row.event_name}</td>
-                              <td role="cell">{row.user_name}</td>
-                              {sportType === "sport" && <td role="cell">{row.market_name}</td>}
-                              <td role="cell">{row.nation}</td>
-                              <td role="cell" className="text-right">{row.user_rate}</td>
-                              <td role="cell" className="text-right">{row.amount}</td>
-                              <td role="cell">{dayjs(row.created_at).format("DD/MM/YYYY HH:mm:ss")}</td>
-                              <td role="cell">{row.ip}</td>
-                              <td role="cell">{row.browser}</td>
+                              {sportType === "sport" && <td>{row.eventType}</td>}
+                              <td>{row.event_name}</td>
+                              <td>{row.user_name}</td>
+                              {sportType === "sport" && <td>{row.market_name}</td>}
+                              <td>{row.nation}</td>
+                              <td className="text-right">{row.user_rate}</td>
+                              <td className="text-right">{row.amount}</td>
+                              <td>{dayjs(row.created_at).format("DD/MM/YYYY HH:mm:ss")}</td>
+                              <td>{row.ip}</td>
+                              <td>{row.browser}</td>
                               <td role="cell"></td>
                             </tr>
                           ))
