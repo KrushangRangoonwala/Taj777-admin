@@ -133,8 +133,9 @@ const Goal = ({ gameData, exposureData, lastResults }) => {
                                                 <div className="nation-name">
                                                     <span title="Who Will Goal Next?">
                                                         {/* <img
-                                                            src="/admin/assets/images/arrow-down.svg"
+                                                            src={`/${import.meta.env.VITE_IMAGE_PATH}/assets/images/arrow-down.svg`}
                                                             className="mr-1"
+                                                            data-temp-for-search
                                                             style={{
                                                                 transform: openSections.column1
                                                                     ? "rotate(180deg)"
@@ -181,8 +182,9 @@ const Goal = ({ gameData, exposureData, lastResults }) => {
                                                 <div className="nation-name">
                                                     <span title="Method Of Next Goal">
                                                         {/* <img
-                                                            src="/admin/assets/images/arrow-down.svg"
+                                                            src={`/${import.meta.env.VITE_IMAGE_PATH}/assets/images/arrow-down.svg`}
                                                             className="mr-1"
+                                                            data-temp-for-search
                                                             style={{
                                                                 transform: openSections.column2
                                                                     ? "rotate(180deg)"

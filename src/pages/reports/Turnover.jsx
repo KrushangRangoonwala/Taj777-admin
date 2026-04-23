@@ -12,11 +12,11 @@ import { apiGetSports, apiGetGameType } from "../../api/API_games";
 import { casino_list } from "../../utilies/casino_list";
 
 const casinoTypes = [
-    { value: "", label: "Select Type" },   // ✅ static first option
-    ...(casino_list?.map(val => ({
-        value: val.game_name,
-        label: val.game_name,
-    })) || [])
+  { value: "", label: "Select Type" },   // ✅ static first option
+  ...(casino_list?.map(val => ({
+    value: val.game_name,
+    label: val.game_name,
+  })) || [])
 ];
 
 const today = dayjs(); // today
@@ -39,6 +39,7 @@ const Turnover = () => {
   const [clientSearch, setClientSearch] = useState("");
   const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
+  const [isListActive, setIsListActive] = useState(false);
 
   const [fromDate, setFromDate] = useState(initialFromDate);
   const [toDate, setToDate] = useState(today);
@@ -98,44 +99,54 @@ const Turnover = () => {
   };
 
   const fetchClients = async (value) => {
-      try {
-        const res = await getClients(value);
-        setClientList(res.results || []);
-      } catch (err) {
-        console.error(err);
-      }
-    };
+    if (!value) {
+      setClientList([{ id: '1', text: 'List is empty.' }]);
+      return;
+    }
 
-  async function getSports() {
-		const data = await apiGetSports();
-		const sportArr = [{ id: "", label: "Select Sports List" }];
-		data?.data?.forEach(item => {
-				sportArr.push({
-					id: item.sport_id,
-					label: item.sport_name === "Soccer" ? "Football" : item.sport_name
-				})
-		})
-		setSportsList(sportArr);
-	};
-  
-  async function getGameType() {
-		const data = await apiGetGameType();
-		const gameTypeArr = [{ id: "", label: "Select Game Type" }];
-		data?.data?.forEach(item => {
-				gameTypeArr.push({
-					id: item.market_type,
-					label: item.market_type
-				})
-		})
-		setGameTypeList(gameTypeArr);
-	};
+    try {
+      const res = await getClients(value);
+      res.results?.length > 0 ? setClientList(res.results) : setClientList([{ id: '1', text: 'No elements found. Consider changing search query.' }]);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
-		getSports();
-    getGameType();
-	}, []);
+    fetchClients(clientSearch);
+  }, [clientSearch])
 
-  const totalPages = Math.ceil(totalRecords / perPage);
+
+  async function getSports() {
+    const data = await apiGetSports();
+    const sportArr = [{ id: "", label: "Select Sports List" }];
+    data?.data?.forEach(item => {
+      sportArr.push({
+        id: item.sport_id,
+        label: item.sport_name === "Soccer" ? "Football" : item.sport_name
+      })
+    })
+    setSportsList(sportArr);
+  };
+
+  async function getGameType() {
+    const data = await apiGetGameType();
+    const gameTypeArr = [{ id: "", label: "Select Game Type" }];
+    data?.data?.forEach(item => {
+      gameTypeArr.push({
+        id: item.market_type,
+        label: item.market_type
+      })
+    })
+    setGameTypeList(gameTypeArr);
+  };
+
+  useEffect(() => {
+    getSports();
+    getGameType();
+  }, []);
+
+  const totalPages = Math.ceil(totalRecords / perPage) || 1;
 
   const changePage = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -207,7 +218,7 @@ const Turnover = () => {
     ]));
 
     autoTable(doc, {
-      head: [['Sr No','Loss Turnover','Loss','Win Turnover','Win','Total Turnover','Total P/L']],
+      head: [['Sr No', 'Loss Turnover', 'Loss', 'Win Turnover', 'Win', 'Total Turnover', 'Total P/L']],
       body: tableData
     });
 
@@ -245,8 +256,9 @@ const Turnover = () => {
               </div>
 
               {/* 🔹 FORM */}
-              <form onSubmit={(e) => { e.preventDefault(); 
-                
+              <form onSubmit={(e) => {
+                e.preventDefault();
+
                 let newErrors = {
                   type: false,
                   sportsList: false,
@@ -269,13 +281,13 @@ const Turnover = () => {
                 if (!isValid) return;
 
                 fetchTurnover();
-                
-                }}>
+
+              }}>
                 <div className="row row5">
 
                   {/* CLIENT SEARCH */}
                   <div className="col-md-4 col-xl-2">
-                    <div className="form-group user-lock-search" style={{ position: "relative" }}>
+                    <div className="form-group user-lock-search mb-3px-plus" style={{ position: "relative" }}>
                       <label>Search By Client Name</label>
 
                       <input
@@ -283,35 +295,44 @@ const Turnover = () => {
                         className="form-control"
                         placeholder="Select option"
                         value={clientSearch}
-                        onChange={(e) => {
-                            setClientSearch(e.target.value);
-                            fetchClients(e.target.value);
-                          }}
+                        onChange={(e) => setClientSearch(e.target.value)}
+                        onFocus={() => {
+                          setIsListActive(true);
+                        }}
+                        onBlur={() => {
+                          setClientSearch("");
+                          setIsListActive(false);
+                        }}
                       />
 
-                        {clientList.length > 0 && (
-                          <div style={{
-                            position: 'absolute',
-                            background: '#fff',
-                            border: '1px solid #ddd',
-                            width: '100%',
-                            zIndex: 1000
-                          }}>
-                            {clientList.map((c, i) => (
-                              <div
-                                key={i}
-                                style={{ padding: '5px', cursor: 'pointer' }}
-                                onClick={() => {
-                                  setSelectedClient(c.id);
-                                  setClientSearch(c.text);
-                                  setClientList([]);
-                                }}
-                              >
-                                {c.text}
-                              </div>
-                            ))}
-                          </div>
-                        )}
+                      {isListActive && (
+                        <div style={{
+                          position: 'absolute',
+                          background: '#fff',
+                          border: '1px solid #ddd',
+                          width: '100%',
+                          zIndex: 1000
+                        }}>
+                          {clientList.map((c, i) => (
+                            <div
+                              key={i}
+                              style={{
+                                padding: '0.7rem',
+                                cursor: 'pointer',
+                                whiteSpace: 'nowrap',
+                                overflowX: 'auto',
+                              }}
+                              onClick={() => {
+                                setSelectedClient(c.id);
+                                setClientSearch(c.text);
+                                setClientList([]);
+                              }}
+                            >
+                              {c.text}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
                   </div>
 
@@ -323,13 +344,25 @@ const Turnover = () => {
                       onChange={(d) => {
                         setFromDate(d);
 
-                        // reset toDate if out of new range
-                        if (toDate && (toDate.isBefore(d, "day") || toDate.isAfter(d.add(7, "day"), "day") || toDate.month() !== d.month())) {
-                          setToDate(d);
+                        if (!d) {
+                          setToDate(null);
+                          return;
                         }
+
+                        const maxDate = d.add(7, "day");
+                        const endOfMonth = d.endOf("month");
+
+                        // choose smaller: 7th day OR end of month
+                        const autoToDate = maxDate.isBefore(endOfMonth) ? maxDate : endOfMonth;
+
+                        // also don't go beyond today
+                        const finalToDate = autoToDate.isAfter(dayjs()) ? dayjs() : autoToDate;
+
+                        setToDate(finalToDate);
                       }}
                       format="DD/MM/YYYY"
                       style={{ width: "100%" }}
+                      className="ant_custom_date date-input"
                       disabledDate={(current) => {
                         return current.isAfter(dayjs(), "day"); // disable future dates
                       }}
@@ -344,6 +377,7 @@ const Turnover = () => {
                       onChange={(d) => setToDate(d)}
                       format="DD/MM/YYYY"
                       style={{ width: "100%" }}
+                      className="ant_custom_date date-input"
                       disabledDate={(current) => {
                         if (!fromDate) return current.isAfter(dayjs(), "day"); // disable all if fromDate not selected
 
@@ -384,44 +418,44 @@ const Turnover = () => {
                   </div>
 
                   {type === "1" && (
-                      <>
-                        <div className="col-md-4 col-xl-2">
-                          <div className="form-group">
-                            <label>Sports List</label>
-                            <select
-                              className={`form-control ${errors.sportsList ? "is-invalid" : ""}`}
-                              value={sportsListType}
-                              onChange={(e) => setSportsListType(e.target.value)}
-                            >
-                              {sportsList.map((t) => (
-                                  <option key={t.id} value={t.id}>
-                                      {t.label}
-                                  </option>
-                              ))}
-                            </select>
-                          </div>
+                    <>
+                      <div className="col-md-4 col-xl-2">
+                        <div className="form-group">
+                          <label>Sports List</label>
+                          <select
+                            className={`form-control ${errors.sportsList ? "is-invalid" : ""}`}
+                            value={sportsListType}
+                            onChange={(e) => setSportsListType(e.target.value)}
+                          >
+                            {sportsList.map((t) => (
+                              <option key={t.id} value={t.id}>
+                                {t.label}
+                              </option>
+                            ))}
+                          </select>
                         </div>
+                      </div>
 
-                        <div className="col-md-4 col-xl-2">
-                          <div className="form-group">
-                            <label>Game Type</label>
-                            <select
-                              className="form-control"
-                              value={gameType}
-                              onChange={(e) => setGameType(e.target.value)}
-                            >
-                              {gameTypeList.map((t) => (
-                                  <option key={t.id} value={t.id}>
-                                      {t.label}
-                                  </option>
-                              ))}
-                            </select>
-                          </div>
+                      <div className="col-md-4 col-xl-2">
+                        <div className="form-group">
+                          <label>Game Type</label>
+                          <select
+                            className="form-control"
+                            value={gameType}
+                            onChange={(e) => setGameType(e.target.value)}
+                          >
+                            {gameTypeList.map((t) => (
+                              <option key={t.id} value={t.id}>
+                                {t.label}
+                              </option>
+                            ))}
+                          </select>
                         </div>
-                      </>
-                    )}
+                      </div>
+                    </>
+                  )}
 
-                    {type === "2" && (
+                  {type === "2" && (
                     <div className="col-md-4 col-xl-2">
                       <div className="form-group">
                         <label>Casino List</label>
@@ -431,9 +465,9 @@ const Turnover = () => {
                           onChange={(e) => setCasinoList(e.target.value)}
                         >
                           {casinoTypes.map((t) => (
-                              <option key={t.value} value={t.value}>
-                                  {t.label}
-                              </option>
+                            <option key={t.value} value={t.value}>
+                              {t.label}
+                            </option>
                           ))}
                         </select>
                       </div>
@@ -444,8 +478,8 @@ const Turnover = () => {
 
                 {/* BUTTONS */}
                 <div className="row row5">
-                  <div className="col-md-12 col-xl-3">
-                    <button type="submit" className="btn btn-primary">
+                  <div className="col-md-12 col-xl-3 ml-3px-child">
+                    <button type="submit" className="btn btn-primary ">
                       Load
                     </button>
 
@@ -454,10 +488,11 @@ const Turnover = () => {
                     </button>
 
                     <div className="d-inline-block ml-1">
-                      <div className={`d-inline-block ${!isDataAvailable ? "disabled" : ""}`}>
+                      <div className={`d-inline-block ml-3px ${!isDataAvailable ? "disabled" : ""}`}>
                         <button
                           type="button"
                           className="btn mr-1 btn-success"
+                          // style={{ marginLeft: "3px" }}
                           disabled={!isDataAvailable}
                           onClick={exportToExcel}
                         >
@@ -468,6 +503,7 @@ const Turnover = () => {
                       <button
                         type="button"
                         className="btn btn-danger"
+                        style={{ marginLeft: "4px" }}
                         disabled={!isDataAvailable}
                         onClick={exportToPDF}
                       >
@@ -516,7 +552,7 @@ const Turnover = () => {
               </div>
 
               {/* 🔹 PAGINATION */}
-              <div className="row pt-3">
+              {/* <div className="row pt-3">
                 <div className="col">
                   <ul className="pagination pagination-rounded mb-0 float-right">
 
@@ -546,7 +582,7 @@ const Turnover = () => {
 
                   </ul>
                 </div>
-              </div>
+              </div> */}
 
             </div>
           </div>

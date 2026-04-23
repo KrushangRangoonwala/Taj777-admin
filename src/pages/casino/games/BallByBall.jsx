@@ -38,7 +38,7 @@ const BallByBall = ({ exposureData, gameData, lastResults }) => {
         if (!displayRdesc) return null;
         return (
             <div className="cricket20ballpopup">
-                <img src="/admin/assets/cards_new/ball-blank.png" alt="ball" />
+                <img src={`/${import.meta.env.VITE_IMAGE_PATH}/assets/cards_new/ball-blank.png`} alt="ball" data-temp-for-search />
                 <span>{displayRdesc}</span>
             </div>
         );

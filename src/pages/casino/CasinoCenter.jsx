@@ -155,6 +155,7 @@ const gamePath_To_Component = {
 
     "instant_worli": Worli,
     "worli_matka": Worli,
+    "matka_market": Worli,
 }
 
 const CasinoCenter = () => {

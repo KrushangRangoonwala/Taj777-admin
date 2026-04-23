@@ -1,6 +1,9 @@
 import axios from "axios";
 import { ajax_adm, ajax_files } from "./axiosConfig";
 import { getDefaultParams } from "./API";
+import { format_casino_list } from "../utilies/helpers";
+import { store } from "../store/store";
+import { setAllCasinoGames } from "../store/slices/casinoSlice";
 
 export function isApiSuccess(response) {
     return (
@@ -12,8 +15,12 @@ export function isApiSuccess(response) {
 
 export const fetchCasinoList = async () => {
     try {
-        const response = await ajax_files.get('/casino_list.php');
-        return response.data;
+        const { data } = await ajax_files.get('/casino_list.php');
+        if (data.status === 'ok') {
+            const formated_casino_list = format_casino_list(data.all_data || []);
+            store.dispatch(setAllCasinoGames(formated_casino_list));
+        }
+        return data;
     } catch (error) {
         console.error('Error fetching casino list:', error);
         throw error;

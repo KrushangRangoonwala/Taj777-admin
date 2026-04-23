@@ -2,7 +2,7 @@ import React from 'react'
 
 const Footer = () => {
     return (
-        <footer className="footer">
+        <footer className="footer" style={{ width: "100%" }}>
             <div className="container-fluid">
                 <div className="row">
                     <div className="col-sm-6">2026 </div>

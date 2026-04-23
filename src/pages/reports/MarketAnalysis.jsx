@@ -93,7 +93,7 @@ const MarketAnalysis = () => {
                                     value={searchTerm}
                                     onChange={(e) => setSearchTerm(e.target.value)}
                                     placeholder="Search Event"
-                                    className="form-control"
+                                    className="form-control dark-placeholder"
                                 />
                             </div>
                         </div>
@@ -161,11 +161,7 @@ const MarketAnalysis = () => {
                                 </div>
                             );
                         })
-                    ) : (
-                        <div className="text-center p-4">
-                            {searchTerm ? `No results found for "${searchTerm}"` : "No data available"}
-                        </div>
-                    )}
+                    ) : <></>}
                 </div>
             </div>
         </div>

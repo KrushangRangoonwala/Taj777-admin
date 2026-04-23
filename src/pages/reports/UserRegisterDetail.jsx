@@ -57,7 +57,7 @@ const UserRegisterDetail = () => {
   };
 
 
-  const totalPages = Math.ceil(totalRecords / perPage);
+  const totalPages = Math.ceil(totalRecords / perPage) || 1;
 
   const getColor = (value) => (Number(value) < 0 ? "#bb2834" : "#128412");
 
@@ -139,7 +139,7 @@ const UserRegisterDetail = () => {
 
     for (let i = start; i <= end; i++) pages.push(i);
 
-    return pages;
+    return pages?.length ? pages : [1];
   };
 
   const exportToExcel = () => {
@@ -237,7 +237,7 @@ const UserRegisterDetail = () => {
               <div className="card-body">
 
                 {/* 🔹 FILTER */}
-                <div className="report-form mb-3">
+                <div className="report-form mb-3 mb-3px-plus">
                   <form onSubmit={(e) => { e.preventDefault(); fetchData(1); }}>
                     <div className="row row5">
 
@@ -245,8 +245,22 @@ const UserRegisterDetail = () => {
                       <div className="col-2">
                         <div className="form-group user-lock-search" style={{ position: "relative" }}>
                           <label>Search By Client Name</label>
-
-                          <Select
+                          <style>{`
+                            .form-control::placeholder {
+                            color: #ced4da ;
+                            opacity: 0 ;
+                            }`}</style>
+                          <input
+                            type="search"
+                            className="form-control"
+                            value={clientSearch}
+                            placeholder="Select option"
+                            onChange={(e) => {
+                              setClientSearch(e.target.value);
+                              fetchClients(e.target.value);
+                            }}
+                          />
+                          {/* <Select
                             options={[]}
                             placeholder="Select option"
                             className="react-select-container"
@@ -257,12 +271,12 @@ const UserRegisterDetail = () => {
                             }}
                             noOptionsMessage={() => "List is empty."}
                             value={clientSearch}
-                            onChange={(e) => {
-                              setClientSearch(e.target.value);
-                              fetchClients(e.target.value);
+                            onInputChange={(value) => {
+                              setClientSearch(value);
+                              fetchClients(value);
                             }}
                             styles={customSelectStyles}
-                          />
+                          /> */}
 
                           {clientList.length > 0 && (
                             <div style={{
@@ -473,7 +487,7 @@ const UserRegisterDetail = () => {
                                     ? dayjs(row.last_login).format("DD/MM/YYYY HH:mm:ss")
                                     : "-"
                                 }
-                                </td>
+                              </td>
                               <td role="cell">
                                 {
                                   row.first_entry && dayjs(row.first_entry).isValid()
@@ -508,7 +522,12 @@ const UserRegisterDetail = () => {
                             <td colSpan="11" role="cell">
                               <div role="alert" aria-live="polite">
                                 <div className="text-center my-2">
-                                  {loading ? "Loading..." : "There are no records to show"}
+                                  {loading
+                                    ? "Loading..."
+                                    : search.length > 0
+                                      ? "There are no records matching your request"
+                                      : "There are no records to show"
+                                  }
                                 </div>
                               </div>
                             </td>

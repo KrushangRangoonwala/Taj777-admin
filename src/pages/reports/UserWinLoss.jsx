@@ -12,7 +12,7 @@ import { customSelectStyles } from '../../components/Header';
 import Select from 'react-select';
 
 const UserWinLoss = () => {
-
+    const [isListActive, setIsListActive] = useState(false);
     const [data, setData] = useState([]);
     const [clientSearch, setClientSearch] = useState('');
     const [clientList, setClientList] = useState([]);
@@ -27,16 +27,31 @@ const UserWinLoss = () => {
 
     const [filterType, setFilterType] = useState("1");
     const [dateRange, setDateRange] = useState([]);
+    const [fromDate, setFromDate] = useState(
+        new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0]
+    );
+    const [toDate, setToDate] = useState(
+        new Date().toISOString().split("T")[0]
+    );
 
-    const totalPages = Math.ceil(totalRecords / perPage);
+    const totalPages = Math.ceil(totalRecords / perPage) || 1;
 
     const getColor = (value) => (Number(value) < 0 ? "#bb2834" : "#128412");
 
     // 🔹 Fetch Clients
     const fetchClients = async (value) => {
+        if (!value) {
+            setClientList([{ id: '1', text: 'List is empty.' }]);
+            return;
+        }
+        // if (value.trim() === "") {
+        //     setClientList([{ id: '1', text: 'No elements found' }]);
+        //     return;
+        // }
+
         try {
             const res = await getClients(value);
-            setClientList(res.results || []);
+            res.results?.length > 0 ? setClientList(res.results) : setClientList([{ id: '1', text: 'No elements found. Consider changing search query.' }]);
         } catch (err) {
             console.log(err);
         }
@@ -181,20 +196,24 @@ const UserWinLoss = () => {
         doc.save(`UserRegister_${new Date().toISOString().slice(0, 19)}.pdf`);
     };
 
+    useEffect(() => {
+        fetchClients(clientSearch);
+    }, [clientSearch])
+
     return (
         <div>
             <div>
                 <div className="row">
                     <div className="col-12">
                         <div className="page-title-box d-flex align-items-center justify-content-between">
-                            <h4 className="mb-0 font-size-18">User Register Detail</h4>
+                            <h4 className="mb-0 font-size-18">User Win Loss</h4>
                             <div className="page-title-right">
                                 <ol className="breadcrumb m-0">
                                     <li className="breadcrumb-item">
                                         <a href="/admin/home">Home</a>
                                     </li>
                                     <li className="breadcrumb-item active">
-                                        <span>User Registration Report</span>
+                                        <span>User Win Loss</span>
                                     </li>
                                 </ol>
                             </div>
@@ -217,7 +236,22 @@ const UserWinLoss = () => {
                                                 <div className="form-group user-lock-search" style={{ position: "relative" }}>
                                                     <label>Search By Client Name</label>
 
-                                                    <Select
+                                                    <input
+                                                        type="text"
+                                                        className="form-control"
+                                                        value={clientSearch}
+                                                        placeholder="Select option"
+                                                        onChange={(e) => setClientSearch(e.target.value)}
+                                                        onFocus={() => {
+                                                            setIsListActive(true);
+                                                        }}
+                                                        onBlur={() => {
+                                                            setClientSearch("");
+                                                            setIsListActive(false);
+                                                        }}
+                                                    />
+
+                                                    {/* <Select
                                                         options={[]}
                                                         placeholder="Select option"
                                                         className="react-select-container"
@@ -228,14 +262,14 @@ const UserWinLoss = () => {
                                                         }}
                                                         noOptionsMessage={() => "List is empty."}
                                                         value={clientSearch}
-                                                        onChange={(e) => {
-                                                            setClientSearch(e.target.value);
-                                                            fetchClients(e.target.value);
+                                                        onInputChange={(value) => {
+                                                            setClientSearch(value);
+                                                            fetchClients(value);
                                                         }}
                                                         styles={customSelectStyles}
-                                                    />
+                                                    /> */}
 
-                                                    {clientList.length > 0 && (
+                                                    {isListActive && (
                                                         <div style={{
                                                             position: 'absolute',
                                                             background: '#fff',
@@ -246,7 +280,12 @@ const UserWinLoss = () => {
                                                             {clientList.map((c, i) => (
                                                                 <div
                                                                     key={i}
-                                                                    style={{ padding: '5px', cursor: 'pointer' }}
+                                                                    style={{
+                                                                        cursor: 'pointer',
+                                                                        padding: "0.7rem 0.7rem",
+                                                                        whiteSpace: 'nowrap',
+                                                                        overflowX: 'auto',
+                                                                    }}
                                                                     onClick={() => {
                                                                         setSelectedClient(c.id);
                                                                         setClientSearch(c.text);
@@ -262,14 +301,40 @@ const UserWinLoss = () => {
                                             </div>
 
                                             {/* DATE RANGE */}
-                                            <div className="col-3">
-                                                <div className="form-group">
-                                                    <label>Select Date Range</label>
+                                            <div className="col-lg-3">
+                                                <label>Select Date Range</label>
+                                                <div className="mb-3">
                                                     <RangePicker
-                                                        value={dateRange}
-                                                        onChange={(dates) => setDateRange(dates || [])}
+                                                        className="ant_custom_date custom-range-picker date-input"
+                                                        value={
+                                                            fromDate && toDate
+                                                                ? [dayjs(fromDate), dayjs(toDate)]
+                                                                : []
+                                                        }
+                                                        onChange={(dates) => {
+                                                            if (dates) {
+                                                                setFromDate(dates[0].toDate());
+                                                                setToDate(dates[1].toDate());
+                                                            } else {
+                                                                setFromDate(null);
+                                                                setToDate(null);
+                                                            }
+                                                        }}
                                                         format="DD/MM/YYYY"
                                                         style={{ width: "100%" }}
+                                                        suffixIcon={
+                                                            <span style={{ pointerEvents: "none" }}>
+                                                                <svg
+                                                                    xmlns="http://www.w3.org/2000/svg"
+                                                                    viewBox="0 0 1024 1024"
+                                                                    width="1em"
+                                                                    height="1em"
+                                                                    fill="currentColor"
+                                                                >
+                                                                    <path d="M940.218182 107.054545h-209.454546V46.545455h-65.163636v60.50909H363.054545V46.545455H297.890909v60.50909H83.781818c-18.618182 0-32.581818 13.963636-32.581818 32.581819v805.236363c0 18.618182 13.963636 32.581818 32.581818 32.581818h861.090909c18.618182 0 32.581818-13.963636 32.581818-32.581818V139.636364c-4.654545-18.618182-18.618182-32.581818-37.236363-32.581819zM297.890909 172.218182V232.727273h65.163636V172.218182h307.2V232.727273h65.163637V172.218182h176.872727v204.8H116.363636V172.218182h181.527273zM116.363636 912.290909V442.181818h795.927273v470.109091H116.363636z" />
+                                                                </svg>
+                                                            </span>
+                                                        }
                                                     />
                                                 </div>
                                             </div>
@@ -323,7 +388,7 @@ const UserWinLoss = () => {
                                 {/* 🔹 TOP BAR */}
                                 <div className="row">
                                     <div className="col-sm-12 col-md-6">
-                                        <label className="d-inline-flex align-items-center">
+                                        {/* <label className="d-inline-flex align-items-center">
                                             Show&nbsp;
                                             <select
                                                 className="custom-select custom-select-sm"
@@ -341,7 +406,7 @@ const UserWinLoss = () => {
                                                 <option value="150">150</option>
                                             </select>
                                             &nbsp;entries
-                                        </label>
+                                        </label> */}
                                     </div>
 
                                     <div className="col-sm-12 col-md-6">
@@ -366,13 +431,13 @@ const UserWinLoss = () => {
                                     <table className="table b-table table-bordered">
                                         <thead>
                                             <tr>
-                                                <th>No</th>
-                                                <th>User Name</th>
-                                                <th>Casinopts</th>
-                                                <th>Sportpts</th>
-                                                <th>SportBookpts</th>
-                                                <th>Third Party pts</th>
-                                                <th>Profit/Loss</th>
+                                                <th aria-colindex="1">No</th>
+                                                <th aria-colindex="2">User Name</th>
+                                                <th aria-colindex="3" class="text-right">Casinopts</th>
+                                                <th aria-colindex="4" class="text-right">Sportpts</th>
+                                                <th aria-colindex="5" class="text-right">SportBookpts</th>
+                                                <th aria-colindex="6" class="text-right">Third Party pts</th>
+                                                <th aria-colindex="7" class="text-right">Profit/Loss</th>
                                             </tr>
                                         </thead>
 
@@ -412,47 +477,30 @@ const UserWinLoss = () => {
                                             ) : (
                                                 <tr>
                                                     <td colSpan="12" className="text-center">
-                                                        {loading ? "Loading..." : "There are no records to show"}
+                                                        <div className="my-2">
+                                                            {loading
+                                                                ? "Loading..."
+                                                                : search?.length
+                                                                    ? "There are no records matching your request"
+                                                                    : "There are no records to show"}
+                                                        </div>
                                                     </td>
                                                 </tr>
                                             )}
                                         </tbody>
+                                        <tfoot>
+                                            <tr>
+                                                <th></th>
+                                                <th></th>
+                                                <th className="text-right">0</th>
+                                                <th className="text-right">0</th>
+                                                <th className="text-right">0</th>
+                                                <th className="text-right">0</th>
+                                                <th className="text-right">0</th>
+                                                {/* <th></th> */}
+                                            </tr>
+                                        </tfoot>
                                     </table>
-                                </div>
-
-                                {/* 🔹 PAGINATION */}
-                                <div className="row pt-3">
-                                    <div className="col">
-                                        <div className="dataTables_paginate paging_simple_numbers float-right">
-                                            <ul className="pagination pagination-rounded mb-0">
-
-                                                <li className={`page-item ${currentPage === 1 && 'disabled'}`}>
-                                                    <button className="page-link" onClick={() => changePage(1)}>«</button>
-                                                </li>
-
-                                                <li className={`page-item ${currentPage === 1 && 'disabled'}`}>
-                                                    <button className="page-link" onClick={() => changePage(currentPage - 1)}>‹</button>
-                                                </li>
-
-                                                {getPageNumbers().map((page) => (
-                                                    <li key={page} className={`page-item ${currentPage === page ? 'active' : ''}`}>
-                                                        <button className="page-link" onClick={() => changePage(page)}>
-                                                            {page}
-                                                        </button>
-                                                    </li>
-                                                ))}
-
-                                                <li className={`page-item ${currentPage === totalPages && 'disabled'}`}>
-                                                    <button className="page-link" onClick={() => changePage(currentPage + 1)}>›</button>
-                                                </li>
-
-                                                <li className={`page-item ${currentPage === totalPages && 'disabled'}`}>
-                                                    <button className="page-link" onClick={() => changePage(totalPages)}>»</button>
-                                                </li>
-
-                                            </ul>
-                                        </div>
-                                    </div>
                                 </div>
 
                             </div>

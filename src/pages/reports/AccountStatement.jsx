@@ -113,7 +113,7 @@ const AccountStatement = () => {
   const indexOfFirst = indexOfLast - perPage;
   const currentData = filteredData.slice(indexOfFirst, indexOfLast);
 
-  const totalPages = Math.ceil(totalRecords / perPage);
+  const totalPages = Math.ceil(totalRecords / perPage) || 1;
 
   const changePage = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -137,7 +137,7 @@ const AccountStatement = () => {
       pages.push(i);
     }
 
-    return pages;
+    return pages?.length > 0 ? pages : [1];
   };
 
   const handleSort = (colIndex) => {
@@ -250,6 +250,12 @@ const AccountStatement = () => {
                               setClientSearch(e.target.value);
                               fetchClients(e.target.value);
                             }}
+                            onBlur={() => {
+                              setTimeout(() => setClientList([]), 200)
+                            }}
+                            onFocus={() => {
+                              setClientList([{ id: '1', text: "List is empty." }]);
+                            }}
                           />
 
                           {clientList.length > 0 && (
@@ -283,7 +289,7 @@ const AccountStatement = () => {
                         <label>Select Date Range</label>
                         <div className="mb-3">
                           <RangePicker
-                            className="custom-range-picker"
+                            className="ant_custom_date custom-range-picker date-input"
                             value={
                               fromDate && toDate
                                 ? [dayjs(fromDate), dayjs(toDate)]
@@ -349,7 +355,7 @@ const AccountStatement = () => {
                     </div>
 
                     <div className="row row5">
-                      <div className="col-lg-3">
+                      <div className="col-lg-3 ml-3px-child">
                         <button type="submit" className="btn btn-primary">Load</button>
                         <button type="button" className="btn btn-light"
                           onClick={() => {
@@ -402,6 +408,8 @@ const AccountStatement = () => {
                         <option>50</option>
                         <option>75</option>
                         <option>100</option>
+                        <option>125</option>
+                        <option>150</option>
                       </select>
                       &nbsp;entries
                     </label>

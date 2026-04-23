@@ -1,6 +1,7 @@
 import axios from "axios";
 import { ajax_adm, ajax_files } from "./axiosConfig";
 import { successToast } from "../utils/toast";
+import { setBalance } from "../store/slices/betSlice";
 
 export const isApp = {
   is_app: 1,
@@ -43,6 +44,21 @@ export const loginAdmin = async (email, password) => {
   }
 
 };
+
+export async function fetchDashboard(search = "") {
+  try {
+    const payload = {
+      search,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("dashboard_api", payload);
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching clients:", error);
+    throw error;
+  }
+}
 
 export async function getAccountStatement(extraPayload = {}) {
   try {
@@ -244,6 +260,21 @@ export async function changeUserPassword(payload) {
     throw error;
   }
 }
+
+export async function changeUserLoginPassword(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("change_login_password.php", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error changing password:", error);
+    throw error;
+  }
+}
+
 export async function changeUserStatus(payload) {
   try {
     const fullPayload = {
@@ -251,6 +282,19 @@ export async function changeUserStatus(payload) {
       ...getDefaultParams(),
     };
     const { data } = await ajax_adm.post("change_status", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error changing password:", error);
+    throw error;
+  }
+}
+export async function editUserProfile(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("edit_profile", fullPayload);
     return data;
   } catch (error) {
     console.error("Error changing password:", error);
@@ -276,10 +320,107 @@ export async function createAccountApi(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await ajax_adm.post("createaccount", fullPayload);
+    const { data } = await ajax_adm.post("create_account", fullPayload);
     return data;
   } catch (error) {
     console.error("Error changing password:", error);
+    throw error;
+  }
+}
+export async function getRemainingPercentage(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("get_remaining_percentage", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error changing password:", error);
+    throw error;
+  }
+}
+export async function checkUsername(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("check_user", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error:", error);
+    throw error;
+  }
+}
+export async function authStatusApi(extraPayload = {}) {
+  try {
+    // merge default params with any extra fields (fromDate, reportType, etc.)
+    const payload = { ...getDefaultParams(), ...extraPayload };
+
+    const { data } = await ajax_adm.post("/chkStatusAuth", payload);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function enableMobileAuthApi(extraPayload = {}) {
+  try {
+    // merge default params with any extra fields (fromDate, reportType, etc.)
+    const payload = { ...getDefaultParams(), ...extraPayload };
+
+    const { data } = await ajax_adm.post("/auth_enable_verification_mobile", payload);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function enableTelegramAuthApi(extraPayload = {}) {
+  try {
+    // merge default params with any extra fields (fromDate, reportType, etc.)
+    const payload = { ...getDefaultParams(), ...extraPayload };
+
+    const { data } = await ajax_adm.post("/auth_enable_verification_telegram", payload);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function disableAuthApi(extraPayload = {}) {
+  try {
+    // merge default params with any extra fields (fromDate, reportType, etc.)
+    const payload = { ...getDefaultParams(), ...extraPayload };
+
+    const { data } = await ajax_adm.post("/auth_disable_verification", payload);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function checkAuthStatusApi(extraPayload = {}) {
+  try {
+    // merge default params with any extra fields (fromDate, reportType, etc.)
+    const payload = { ...getDefaultParams(), ...extraPayload };
+
+    const { data } = await ajax_adm.post("/chkStatusAuth", payload);
+    return data;
+  } catch (error) {
+    throw error;
+  }
+}
+
+export async function telegramOtpGenerationApi(extraPayload = {}) {
+  try {
+    // merge default params with any extra fields (fromDate, reportType, etc.)
+    const payload = { ...getDefaultParams(), ...extraPayload };
+
+    const { data } = await ajax_adm.post("/telegram_otp_generation", payload);
+    return data;
+  } catch (error) {
     throw error;
   }
 }
@@ -327,3 +468,53 @@ export const getEventPage_Exposure = (eventId) => fetchExposureList({ eventId, e
 
 export const getMarketPage_Exposure = () => fetchExposureList({ exposureType: "marketList" })
 
+
+
+// export interface UserInfoRequest {
+//   latitude: number | null;
+//   longitude: number | null;
+//   accuracy: number | null;
+//   userAgent: string;
+//   platform: string;
+//   language: string;
+// }
+
+const USER_INFO_URL = `http://178.128.80.62:8080/user-info`;
+export const sendUserInfoAPI = async (payload) => {
+  try {
+    console.log('[User Info] Calling:', USER_INFO_URL);
+    const response = await fetch(USER_INFO_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: 'include',
+      body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      console.error('[User Info] Error:', response.status, errorData);
+      return null;
+    }
+
+    return await response.json();
+  } catch (err) {
+    console.error('❌ API call (sendUserInfoAPI) failed', err);
+    return null;
+  }
+};
+
+export async function apiBalance(dispatch, pageName) {
+  const payload = {
+    ...getDefaultParams(),
+    ...(!!pageName ? pageName : {}),
+  };
+  try {
+    const { data } = await ajax_files.post("refresh_balance", payload);
+    console.log('data', data);
+    dispatch(setBalance({ point: data.balance, exposure: data.exposure }));
+  } catch (error) {
+    console.log("error", error);
+  }
+}

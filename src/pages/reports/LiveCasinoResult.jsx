@@ -10,9 +10,48 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { customSelectStyles } from "../../components/Header";
 import { Table } from 'react-bootstrap';
+import Pagination from "../../components/Pagination";
 
 
 const { RangePicker } = DatePicker;
+const providerTypes = [
+  { value: "", label: "Select" },
+  { value: "ezugi", label: "Ezugi" },
+  { value: "ss", label: "Super Spade" },
+  { value: "qt", label: "Slot 3 | Holi" },
+  { value: "evo", label: "Evolution" },
+  { value: "cockfight", label: "CockFight" },
+  { value: "ludo", label: "Ludo Classic" },
+  { value: "pop-the-ball", label: "PopTheBall" },
+  { value: "binary", label: "Binary" },
+  { value: "tgs", label: "Slot 2" },
+  { value: "slot", label: "Slot" },
+  { value: "tgslive", label: "VivoGames-LuckyStreak" },
+  { value: "rummy", label: "Rummy" },
+  { value: "ludo-lands", label: "Ludo Lands" },
+  { value: "vivo", label: "Vivo Gaming" },
+  { value: "snakes-and-ladders", label: "Snakes and Ladders" },
+  { value: "smart", label: "Smart Soft" },
+  { value: "astar", label: "Astar Game" },
+  { value: "bc", label: "Creedroomz" },
+  { value: "ds", label: "Dragoon Soft" },
+  { value: "bota", label: "Bota" },
+  { value: "tembo", label: "Tembo" },
+  { value: "lottery", label: "Lottery" },
+  { value: "bcslot", label: "Pascal Game | Popok" },
+  { value: "av", label: "Aviator" },
+  { value: "scratch", label: "Scratch" },
+  { value: "darwin", label: "Darwin" },
+  { value: "pg", label: "Pocket Game" },
+  { value: "jilli", label: "Jili" },
+  { value: "bet", label: "Bet Core" },
+  { value: "win", label: "Win" },
+  { value: "gemini1", label: "Gemini" },
+  { value: "amigo", label: "Amigo" },
+  { value: "egt", label: "EGT" },
+  { value: "studio21", label: "Studio21" },
+  { value: "beon", label: "Beon Gaming" },
+];
 
 const LiveCasinoResult = () => {
   const [activeTab, setActiveTab] = useState("login");
@@ -136,7 +175,7 @@ const LiveCasinoResult = () => {
     fetchUserHistory();
   }, [activeTab]); */
 
-  const totalPages = Math.ceil(totalRecords / perPage);
+  const totalPages = Math.ceil(totalRecords / perPage) || 1;
 
   const changePage = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -235,7 +274,7 @@ const LiveCasinoResult = () => {
               <ul className="nav nav-tabs">
                 <li className="nav-item">
                   <button
-                    className={`nav-link ${activeTab === "login" ? "active tab-bg-primary" : "bg-white"}`}
+                    className={`nav-link fw-500 ${activeTab === "login" ? "active tab-bg-primary" : "bg-white"}`}
                     onClick={() => handleTabChange("login")}
                   >
                     Settled Bets
@@ -243,7 +282,7 @@ const LiveCasinoResult = () => {
                 </li>
                 <li className="nav-item">
                   <button
-                    className={`nav-link ${activeTab === "password" ? "active tab-bg-primary" : "bg-white"}`}
+                    className={`nav-link fw-500 ${activeTab === "password" ? "active tab-bg-primary" : "bg-white"}`}
                     onClick={() => handleTabChange("password")}
                   >
                     Unsettled Bets
@@ -257,11 +296,11 @@ const LiveCasinoResult = () => {
                 <div className={`tab-pane ${activeTab === "login" ? "active" : ""}`}>
 
                   <form>
-                    <div className="row row5 mb-3">
+                    <div className="row row5 mb-3 mb-20px">
 
                       {/* CLIENT */}
-                      <div className="col-xl-2">
-                        {/* <input
+                      <div className="col-xl-2 mb-3">
+                        <input
                           type="text"
                           className="form-control"
                           placeholder="Select option"
@@ -270,14 +309,14 @@ const LiveCasinoResult = () => {
                             setClientSearch(e.target.value);
                             fetchClients(e.target.value);
                           }}
-                        /> */}
-                        <Select
+                        />
+                        {/* <Select
                           options={[]}
                           placeholder="Select option"
                           value={clientSearch}
-                          onChange={(e) => {
-                            setClientSearch(e.target.value);
-                            fetchClients(e.target.value);
+                          onInputChange={(value) => {
+                            setClientSearch(value);
+                            fetchClients(value);
                           }}
                           className="react-select-container"
                           classNamePrefix="react-select"
@@ -287,11 +326,11 @@ const LiveCasinoResult = () => {
                           }}
                           noOptionsMessage={() => "List is empty."}
                           styles={customSelectStyles}
-                        />
+                        /> */}
                       </div>
 
                       {/* DATE */}
-                      <div className="col-xl-2">
+                      <div className="col-xl-2 mb-3">
                         {/* <RangePicker
                           style={{ width: "100%" }}
                           value={dateRange}
@@ -302,23 +341,28 @@ const LiveCasinoResult = () => {
                           value={date}
                           onChange={(d) => setDate(d)}
                           format="DD/MM/YYYY"
-                          style={{ width: "100%" }}
+                          style={{ width: "100%", height: "100%" }}
+                          className="ant_custom_date"
                         />
                       </div>
 
                       {/* TYPE */}
-                      <div className="col-xl-2">
+                      <div className="col-xl-2 mb-3">
                         <select className="form-control">
-                          <option value="">Select</option>
                           {/* <option value="ezugi">Ezugi</option>
                           <option value="ss">Super Spade</option>
                           <option value="qt">Slot 3 | Holi</option>
                           <option value="evo">Evolution</option> */}
+                          {providerTypes.map((p) => (
+                            <option key={p.value} value={p.value}>
+                              {p.label}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
                       {/* BUTTONS */}
-                      <div className="col-xl-5">
+                      <div className="col-xl-5 mb-3">
                         <button
                           type="button"
                           className="btn btn-primary"
@@ -353,6 +397,42 @@ const LiveCasinoResult = () => {
 
                     </div>
                   </form>
+
+                  {/* TOP BAR */}
+                  <div className="row">
+                    <div className="col-6">
+                      <label className="d-inline-flex align-items-center">
+                        Show&nbsp;
+                        <select
+                          className="custom-select custom-select-sm"
+                          onChange={(e) => setPerPage(Number(e.target.value))}
+                        >
+                          <option>25</option>
+                          <option>50</option>
+                          <option>75</option>
+                          <option>100</option>
+                          <option>125</option>
+                          <option>150</option>
+                        </select>
+                        &nbsp;entries
+                      </label>
+                    </div>
+
+                    <div className="col-6 text-right">
+                      <div id="tickets-table_filter" className="dataTables_filter text-md-right">
+                        <label className="d-inline-flex align-items-center">
+                          <input
+                            type="search"
+                            placeholder="Search..."
+                            className="form-control form-control-sm ml-2"
+                            value={search}
+                            onChange={(e) => setSearch(e.target.value)}
+                          // onKeyUp={(e) => { fetchStatement(1) }}
+                          />
+                        </label>
+                      </div>
+                    </div>
+                  </div>
 
                   {/* TABLE */}
                   <div className="table-responsive mb-0">
@@ -401,7 +481,12 @@ const LiveCasinoResult = () => {
                               <td colSpan="7" role="cell">
                                 <div role="alert" aria-live="polite">
                                   <div className="text-center my-2">
-                                    {loading ? "Loading..." : "There are no records to show"}
+                                    {loading
+                                      ? "Loading..."
+                                      : search.length > 0
+                                        ? "There are no records matching your request"
+                                        : "There are no records to show"
+                                    }
                                   </div>
                                 </div>
                               </td>
@@ -418,15 +503,15 @@ const LiveCasinoResult = () => {
                 <div className={`tab-pane ${activeTab === "password" ? "active" : ""}`}>
 
                   <form>
-                    <div className="row row5 mb-3">
+                    <div className="row row5 mb-3 mb-20px">
 
-                      <div className="col-xl-2">
-                        {/* <input
+                      <div className="col-xl-2 mb-3">
+                        <input
                           type="text"
                           className="form-control"
                           placeholder="Select option"
-                        /> */}
-                        <Select
+                        />
+                        {/* <Select
                           options={[]}
                           placeholder="Select option"
                           className="react-select-container"
@@ -437,21 +522,20 @@ const LiveCasinoResult = () => {
                           }}
                           noOptionsMessage={() => "List is empty."}
                           styles={customSelectStyles}
-                        />
+                        /> */}
                       </div>
 
-                      <div className="col-xl-2">
+                      <div className="col-xl-2 mb-3">
                         <select className="form-control">
-                          <option value="">Select</option>
-                          {/* <option value="ezugi">Ezugi</option>
-                          <option value="ss">Super Spade</option>
-                          <option value="qt">Slot 3 | Holi</option>
-                          <option value="evo">Evolution</option>
-                          <option value="cockfight">CockFight</option> */}
+                          {providerTypes.map((p) => (
+                            <option key={p.value} value={p.value}>
+                              {p.label}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
-                      <div className="col-xl-5">
+                      <div className="col-xl-5 mb-3">
                         <button className="btn btn-primary">Load</button>{" "}
                         <button className="btn btn-light">Reset</button>
                       </div>
@@ -502,7 +586,7 @@ const LiveCasinoResult = () => {
 
 
                 </div>
-
+                <Pagination currentPage={currentPage} totalPages={totalPages} apiCallByPageNo={fetchUserHistory} />
               </div>
             </div>
           </div>

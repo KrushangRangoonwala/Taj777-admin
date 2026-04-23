@@ -11,7 +11,7 @@ const menuItems = [
         href: "/admin/home",
         icon: "bx bx-home-circle",
         liClassName: "mm-active",
-        linkClasses: "side-nav-link-ref router-link-exact-active router-link-active active",
+        linkClasses: "side-nav-link-ref router-link-exact-active router-link-active ", // active    
         ariaCurrent: "page",
     },
     {
@@ -74,28 +74,28 @@ const menuItems = [
     },
     {
         label: "Vip Casino",
-        href: "/admin/casino/vip",
+        // href: "/admin/casino/vip",
         icon: "mdi mdi-cards-playing-outline",
         linkClasses: "side-nav-link-ref",
         badge: "New",
     },
     {
         label: "Virtual Casino",
-        href: "/admin/vcasino/list",
+        // href: "/admin/vcasino/list",
         icon: "mdi mdi-cards-playing-outline",
         linkClasses: "side-nav-link-ref",
         badge: "New",
     },
     {
         label: "Premium Casino",
-        href: "/admin/pcasino/list",
+        // href: "/admin/pcasino/list",
         icon: "mdi mdi-cards-playing-outline",
         linkClasses: "side-nav-link-ref",
         badge: "New",
     },
     {
         label: "Tembo Casino",
-        href: "/admin/tcasino/list",
+        // href: "/admin/tcasino/list",
         icon: "mdi mdi-cards-playing-outline",
         linkClasses: "side-nav-link-ref",
         badge: "New",
@@ -145,12 +145,12 @@ export default function Sidebar() {
                                                 {menuItems.map((item, index) => {
                                                     const isOpen = openMenuIndex === index;
                                                     return (
-                                                        <li key={index} className={`${item.liClassName || ""} ${isOpen ? "" : ""}`.trim()}>
+                                                        <li key={index} className={`${item.liClassName || ""} ${isOpen ? "mm-active" : ""}`.trim()}>
                                                             {item.subItems ? (
                                                                 <>
                                                                     <Link
                                                                         href="javascript:void(0);"
-                                                                        className={`has-arrow ${isOpen ? "mm-active" : ""}`}
+                                                                        className="has-arrow"
                                                                         aria-expanded={isOpen ? "true" : "false"}
                                                                         onClick={(e) => {
                                                                             e.preventDefault();
@@ -158,13 +158,13 @@ export default function Sidebar() {
                                                                         }}
                                                                     >
                                                                         <i className={item.icon}></i>
-                                                                        <span>{item.label}</span>
+                                                                        <span style={{ marginLeft: "4px" }}>{item.label}</span>
                                                                     </Link>
                                                                     <SmoothMenu isOpen={isOpen} className="sub-menu">
                                                                         {item.subItems.map((subItem, subIndex) => (
                                                                             <li key={subIndex}>
                                                                                 <Link
-                                                                                    to={subItem.href}
+                                                                                    to={subItem.href || "#"}
                                                                                     className="side-nav-link-ref"
                                                                                 >
                                                                                     {subItem.label}

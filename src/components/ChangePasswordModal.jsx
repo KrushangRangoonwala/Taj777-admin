@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import { Modal } from 'react-bootstrap';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { changeUserPassword } from '../api/API';
 import { errorToast, successToast } from '../utils/toast';
+import { Link, useNavigate } from 'react-router-dom';
+import { logout } from '../store/slices/userSlice';
 
 const ChangePasswordModal = ({ show, onHide }) => {
-    console.log('show', show);
-    // const { userData } = useSelector((state) => state.user);
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { userData } = useSelector((state) => state.user);
     const [formData, setFormData] = useState({
         password: '', // Transaction Code (as per name attribute in snippet)
         NewPassword: '',
         ConfirmNewPassword: ''
     });
+    const [errors, setErrors] = useState({});
     const [loading, setLoading] = useState(false);
 
     const handleChange = (e) => {
@@ -20,18 +24,31 @@ const ChangePasswordModal = ({ show, onHide }) => {
             ...prev,
             [name]: value
         }));
+        if (errors[name]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: null
+            }));
+        }
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!formData.password || !formData.NewPassword || !formData.ConfirmNewPassword) {
-            errorToast("Please fill in all fields");
+        const newErrors = {};
+        if (!formData.password) newErrors.password = "The Transaction Code field is required";
+        if (!formData.NewPassword) newErrors.NewPassword = "The New Password field is required";
+        if (!formData.ConfirmNewPassword) newErrors.ConfirmNewPassword = "The Confirm Password field is required";
+
+        if (Object.keys(newErrors).length > 0) {
+            setErrors(newErrors);
             return;
         }
 
         if (formData.NewPassword !== formData.ConfirmNewPassword) {
-            errorToast("New Password and Confirm New Password do not match");
+            setErrors({
+                ConfirmNewPassword: "Passwords and Confirm Password do not match"
+            });
             return;
         }
 
@@ -48,8 +65,11 @@ const ChangePasswordModal = ({ show, onHide }) => {
 
             if (response.status === "ok") {
                 successToast(response.message || "Password changed successfully");
-                onHide();
-                setFormData({ password: '', NewPassword: '', ConfirmNewPassword: '' });
+                /* onHide();
+                setFormData({ password: '', NewPassword: '', ConfirmNewPassword: '' }); */
+                dispatch(logout());
+                sessionStorage.removeItem('userdata');
+                navigate('/admin');
             } else {
                 errorToast(response.message || "Failed to change password");
             }
@@ -80,7 +100,7 @@ const ChangePasswordModal = ({ show, onHide }) => {
                 </button>
             </Modal.Header>
             <Modal.Body id="__BVID__22___BV_modal_body_">
-                <form data-vv-scope="ChangePassword" method="post" onSubmit={(e) => e.preventDefault()}>{/* onSubmit={handleSubmit} */}
+                <form data-vv-scope="ChangePassword" method="post" onSubmit={handleSubmit}>
                     {[
                         { placeholder: "Transaction Code", "data-vv-as": "Transaction Code", type: "password", name: "password", "aria-required": "true", "aria-invalid": "true" },
                         { placeholder: "New Password", "data-vv-as": "New Password", type: "password", name: "NewPassword", "aria-required": "false", "aria-invalid": "false" },
@@ -94,10 +114,15 @@ const ChangePasswordModal = ({ show, onHide }) => {
                                 name={field.name}
                                 value={formData[field.name]}
                                 onChange={handleChange}
-                                className="form-control"
+                                className={`form-control dark-placeholder ${errors[field.name] ? 'is-invalid' : ''}`}
                                 aria-required={field["aria-required"]}
-                                aria-invalid={field["aria-invalid"]}
+                                aria-invalid={errors[field.name] ? "true" : "false"}
                             />
+                            {errors[field.name] && (
+                                <div className="invalid-feedback text-left">
+                                    {errors[field.name]}
+                                </div>
+                            )}
                         </div>
                     ))}
                     <div className="form-group">

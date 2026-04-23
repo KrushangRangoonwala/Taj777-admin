@@ -49,5 +49,5 @@ const createApiInstance = (baseURL) => {
 export const ajax_adm = createApiInstance("http://159.65.143.49/~sevennew/ajax_adm/");
 export const ajax_files = createApiInstance("http://159.65.143.49/~sevennew/ajaxfiles/");
 
-// export const ajax_adm = createApiInstance("https://worlds777.app/ajax_adm/");
+// export const ajax_adm = createApiInstance("https://worlds777.app/ajax_adm/"); // admin_new
 // export const ajax_files = createApiInstance("https://worlds777.app/ajaxfiles/");

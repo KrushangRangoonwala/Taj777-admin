@@ -32,7 +32,7 @@ const EventRightSidebar = ({ tvUrl, liveScoreData, isLive, activeBets }) => {
                     <div data-toggle="collapse" data-target=".video-tv" aria-expanded="true" className="card-header pointer" onClick={() => setIsTvOn(!isTvOn)}>
                         <h6 className="card-title">
                             <Link to="" title="">
-                                <img src="/admin/assets/images/arrow-down.svg" className="mr-1" />
+                                <img src={`/${import.meta.env.VITE_IMAGE_PATH}/assets/images/arrow-down.svg`} className="mr-1" />
                             </Link>
                             Live Match
                         </h6>

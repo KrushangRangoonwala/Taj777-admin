@@ -1,8 +1,10 @@
-import React, { useState,useEffect } from 'react';
-import { insertUser } from "../../api/API";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from "react-router-dom";
+import { insertUser, getRemainingPercentage, checkUsername } from "../../api/API";
 
 const InsertUser = () => {
 
+  const navigate = useNavigate();
   const [loginUser, setLoginUser] = useState(null);
 
   useEffect(() => {
@@ -21,7 +23,7 @@ const InsertUser = () => {
     mono: '',
     camt: '',
     newlvlno: '0',
-    spart1: '',
+    spart1: '0',
     remark: '',
     mpassword: '',
     changePasswordLock: false,
@@ -29,12 +31,45 @@ const InsertUser = () => {
 
   const [loginUserPower, setLoginUserPower] = useState(null);
   const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
+  const [usernameTimer, setUsernameTimer] = useState(null);
+  const [isUsernameTaken, setIsUsernameTaken] = useState(false);
+
+  const [percentageData, setPercentageData] = useState({
+    remaining: 0,
+    totalUsed: 0,
+  });
+
+  useEffect(() => {
+    const fetchPercentage = async () => {
+      try {
+        const res = await getRemainingPercentage();
+
+        if (res?.status === "ok") {
+          setPercentageData({
+            remaining: Number(res.data.remaining_percentage),
+            totalUsed: Number(res.data.total_used_percentage),
+          });
+        }
+      } catch (err) {
+        console.error("Percentage API error", err);
+      }
+    };
+
+    fetchPercentage();
+  }, []);
+
+  const enteredPartnership = Number(formData.spart1) || 0;
+
+  const remaining = percentageData.remaining;
+
+  const downline = remaining - enteredPartnership;
 
   const renderAccountTypeOptions = () => {
     if (!loginUser) return null;
 
-    console.log("loginUser",loginUser);
+    console.log("loginUser", loginUser);
 
     const power = Number(loginUser.user_type);
 
@@ -70,18 +105,144 @@ const InsertUser = () => {
     );
   };
 
+  const validateField = (name, value, currentFormData = formData) => {
+    let error = "";
+    switch (name) {
+      case "username":
+        if (!value.trim()) {
+          error = "The User Name field is required";
+        } else if (value.length < 4) {
+          error = "The User Name field must be at least 4 characters";
+        } else if (!/^[a-zA-Z0-9]+$/.test(value)) {
+          error = "The User Name field may only contain alpha-numeric characters";
+        }
+        break;
+      case "fullname":
+        if (!value.trim()) {
+          error = "The Full Name field is required";
+        } else if (value.length < 4) {
+          error = "The Full Name field must be at least 4 characters";
+        }
+        break;
+      case "password":
+        if (!value) {
+          error = "The password field is required";
+        } else if (value.length < 8) {
+          error = "The Password field must be at least 8 characters";
+        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+          error = "The password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 number";
+        }
+        break;
+      case "cpassword":
+        if (!value) {
+          error = "The Confirm Password field is required";
+        } else if (value !== currentFormData.password) {
+          error = "The Confirm Password confirmation does not match";
+        }
+        break;
+      case "spart1":
+        if (!String(value)) {
+          error = "The Partnership With No Return field is required";
+        }
+        break;
+      case "mpassword":
+        if (!value.trim()) {
+          error = "true";
+        }
+        break;
+      case "newlvlno":
+        if (!value || value === "0") {
+          error = "Please select User Type";
+        }
+        break;
+      default:
+        break;
+    }
+    return error;
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const error = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
+
+    let updatedValue = value;
+
+    // PARTNERSHIP CLAMP
+    // setTimeout(() => {
+    if (name === "spart1") {
+      // let num = Number(value);
+      let num = value;
+      // console.log("##### ", num, percentageData.remaining)
+      // if (isNaN(num)) num = 0;
+      if (num > percentageData.remaining) num = percentageData.remaining;
+      if (num < 0) num = 0;
+
+      updatedValue = num;
+    }
+    // }, 400)
+
+    setTouched((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
+
+    setFormData((prev) => {
+      const newData = {
+        ...prev,
+        [name]: updatedValue,
+      };
+
+      const error = validateField(name, updatedValue, newData);
+      setErrors((prevErr) => ({
+        ...prevErr,
+        [name]: error,
+      }));
+
+      // Special case for password change: validate cpassword as well
+      if (name === "password" && touched.cpassword) {
+        const cError = validateField("cpassword", prev.cpassword, newData);
+        setErrors((prevErr) => ({
+          ...prevErr,
+          cpassword: cError,
+        }));
+      }
+
+      return newData;
     });
-    // Clear error when user types
-    if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: null,
-      });
+
+    if (name === "username") {
+      if (usernameTimer) {
+        clearTimeout(usernameTimer);
+      }
+
+      const timer = setTimeout(async () => {
+        if (!updatedValue.trim()) {
+          setIsUsernameTaken(false);
+          return;
+        }
+
+        try {
+          const res = await checkUsername({
+            username: updatedValue,
+          });
+
+          if (res?.exists) {
+            setIsUsernameTaken(true);
+          } else {
+            setIsUsernameTaken(false);
+          }
+        } catch (err) {
+          console.error("Username check error", err);
+        }
+      }, 500);
+
+      setUsernameTimer(timer);
     }
   };
 
@@ -89,43 +250,20 @@ const InsertUser = () => {
     e.preventDefault();
 
     const newErrors = {};
+    const newTouched = {};
 
-    const passwordRegex =
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    Object.keys(formData).forEach((key) => {
+      const error = validateField(key, formData[key]);
+      if (error) {
+        newErrors[key] = error;
+      }
+      newTouched[key] = true;
+    });
 
-    // Required validations
-    if (!formData.username.trim()) {
-      newErrors.username = 'The User Name field is required';
-    }
-
-    if (!formData.fullname.trim()) {
-      newErrors.fullname = 'The Full Name field is required';
-    }
-
-    if (!formData.password) {
-      newErrors.password = 'The Password field is required';
-    } else if (!passwordRegex.test(formData.password)) {
-      newErrors.password =
-        'Password must be at least 8 characters and contain uppercase, lowercase and number';
-    }
-
-    if (!formData.cpassword) {
-      newErrors.cpassword = 'The Confirm Password field is required';
-    } else if (formData.password !== formData.cpassword) {
-      newErrors.cpassword =
-        'The Confirm Password confirmation does not match';
-    }
-
-    if (!formData.newlvlno || formData.newlvlno === '0') {
-      newErrors.newlvlno = 'Please select User Type';
-    }
-
-    if (!formData.mpassword.trim()) {
-      newErrors.mpassword = 'Transaction Code field is required';
-    }
+    setTouched(newTouched);
+    setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors);
       return;
     }
 
@@ -146,6 +284,7 @@ const InsertUser = () => {
         max_stake: 0,
         partnership: formData.spart1 || 0,
         master_password: formData.mpassword,
+        changePasswordLock: formData.changePasswordLock ? 1 : 0,
       };
 
       const res = await insertUser(payload);
@@ -166,6 +305,7 @@ const InsertUser = () => {
           remark: '',
           mpassword: '',
         });
+        navigate("/admin/activeusers");
 
         setErrors({});
       } else {
@@ -205,13 +345,13 @@ const InsertUser = () => {
           </div>
         </div>
 
-        <form data-vv-scope="InserUserAccount" method="post" onSubmit={handleSubmit}>
+        <form data-vv-scope="InserUserAccount" className="dark-placeholder" method="post" onSubmit={handleSubmit}>
           <div className="row">
             <div className="col-md-6">
               <div className="card">
                 <div className="card-body">
                   <h4 className="card-title">General Information</h4>
-                  
+
                   <div className="form-group">
                     <label>User name: <span className="text-danger">*</span></label>
                     <input
@@ -220,15 +360,17 @@ const InsertUser = () => {
                       name="username"
                       data-vv-as="User Name"
                       autoComplete="new-password"
-                      className={`form-control animation ${errors.username ? 'is-invalid' : ''}`}
+                      className={`form-control animation ${isUsernameTaken || (touched.username && errors.username) ? 'is-invalid' : ''}`} // if username exist then apply 'is-invalid' or if username exist and username have no error then apply 'is-valid'
                       aria-required="true"
                       aria-invalid={!!errors.username}
                       value={formData.username}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                     />
-                    {errors.username && (
+                    {touched.username && errors.username && (
                       <small className="error">{errors.username}</small>
                     )}
+
                   </div>
 
                   <div className="form-group">
@@ -238,13 +380,14 @@ const InsertUser = () => {
                       data-vv-as="Full Name"
                       type="text"
                       name="fullname"
-                      className={`form-control animation ${errors.fullname ? 'is-invalid' : ''}`}
+                      className={`form-control animation ${touched.fullname && errors.fullname ? 'is-invalid' : ''}`}
                       aria-required="true"
                       aria-invalid={!!errors.fullname}
                       value={formData.fullname}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                     />
-                    {errors.fullname && (
+                    {touched.fullname && errors.fullname && (
                       <small className="error">{errors.fullname}</small>
                     )}
                   </div>
@@ -256,13 +399,14 @@ const InsertUser = () => {
                       type="password"
                       data-vv-as="Password"
                       name="password"
-                      className={`form-control animation ${errors.password ? 'is-invalid' : ''}`}
+                      className={`form-control animation ${touched.password && errors.password ? 'is-invalid' : ''}`}
                       aria-required="true"
                       aria-invalid={!!errors.password}
                       value={formData.password}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                     />
-                    {errors.password && (
+                    {touched.password && errors.password && (
                       <small className="error">{errors.password}</small>
                     )}
                   </div>
@@ -274,13 +418,14 @@ const InsertUser = () => {
                       type="password"
                       data-vv-as="Confirm Password"
                       name="cpassword"
-                      className={`form-control animation ${errors.cpassword ? 'is-invalid' : ''}`}
+                      className={`form-control animation ${touched.cpassword && errors.cpassword ? 'is-invalid' : ''}`}
                       aria-required="true"
                       aria-invalid={!!errors.cpassword}
                       value={formData.cpassword}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                     />
-                    {errors.cpassword && (
+                    {touched.cpassword && errors.cpassword && (
                       <small className="error">{errors.cpassword}</small>
                     )}
                   </div>
@@ -339,19 +484,20 @@ const InsertUser = () => {
 
                   <div className="form-group tag-select">
                     <label>User Type: <span className="text-danger">*</span></label>
-                      <select
-                        name="newlvlno"
-                        className="form-control"
-                        value={formData.newlvlno}
-                        onChange={handleChange}
-                      >
-                        {renderAccountTypeOptions()}
-                      </select>
-                      {errors.newlvlno && (
-                        <small className="error">{errors.newlvlno}</small>
-                      )}
+                    <select
+                      name="newlvlno"
+                      className={`form-control ${touched.newlvlno && errors.newlvlno ? 'is-invalid' : ''}`}
+                      value={formData.newlvlno}
+                      onChange={handleChange}
+                      onBlur={handleBlur}
+                    >
+                      {renderAccountTypeOptions()}
+                    </select>
+                    {touched.newlvlno && errors.newlvlno && (
+                      <small className="error">{errors.newlvlno}</small>
+                    )}
                   </div>
-                    
+
                   {!isUserTypeSelected && (
                     <>
                       <h4 className="card-title">Partnership Information</h4>
@@ -360,7 +506,7 @@ const InsertUser = () => {
                           <label>Partnership With No Return:</label>
                           <input
                             placeholder="Partnership With No Return"
-                            type="text"
+                            type="number"
                             name="spart1"
                             data-vv-as="Partnership With No Return"
                             maxLength="4"
@@ -370,8 +516,11 @@ const InsertUser = () => {
                             value={formData.spart1}
                             onChange={handleChange}
                           />
+                          {errors.spart1 && (
+                            <small className="error">{errors.spart1}{' '}</small>
+                          )}
                           <p className="help is-success m-0 d-inline-block">
-                            Our : 77.5 | Down Line: 0
+                            Our : {remaining} | Down Line: {downline >= 0 ? downline : 0}
                           </p>
                         </div>
                       </div>
@@ -422,17 +571,18 @@ const InsertUser = () => {
                       placeholder="Transaction Code"
                       type="password"
                       name="mpassword"
-                      className={`form-control ${errors.mpassword ? 'is-invalid' : ''}`}
+                      className={`form-control ${touched.mpassword && errors.mpassword ? 'is-invalid' : ''}`}
                       aria-required="true"
                       aria-invalid={!!errors.mpassword}
                       value={formData.mpassword}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                     />
-                    {errors.mpassword && (
+                    {/* {errors.mpassword && (
                       <small className="error d-block mt-1">
                         {errors.mpassword}
                       </small>
-                    )}
+                    )} */}
                     <button
                       type="submit"
                       id="spinner-dark-8"

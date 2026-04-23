@@ -3,6 +3,7 @@ import UserMoreModal from '../../components/UserMoreModal';
 import DepositModal from '../../components/DepositModal';
 import WithdrawModal from '../../components/WithdrawModal';
 import { getUserList } from "../../api/API";
+import { Link } from 'react-router-dom';
 
 const ActiveUsers = () => {
   const [showModal, setShowModal] = useState(false);
@@ -10,6 +11,37 @@ const ActiveUsers = () => {
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
   const [users, setUsers] = useState([]);
+  const [searchKey, setSearchKey] = useState("");
+
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(25);
+  const [total, setTotal] = useState(0);
+
+  const totalPages = Math.ceil(total / limit);
+
+  const changePage = (pageNo) => {
+    if (pageNo >= 1 && pageNo <= totalPages) {
+      fetchUserList(searchKey, pageNo);
+    }
+  };
+
+  const getPageNumbers = () => {
+    const pages = [];
+    const maxVisible = 5;
+
+    let start = Math.max(1, page - 2);
+    let end = Math.min(totalPages, start + maxVisible - 1);
+
+    if (end - start < maxVisible - 1) {
+      start = Math.max(1, end - maxVisible + 1);
+    }
+
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  };
 
   const handleMoreClick = (user) => {
     setSelectedUser(user);
@@ -26,21 +58,26 @@ const ActiveUsers = () => {
     setShowWithdrawModal(true);
   };
 
-  const fetchUserList = async () => {
+  const fetchUserList = async (search = "", pageNo = page) => {
     try {
       const payload = {
-        user_status: "1"
+        user_status: "0",
+        searchKey: search,
+        page: pageNo,
+        limit: limit
       };
 
       const res = await getUserList(payload);
 
       if (res.status === "ok") {
         const numbered = res.data.map((item, index) => ({
-          sr_no: index + 1,
+          sr_no: (pageNo - 1) * limit + index + 1,
           ...item
         }));
 
-        setUsers(numbered); // ✅ IMPORTANT
+        setUsers(numbered);
+        setTotal(res.total);
+        setPage(pageNo);
       }
     } catch (err) {
       console.error(err);
@@ -155,15 +192,36 @@ const ActiveUsers = () => {
               <div className="card-body">
                 <div className="row row5">
                   <div className="col-md-6 mb-2 search-form">
-                    <form method="post" className="ajaxFormSubmit">
+                    <form
+                      method="post"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        fetchUserList(searchKey, 1); // reset to page 1
+                      }}
+                    >
                       <div className="d-inline-block form-group form-group-feedback form-group-feedback-right" style={{ marginRight: '0.2rem' }}>
-                        <input type="text" name="searchKey" placeholder="Search User" className="form-control" />
+                        <input
+                          type="text"
+                          name="searchKey"
+                          placeholder="Search User"
+                          className="form-control dark-placeholder"
+                          value={searchKey}
+                          onChange={(e) => setSearchKey(e.target.value)}
+                        />
                       </div>
                       <div className="d-inline-block">
                         <button type="submit" id="submit" className="btn btn-primary">
                           Load
                         </button>
-                        <button type="button" id="reset" className="btn btn-light ml-1">
+                        <button
+                          type="button"
+                          id="reset"
+                          className="btn btn-light ml-1"
+                          onClick={() => {
+                            setSearchKey("");
+                            fetchUserList("", 1);
+                          }}
+                        >
                           Reset
                         </button>
                       </div>
@@ -172,7 +230,7 @@ const ActiveUsers = () => {
                   <div className="col-md-6 text-right mb-2">
                     <div className="d-inline-block mr-2">
                       <div id="export_1774244719287" className="d-inline-block" style={{ marginRight: '0.2rem' }}>
-                        <button type="button" className="btn mr-1 btn-success">
+                        <button type="button" className="btn mr-1 btn-success" style={{ marginRight: 'calc(1rem)' }}>
                           <i className="fas fa-file-excel"></i>
                         </button>
                       </div>
@@ -181,9 +239,9 @@ const ActiveUsers = () => {
                       </button>
                     </div>
                     <div className="d-inline-block">
-                      <a href="/admin/users/insertuser" className="btn btn-success">
+                      <Link to="/admin/users/insertuser" className="btn btn-success">
                         <i aria-hidden="true" className="fa fa-plus"></i> CREATE ACCOUNT
-                      </a>
+                      </Link>
                     </div>
                   </div>
                 </div>
@@ -252,7 +310,12 @@ const ActiveUsers = () => {
                         </tr>
                       </thead>
                       <tbody role="rowgroup">
-                        {users.map((user) => (
+                        {users?.length === 0 && <td colSpan="12" role="cell" className="">
+                          <div role="alert" aria-live="polite">
+                            <div className="text-center my-2">There are no records to show</div>
+                          </div>
+                        </td>}
+                        {users?.map((user) => (
                           <tr key={user.id} role="row">
                             <td aria-colindex="1" role="cell">
                               <span title={user.fullName}>{user.username}</span>
@@ -310,24 +373,37 @@ const ActiveUsers = () => {
                 <div className="row pt-3">
                   <div className="col">
                     <div className="dataTables_paginate paging_simple_numbers float-right">
-                      <ul className="pagination pagination-rounded mb-0">
-                        <ul role="menubar" aria-disabled="false" aria-label="Pagination" className="pagination dataTables_paginate paging_simple_numbers my-0 b-pagination justify-content-end">
-                          <li role="presentation" aria-hidden="true" className="page-item disabled">
-                            <span role="menuitem" aria-label="Go to first page" aria-disabled="true" className="page-link">«</span>
+                      <ul className="pagination pagination-rounded mb-0 float-right">
+
+                        {/* FIRST */}
+                        <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                          <button className="page-link" onClick={() => changePage(1)}>«</button>
+                        </li>
+
+                        {/* PREV */}
+                        <li className={`page-item ${page === 1 ? 'disabled' : ''}`}>
+                          <button className="page-link" onClick={() => changePage(page - 1)}>‹</button>
+                        </li>
+
+                        {/* CURRENT PAGE ONLY (since your UI shows 1 only) */}
+                        {getPageNumbers().map((p) => (
+                          <li key={p} className={`page-item ${page === p ? 'active' : ''}`}>
+                            <button className="page-link" onClick={() => changePage(p)}>
+                              {p}
+                            </button>
                           </li>
-                          <li role="presentation" aria-hidden="true" className="page-item disabled">
-                            <span role="menuitem" aria-label="Go to previous page" aria-disabled="true" className="page-link">‹</span>
-                          </li>
-                          <li role="presentation" className="page-item active">
-                            <button role="menuitemradio" type="button" aria-label="Go to page 1" aria-checked="true" aria-posinset="1" aria-setsize="1" tabIndex="0" className="page-link">1</button>
-                          </li>
-                          <li role="presentation" aria-hidden="true" className="page-item disabled">
-                            <span role="menuitem" aria-label="Go to next page" aria-disabled="true" className="page-link">›</span>
-                          </li>
-                          <li role="presentation" aria-hidden="true" className="page-item disabled">
-                            <span role="menuitem" aria-label="Go to last page" aria-disabled="true" className="page-link">»</span>
-                          </li>
-                        </ul>
+                        ))}
+
+                        {/* NEXT */}
+                        <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                          <button className="page-link" onClick={() => changePage(page + 1)}>›</button>
+                        </li>
+
+                        {/* LAST */}
+                        <li className={`page-item ${page === totalPages ? 'disabled' : ''}`}>
+                          <button className="page-link" onClick={() => changePage(totalPages)}>»</button>
+                        </li>
+
                       </ul>
                     </div>
                   </div>

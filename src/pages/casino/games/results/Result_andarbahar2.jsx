@@ -84,7 +84,7 @@ const Result_andarbahar2 = ({ cardList = [], winner = "" }) => {
                             <div className="col-2">
                                 {(winner === "A" || winner === "1") && (
                                     <div className="casino-result-cards-item">
-                                        <img src="/admin/assets/images/winner.png" className="winner-icon" alt="winner" style={{ width: '33px' }} />
+                                        <img src={`/${import.meta.env.VITE_IMAGE_PATH}/assets/images/winner.png`} className="winner-icon" alt="winner" style={{ width: '33px' }} />
                                     </div>
                                 )}
                             </div>
@@ -117,7 +117,7 @@ const Result_andarbahar2 = ({ cardList = [], winner = "" }) => {
                             <div className="col-2">
                                 {(winner === "B" || winner === "2") && (
                                     <div className="casino-result-cards-item">
-                                        <img src="/admin/assets/images/winner.png" className="winner-icon" alt="winner" style={{ width: '33px' }} />
+                                        <img src={`/${import.meta.env.VITE_IMAGE_PATH}/assets/images/winner.png`} className="winner-icon" alt="winner" style={{ width: '33px' }} />
                                     </div>
                                 )}
                             </div>

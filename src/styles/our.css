@@ -55,7 +55,7 @@
     }
 }
 
-.bg-white{
+.bg-white {
     background-color: white;
 }
 
@@ -64,4 +64,125 @@
     font-size: 13.5px !important;
     color: #495057 !important;
     font-weight: 400 !important;
+}
+
+.tooltip .tooltip-arrow {
+    position: absolute;
+    display: block;
+    width: .8rem;
+    height: .4rem;
+}
+
+.tooltip .tooltip-arrow:before {
+    position: absolute;
+    content: "";
+    border-color: transparent;
+    border-style: solid;
+}
+
+.bs-tooltip-top .tooltip-arrow {
+    bottom: 0;
+}
+
+.bs-tooltip-top .tooltip-arrow:before {
+    top: 0;
+    border-width: .4rem .4rem 0;
+    border-top-color: #000;
+}
+
+.ant_custom_date {
+    font-family: inherit !important;
+    font-size: 13.5px !important;
+    color: #495057 !important;
+    font-weight: 400 !important;
+}
+
+.ant_custom_date input {
+    font-size: 13.5px !important;
+}
+
+.ml-3px {
+    margin-left: 3px;
+}
+
+.ml-3px-child>*:not(:first-child) {
+    margin-left: 3px;
+}
+
+.ml-3px-plus {
+    margin-left: calc(1rem + 3px) !important;
+}
+
+.ml-4px-plus {
+    margin-left: calc(1rem + 4px) !important;
+}
+
+.mb-3px-plus {
+    margin-bottom: calc(1rem + 3px) !important;
+}
+
+.mb-4px-plus {
+    margin-bottom: calc(1rem + 4px) !important;
+}
+
+.anticon-calendar {
+    font-size: medium !important;
+    color: rgba(0, 0, 0, .5) !important;
+    fill: currentColor !important;
+}
+
+.form-control::placeholder {
+    color: #ced4da !important;
+}
+
+.dark-placeholder .form-control::placeholder,
+.form-control.dark-placeholder::placeholder {
+    color: #495057 !important;
+    opacity: 0.8 !important;
+}
+
+.form-control:focus::placeholder {
+    color: #495057 !important;
+}
+
+.mb-20px {
+    margin-bottom: 20px !important;
+}
+
+.date-input {
+    height: calc(1.5em + .94rem + 2px) !important;
+    padding: .47rem .75rem !important;
+}
+
+.fw-500 {
+    font-weight: 500;
+}
+
+/* Custom Search Input Clear Button */
+input[type="search"]::-webkit-search-cancel-button {
+    -webkit-appearance: none;
+    height: 14px;
+    width: 14px;
+    background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233051d3' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3e%3cline x1='18' y1='6' x2='6' y2='18'%3e%3c/line%3e%3cline x1='6' y1='6' x2='18' y2='18'%3e%3c/line%3e%3c/svg%3e");
+    background-repeat: no-repeat;
+    background-size: contain;
+    cursor: pointer;
+    margin-right: 2px;
+    opacity: 0;
+    transition: opacity 0.2s ease-in-out;
+}
+
+input[type="search"]:focus::-webkit-search-cancel-button,
+input[type="search"]:hover::-webkit-search-cancel-button {
+    opacity: 1;
+}
+
+input[type="search"]::placeholder {
+    color: #495057;
+    /* color: red; */
+    opacity: 0.8;
+}
+
+.hover-blue:hover {
+    color: #1f3dd0;
 }

@@ -164,8 +164,9 @@ const SuperOver = ({ exposureData, lastResults }) => {
                                 <span>
                                     <img
                                         style={{ width: "30px" }}
-                                        src={`/admin/assets/cards_new/${card}.png`}
+                                        src={`/${import.meta.env.VITE_IMAGE_PATH}/assets/cards_new/${card}.png`}
                                         alt={card}
+                                        data-temp-for-search
                                     />
                                 </span>
                             </div>
@@ -178,7 +179,7 @@ const SuperOver = ({ exposureData, lastResults }) => {
                         ball ? (
                             <div key={idx}>
                                 <span>
-                                    <img src={`/admin/assets/cards_new/cricket/${ball}.png`} alt={`ball-${idx}`} />
+                                    <img src={`/${import.meta.env.VITE_IMAGE_PATH}/assets/cards_new/cricket/${ball}.png`} alt={`ball-${idx}`} data-temp-for-search />
                                 </span>
                             </div>
                         ) : null

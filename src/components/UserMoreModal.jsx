@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { changeUserPassword, changeUserStatus } from "../api/API";
+import { changeUserPassword, changeUserStatus, editUserProfile } from "../api/API";
 
 const UserMoreModal = ({ user, onClose }) => {
   const [activeTab, setActiveTab] = useState('Profile');
@@ -16,8 +16,17 @@ const UserMoreModal = ({ user, onClose }) => {
   accout_status: user?.ust ? "1" : "0",
   master_password: "",
 });
-const [lockErrors, setLockErrors] = useState({});
-const [lockLoading, setLockLoading] = useState(false);
+  const [lockErrors, setLockErrors] = useState({});
+  const [lockLoading, setLockLoading] = useState(false);
+
+  const [editForm, setEditForm] = useState({
+    fname: user?.fullName || user?.full_name || "",
+    is_password_lock: user?.is_password_lock ? true : false,
+    mpass: ""
+  });
+
+  const [editErrors, setEditErrors] = useState({});
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
     document.body.classList.add('modal-open');
@@ -25,6 +34,16 @@ const [lockLoading, setLockLoading] = useState(false);
       document.body.classList.remove('modal-open');
     };
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      setEditForm({
+        fname: user.fullName || user.full_name || "",
+        is_password_lock: user.is_password_lock ? true : false,
+        mpass: ""
+      });
+    }
+  }, [user]);
 
   const tabs = [
     { name: 'Profile', shortName: 'Profile' },
@@ -183,8 +202,8 @@ const [lockLoading, setLockLoading] = useState(false);
 
       const payload = {
         id: user?.id || user?.Id,
-        accout_status: lockForm.accout_status,
-        bet_status: lockForm.bet_status,
+        accout_status: lockForm.accout_status == 1 ? 0 : 1,
+        bet_status: lockForm.bet_status == 1 ? 0 : 1,
         master_password: lockForm.master_password,
       };
 
@@ -208,6 +227,70 @@ const [lockLoading, setLockLoading] = useState(false);
       alert("Something went wrong");
     } finally {
       setLockLoading(false);
+    }
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value, type, checked } = e.target;
+
+    const val = type === "checkbox" ? checked : value;
+
+    setEditForm((prev) => ({
+      ...prev,
+      [name]: val
+    }));
+
+    // 🔴 validation on change
+    if (name === "fname" || name === "mpass") {
+      setEditErrors((prev) => ({
+        ...prev,
+        [name]: val ? "" : "required"
+      }));
+    }
+  };
+
+  const handleEditSubmit = async (e) => {
+    e.preventDefault();
+
+    const errors = {};
+
+    if (!editForm.fname.trim()) {
+      errors.fname = "required";
+    }
+
+    if (!editForm.mpass.trim()) {
+      errors.mpass = "required";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setEditErrors(errors);
+      return;
+    }
+
+    try {
+      setEditLoading(true);
+
+      const payload = {
+        id: user?.id || user?.Id,
+        full_name: editForm.fname,
+        is_password_lock: editForm.is_password_lock ? 1 : 0,
+        master_password: editForm.mpass
+      };
+
+      const res = await editUserProfile(payload);
+
+      if (res?.status === "ok") {
+        alert(res.msg || "Profile updated successfully");
+        onClose();
+      } else {
+        alert(res.msg || "Failed to update");
+      }
+
+    } catch (err) {
+      console.error(err);
+      alert("Something went wrong");
+    } finally {
+      setEditLoading(false);
     }
   };
 
@@ -529,17 +612,31 @@ const [lockLoading, setLockLoading] = useState(false);
 
                 {/* Edit Profile Tab */}
                 <div role="tabpanel" aria-hidden={activeTab !== 'Edit Profile'} className={`tab-pane ${activeTab === 'Edit Profile' ? 'active' : ''}`} style={{ display: activeTab === 'Edit Profile' ? 'block' : 'none' }}>
-                  <form data-vv-scope="editprofile" method="post">
+                  <form data-vv-scope="editprofile" method="post" onSubmit={handleEditSubmit}>
                     <div className="form-group row">
                       <label className="col-form-label col-4">Full Name</label>
                       <div className="col-8 form-group-feedback-right pl-0">
-                        <input placeholder="Full Name" type="text" name="fname" defaultValue={user.fullName || user.full_name || ""} className="form-control" />
+                        <input
+                          placeholder="Full Name"
+                          type="text"
+                          name="fname"
+                          value={editForm.fname}
+                          onChange={handleEditChange}
+                          className={`form-control ${editErrors.fname ? "is-invalid" : ""}`}
+                        />
                       </div>
                     </div>
                     <div className="form-group row align-items-center">
                       <label className="col-form-label col-4">Change Password Lock</label>
                       <div className="mb-1 custom-control custom-switch">
-                        <input type="checkbox" className="custom-control-input" value="true" id="password-lock" />
+                        <input
+                          type="checkbox"
+                          className="custom-control-input"
+                          id="password-lock"
+                          name="is_password_lock"
+                          checked={editForm.is_password_lock}
+                          onChange={handleEditChange}
+                        />
                         <label className="custom-control-label" htmlFor="password-lock"></label>
                       </div>
                     </div>
@@ -553,13 +650,20 @@ const [lockLoading, setLockLoading] = useState(false);
                     <div className="form-group row">
                       <label className="col-form-label col-4">Transaction Code</label>
                       <div className="col-8 form-group-feedback-right pl-0">
-                        <input placeholder="Transaction Code" type="password" name="mpass" className="form-control" />
+                        <input
+                          placeholder="Transaction Code"
+                          type="password"
+                          name="mpass"
+                          value={editForm.mpass}
+                          onChange={handleEditChange}
+                          className={`form-control ${editErrors.mpass ? "is-invalid" : ""}`}
+                        />
                       </div>
                     </div>
                     <div className="form-group row">
                       <div className="col-12 text-right">
-                        <button type="submit" className="btn btn-primary">
-                          submit
+                        <button type="submit" className="btn btn-primary" disabled={editLoading}>
+                          {editLoading ? "Submitting..." : "submit"}
                           <i className="fas fa-sign-in-alt ml-1"></i>
                         </button>
                       </div>

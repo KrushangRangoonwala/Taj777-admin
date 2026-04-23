@@ -165,7 +165,7 @@ const CreateAccount = () => {
                           <input
                             type="text"
                             name="uname"
-                            className={`form-control ${errors.uname ? 'is-invalid' : ''}`}
+                            className={`form-control ${errors.uname || true ? 'is-invalid' : ''}`}
                             value={formData.uname}
                             onChange={handleInputChange}
                           />
@@ -246,19 +246,19 @@ const CreateAccount = () => {
                       {errors.privileges && <small className="error">{errors.privileges}</small>}
 
                       <div className="previlage-master mt-2">
-                        <div className="form-group mb-0">
+                        <div className="form-group mb-0 ml-3px-child">
                           <input
                             type="password"
                             name="mpass"
                             placeholder="Transaction Code"
-                            className={`form-control mpass-text ${errors.mpass ? 'is-invalid' : ''}`}
+                            className={`form-control dark-placeholder mpass-text ${errors.mpass ? 'is-invalid' : ''}`}
                             value={formData.mpass}
                             onChange={handleInputChange}
                           />
-                          <button type="submit" className="btn btn-success ml-2">Submit</button>
+                          <button type="submit" className="btn btn-success ml-3px-child">Submit</button>
                           <button
                             type="button"
-                            className="btn btn-light ml-2"
+                            className="btn btn-light ml-3px-child"
                             onClick={() => {
                               setFormData({ uname: '', fullname: '', password: '', cpass: '', mpass: '' });
                               setSelectedPrivileges([]);
@@ -276,23 +276,24 @@ const CreateAccount = () => {
 
                 <div className="outer mt-4">
                   <div className="inner">
-                    <div className="table table-bordered">
-                      <table className="table table-bordered">
-                        <thead>
-                          <tr>
-                            <th className="fixed-col-1">Action</th>
-                            <th className="fixed-col-2">Username</th>
-                            <th className="fixed-col-3">isAuth</th>
-                            {privileges.map((p) => (
-                              <th key={p.id}>{p.name}</th>
-                            ))}
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {/* Table rows would go here */}
-                        </tbody>
-                      </table>
-                    </div>
+                    {/* <div className="table table-bordered"> */}
+                    <table className="table table-bordered">
+                      <thead>
+                        <tr>
+                          <th className="fixed-col-1">Action</th>
+                          <th className="fixed-col-2">Username</th>
+                          <th className="fixed-col-3">IsAuth</th>
+                          <th style={{ alignContent: "center" }}>Full Name</th>
+                          {privileges.map((p) => (
+                            <th key={p.id} style={{ alignContent: "center" }}>{p.name}</th>
+                          ))}
+                        </tr>
+                      </thead>
+                      {/* <tbody>
+                           Table rows would go here 
+                        </tbody> */}
+                    </table>
+                    {/* </div> */}
                   </div>
                 </div>
               </div>

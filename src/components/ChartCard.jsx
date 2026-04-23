@@ -2,20 +2,24 @@ import React from 'react';
 import Chart from 'react-apexcharts';
 
 const ChartCard = ({ options, series, legendData, type = 'bar', height = 350 }) => {
+
+    const safeSeries = Array.isArray(series) ? series : [];
+    const safeLegend = Array.isArray(legendData) ? legendData : [];
+
     return (
         <div className="col-xl-12">
             <div className="card">
                 <div className="card-body">
                     <div style={{ minHeight: '365px' }}>
                         <Chart
-                            options={options}
-                            series={series}
+                            options={options || {}}
+                            series={safeSeries}
                             type={type}
                             height={height}
                         />
                     </div>
                     <div className="row row5 align-self-center text-center">
-                        {legendData.map((item, index) => (
+                        {safeLegend.map((item, index) => (
                             <div key={index} className={item.columnClass || 'col-4 col-sm'}>
                                 <p className="mb-2 font-size-11">
                                     <i className={`mdi mdi-circle align-middle font-size-10 me-2 ${item.colorClass}`}></i>

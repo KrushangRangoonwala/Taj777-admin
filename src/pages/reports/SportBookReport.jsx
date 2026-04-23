@@ -10,11 +10,17 @@ import autoTable from "jspdf-autotable";
 import { customSelectStyles } from "../../components/Header";
 import Select from "react-select";
 import { Table } from 'react-bootstrap';
+import Pagination from "../../components/Pagination";
 
 
 const { RangePicker } = DatePicker;
+const providerTypes = [
+  { value: "", label: "Select" },
+  { value: "sportbook1", label: "Sport Book1" },
+];
 
 const SportBookReport = () => {
+  const [isListActive, setIsListActive] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
@@ -77,13 +83,23 @@ const SportBookReport = () => {
 
   // 🔹 Fetch clients
   const fetchClients = async (value) => {
+    if (!value) {
+      setClientList([{ id: '1', text: 'List is empty.' }]);
+      return;
+    }
+
     try {
       const res = await getClients(value);
-      setClientList(res.results || []);
+      res.results?.length > 0 ? setClientList(res.results) : setClientList([{ id: '1', text: 'No elements found. Consider changing search query.' }]);
     } catch (err) {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    fetchClients(clientSearch);
+  }, [clientSearch])
+
 
   // 🔹 Fetch User History API
   const fetchUserHistory = async (page = 1) => {
@@ -136,7 +152,7 @@ const SportBookReport = () => {
     fetchUserHistory();
   }, [activeTab]); */
 
-  const totalPages = Math.ceil(totalRecords / perPage);
+  const totalPages = Math.ceil(totalRecords / perPage) || 1;
 
   const changePage = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -235,7 +251,7 @@ const SportBookReport = () => {
               <ul className="nav nav-tabs">
                 <li className="nav-item">
                   <button
-                    className={`nav-link ${activeTab === "login" ? "active tab-bg-primary" : "bg-white"}`}
+                    className={`nav-link fw-500 ${activeTab === "login" ? "active tab-bg-primary" : "bg-white"}`}
                     onClick={() => handleTabChange("login")}
                   >
                     Settled Bets
@@ -243,7 +259,7 @@ const SportBookReport = () => {
                 </li>
                 <li className="nav-item">
                   <button
-                    className={`nav-link ${activeTab === "password" ? "active tab-bg-primary" : "bg-white"}`}
+                    className={`nav-link fw-500 ${activeTab === "password" ? "active tab-bg-primary" : "bg-white"}`}
                     onClick={() => handleTabChange("password")}
                   >
                     Unsettled Bets
@@ -257,27 +273,31 @@ const SportBookReport = () => {
                 <div className={`tab-pane ${activeTab === "login" ? "active" : ""}`}>
 
                   <form>
-                    <div className="row row5 mb-3">
+                    <div className="row row5 mb-3 mb-20px">
 
                       {/* CLIENT */}
-                      <div className="col-xl-2">
-                        {/* <input
+                      <div className="col-xl-2 mb-3">
+                        <input
                           type="text"
                           className="form-control"
                           placeholder="Select option"
                           value={clientSearch}
-                          onChange={(e) => {
-                            setClientSearch(e.target.value);
-                            fetchClients(e.target.value);
+                          onChange={(e) => setClientSearch(e.target.value)}
+                          onFocus={() => {
+                            setIsListActive(true);
                           }}
-                        /> */}
-                        <Select
+                          onBlur={() => {
+                            setClientSearch("");
+                            setIsListActive(false);
+                          }}
+                        />
+                        {/* <Select
                           options={[]}
-                          placeholder="Select option"
+                          placeholder="Select option 111"
                           value={clientSearch}
-                          onChange={(e) => {
-                            setClientSearch(e.target.value);
-                            fetchClients(e.target.value);
+                          onInputChange={(value) => {
+                            setClientSearch(value);
+                            fetchClients(value);
                           }}
                           className="react-select-container"
                           classNamePrefix="react-select"
@@ -287,11 +307,39 @@ const SportBookReport = () => {
                           }}
                           noOptionsMessage={() => "List is empty."}
                           styles={customSelectStyles}
-                        />
+                        /> */}
+                        {isListActive && (
+                          <div style={{
+                            position: 'absolute',
+                            background: '#fff',
+                            border: '1px solid #ddd',
+                            width: '95%',
+                            zIndex: 1000
+                          }}>
+                            {clientList.map((c, i) => (
+                              <div
+                                key={i}
+                                style={{
+                                  cursor: 'pointer',
+                                  padding: "0.7rem 0.7rem",
+                                  whiteSpace: 'nowrap',
+                                  overflowX: 'auto',
+                                }}
+                                onClick={() => {
+                                  setSelectedClient(c.id);
+                                  setClientSearch(c.text);
+                                  setClientList([]);
+                                }}
+                              >
+                                {c.text}
+                              </div>
+                            ))}
+                          </div>
+                        )}
                       </div>
 
                       {/* DATE */}
-                      <div className="col-xl-2">
+                      <div className="col-xl-2 mb-3">
                         {/* <RangePicker
                           style={{ width: "100%" }}
                           value={dateRange}
@@ -302,20 +350,24 @@ const SportBookReport = () => {
                           value={date}
                           onChange={(d) => setDate(d)}
                           format="DD/MM/YYYY"
-                          style={{ width: "100%" }}
+                          style={{ width: "100%", height: "100%" }}
+                          className="ant_custom_date"
                         />
                       </div>
 
                       {/* TYPE */}
-                      <div className="col-xl-2">
+                      <div className="col-xl-2 mb-3">
                         <select className="form-control">
-                          <option value="">Select</option>
-                          {/* <option value="sportbook1">Sport Book1</option> */}
+                          {providerTypes.map((p) => (
+                            <option key={p.value} value={p.value}>
+                              {p.label}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
                       {/* BUTTONS */}
-                      <div className="col-xl-5">
+                      <div className="col-xl-5 mb-3">
                         <button
                           type="button"
                           className="btn btn-primary"
@@ -330,9 +382,9 @@ const SportBookReport = () => {
                           Reset
                         </button>
 
-                        <div className="d-inline-block ml-3">
+                        <div className="d-inline-block ml-3 ml-3px-plus">
                           <button
-                            className="btn btn-success mr-1"
+                            className="btn btn-success mr-2"
                             onClick={exportExcel}
                             disabled={data.length === 0}
                           >
@@ -364,6 +416,8 @@ const SportBookReport = () => {
                           <option>50</option>
                           <option>75</option>
                           <option>100</option>
+                          <option>125</option>
+                          <option>150</option>
                         </select>
                         &nbsp;entries
                       </label>
@@ -428,7 +482,12 @@ const SportBookReport = () => {
                               <td colSpan="6" role="cell">
                                 <div role="alert" aria-live="polite">
                                   <div className="text-center my-2">
-                                    {loading ? "Loading..." : "There are no records to show"}
+                                    {loading
+                                      ? "Loading..."
+                                      : search.length > 0
+                                        ? "There are no records matching your request"
+                                        : "There are no records to show"
+                                    }
                                   </div>
                                 </div>
                               </td>
@@ -445,15 +504,15 @@ const SportBookReport = () => {
                 <div className={`tab-pane ${activeTab === "password" ? "active" : ""}`}>
 
                   <form>
-                    <div className="row row5 mb-3">
+                    <div className="row row5 mb-3 mb-20px">
 
-                      <div className="col-xl-2">
-                        {/* <input
+                      <div className="col-xl-2 mb-3">
+                        <input
                           type="text"
                           className="form-control"
                           placeholder="Select option"
-                        /> */}
-                        <Select
+                        />
+                        {/* <Select
                           options={[]}
                           placeholder="Select option"
                           className="react-select-container"
@@ -464,13 +523,16 @@ const SportBookReport = () => {
                           }}
                           noOptionsMessage={() => "List is empty."}
                           styles={customSelectStyles}
-                        />
+                        /> */}
                       </div>
 
-                      <div className="col-xl-2">
+                      <div className="col-xl-2 mb-3">
                         <select className="form-control">
-                          <option value="">Select</option>
-                          {/* <option value="sportbook1">Sport Book1</option> */}
+                          {providerTypes.map((p) => (
+                            <option key={p.value} value={p.value}>
+                              {p.label}
+                            </option>
+                          ))}
                         </select>
                       </div>
 
@@ -508,7 +570,14 @@ const SportBookReport = () => {
                           <tr role="row" className="b-table-empty-row">
                             <td colSpan="5" role="cell">
                               <div role="alert" aria-live="polite">
-                                <div className="text-center my-2">There are no records to show</div>
+                                <div className="text-center my-2">
+                                  {loading
+                                    ? "Loading..."
+                                    : search.length > 0
+                                      ? "There are no records matching your request"
+                                      : "There are no records to show"
+                                  }
+                                </div>
                               </div>
                             </td>
                           </tr>
@@ -516,10 +585,8 @@ const SportBookReport = () => {
                       </Table>
                     </div>
                   </div>
-
-
                 </div>
-
+                <Pagination currentPage={currentPage} totalPages={totalPages} apiCallByPageNo={fetchUserHistory} />
               </div>
             </div>
           </div>

@@ -25,9 +25,7 @@ const Dashboard = () => {
         },
         dataLabels: { enabled: false },
         colors: ['#556ee6', '#f1b44c', '#50a5f1', '#34c38f', '#343a40'],
-        xaxis: {
-            categories: ['Credit pts', 'All pts', 'Settlement pts', 'Upper pts', 'Down pts'],
-        },
+        xaxis: { categories: [] },
         legend: {
             show: true,
             position: 'bottom',
@@ -51,9 +49,7 @@ const Dashboard = () => {
         },
         dataLabels: { enabled: false },
         colors: ['#556ee6', '#f1b44c', '#50a5f1', '#34c38f'],
-        xaxis: {
-            categories: ['Sports P/L', 'Casino P/L', 'Third Party Casino P/L', 'Total P/L'],
-        },
+        xaxis: { categories: [] },
         legend: {
             show: true,
             position: 'bottom',

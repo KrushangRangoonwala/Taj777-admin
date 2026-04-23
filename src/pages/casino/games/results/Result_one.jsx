@@ -213,7 +213,7 @@ const getGameResultContent = { // BY GAME_TYPE
         return (
             <div className="col-12 my-2 text-center">
                 <div className="cricket20ballpopup cricket20ballresult goalresult">
-                    <img src="/admin/assets/cards/soccer-ball.png" alt="goal" />
+                    <img src={`/${import.meta.env.VITE_IMAGE_PATH}/assets/cards/soccer-ball.png`} alt="goal" />
                     <span>{formattedDesc}</span>
                 </div>
             </div>

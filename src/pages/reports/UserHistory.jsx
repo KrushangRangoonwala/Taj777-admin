@@ -8,11 +8,14 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Table } from 'react-bootstrap';
+import Select from "react-select";
+import { customSelectStyles } from "../../components/Header";
 
 
 const { RangePicker } = DatePicker;
 
 const UserHistory = () => {
+  const [isListActive, setIsListActive] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
   const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
@@ -73,13 +76,23 @@ const UserHistory = () => {
 
   // 🔹 Fetch clients
   const fetchClients = async (value) => {
+    if (!value) {
+      setClientList([{ id: '1', text: 'List is empty.' }]);
+      return;
+    }
+
     try {
+      console.log("inininin");
       const res = await getClients(value);
-      setClientList(res.results || []);
+      res.results?.length > 0 ? setClientList(res.results) : setClientList([{ id: '1', text: 'No elements found. Consider changing search query.' }]);
     } catch (err) {
       console.error(err);
     }
   };
+
+  useEffect(() => {
+    fetchClients(clientSearch);
+  }, [clientSearch])
 
   // 🔹 Fetch User History API
   const fetchUserHistory = async (page = 1) => {
@@ -132,7 +145,7 @@ const UserHistory = () => {
     fetchUserHistory();
   }, [activeTab]); */
 
-  const totalPages = Math.ceil(totalRecords / perPage);
+  const totalPages = Math.ceil(totalRecords / perPage) || 1;
 
   const changePage = (page) => {
     if (page >= 1 && page <= totalPages) {
@@ -150,8 +163,8 @@ const UserHistory = () => {
       end = totalPages;
       start = Math.max(end - totalNumbers + 1, 1);
     }
-
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    const aa = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    return aa.length ? aa : [1];
   };
 
   // 🔹 Date change
@@ -229,20 +242,22 @@ const UserHistory = () => {
               <div className="tabs">
                 <ul className="nav nav-tabs">
                   <li className="nav-item">
-                    <button
+                    <a
+                      role="button"
                       className={`nav-link ${activeTab === "login" ? "active tab-bg-primary" : "bg-white"}`}
                       onClick={() => handleTabChange("login")}
                     >
                       Login History
-                    </button>
+                    </a>
                   </li>
                   <li className="nav-item">
-                    <button
+                    <a
+                      role="button"
                       className={`nav-link ${activeTab === "password" ? "active tab-bg-primary" : "bg-white"}`}
                       onClick={() => handleTabChange("password")}
                     >
                       Change Password History
-                    </button>
+                    </a>
                   </li>
                 </ul>
 
@@ -253,30 +268,56 @@ const UserHistory = () => {
                     <form>
                       <div className="row row5">
 
-                        <div className="form-group col-xl-3">
+                        <div className="form-group col-xl-3 mb-20px">
                           <input
                             type="text"
                             className="form-control"
                             value={clientSearch}
                             placeholder="Select option"
-                            onChange={(e) => {
-                              setClientSearch(e.target.value);
-                              fetchClients(e.target.value);
+                            onChange={(e) => setClientSearch(e.target.value)}
+                            onFocus={() => {
+                              setIsListActive(true);
                             }}
-                            autoComplete="off"
+                            onBlur={() => {
+                              setClientSearch("");
+                              setIsListActive(false);
+                            }}
                           />
-                          {clientList.length > 0 && (
+                          {/* <Select
+                            options={[]}
+                            placeholder="Select option"
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                            inputValue={clientSearch}
+                            onInputChange={(value) => {
+                              setClientSearch(value);
+                              fetchClients(value);
+                            }}
+                            components={{
+                              DropdownIndicator: () => null,
+                              IndicatorSeparator: () => null
+                            }}
+                            noOptionsMessage={() => "List is empty."}
+                            styles={customSelectStyles}
+                          /> */}
+                          {isListActive && (
                             <div style={{
                               position: 'absolute',
                               background: '#fff',
                               border: '1px solid #ddd',
-                              width: '100%',
+                              width: '96%',
                               zIndex: 1000
                             }}>
                               {clientList.map((c, i) => (
                                 <div
                                   key={i}
-                                  style={{ padding: '5px', cursor: 'pointer' }}
+                                  style={{
+                                    cursor: 'pointer',
+                                    padding: "0.7rem 0.7rem",
+                                    whiteSpace: 'nowrap',
+                                    overflowX: 'auto',
+                                    color: "#495057"
+                                  }}
                                   onClick={() => {
                                     setSelectedClient(c.id);
                                     setClientSearch(c.text);
@@ -292,10 +333,11 @@ const UserHistory = () => {
 
                         <div className="form-group col-xl-3">
                           <RangePicker
-                            style={{ width: "100%" }}
+                            style={{ width: "100%", height: "100%" }}
                             value={dateRange}
                             onChange={handleDateChange}
                             format="DD/MM/YYYY"
+                            className="ant_custom_date"
                           />
                         </div>
 
@@ -348,6 +390,8 @@ const UserHistory = () => {
                             <option value="50">50</option>
                             <option value="75">75</option>
                             <option value="100">100</option>
+                            <option value="125">125</option>
+                            <option value="150">150</option>
                           </select>
                           &nbsp;entries
                         </label>
@@ -371,7 +415,7 @@ const UserHistory = () => {
 
                     <div className="table-responsive mb-0">
                       <div className="table no-footer table-responsive-sm">
-                        <Table role="table" aria-busy="false" aria-colcount="4" className="b-table" bordered hover>
+                        <Table role="table" aria-busy="false" aria-colcount="4" className="b-table" hover>
                           <thead role="rowgroup">
                             <tr role="row">
                               <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'username' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('username')}>
@@ -412,7 +456,12 @@ const UserHistory = () => {
                                 <td colSpan="4" role="cell">
                                   <div role="alert" aria-live="polite">
                                     <div className="text-center my-2">
-                                      {loading ? "Loading..." : "There are no records to show"}
+                                      {loading
+                                        ? "Loading..."
+                                        : search?.length
+                                          ? "There are no records matching your request"
+                                          : "There are no records to show"
+                                      }
                                     </div>
                                   </div>
                                 </td>
@@ -463,21 +512,45 @@ const UserHistory = () => {
                   <div className={`tab-pane ${activeTab === "password" ? "active" : ""}`}>
 
                     <form>
-                      <div className="row row5">
+                      <div className="row">
 
-                        <div className="form-group col-xl-3">
+                        <div className="form-group col-xl-3 mb-20px">
                           <input
                             type="text"
                             className="form-control"
                             value={clientSearch}
                             placeholder="Select option"
-                            onChange={(e) => {
-                              setClientSearch(e.target.value);
-                              fetchClients(e.target.value);
+                            onChange={(e) => setClientSearch(e.target.value)}
+                            onFocus={() => {
+                              setIsListActive(true);
                             }}
-                            autoComplete="off"
+                            onBlur={() => {
+                              setClientSearch("");
+                              setIsListActive(false);
+                            }}
                           />
-                          {clientList.length > 0 && (
+                          {/* <Select
+                            options={[]}
+                            placeholder="Select option"
+                            className="react-select-container"
+                            classNamePrefix="react-select"
+                            inputValue={clientSearch}
+                            onInputChange={(value) => {
+                              setClientSearch(value);
+                              fetchClients(value);
+                            }}
+                            // onChange={(value) => {
+                            //   setClientSearch(value);
+                            //   fetchClients(value);
+                            // }}
+                            components={{
+                              DropdownIndicator: () => null,
+                              IndicatorSeparator: () => null
+                            }}
+                            noOptionsMessage={() => "List is empty."}
+                            styles={customSelectStyles}
+                          /> */}
+                          {isListActive && (
                             <div style={{
                               position: 'absolute',
                               background: '#fff',
@@ -488,7 +561,13 @@ const UserHistory = () => {
                               {clientList.map((c, i) => (
                                 <div
                                   key={i}
-                                  style={{ padding: '5px', cursor: 'pointer' }}
+                                  style={{
+                                    cursor: 'pointer',
+                                    padding: "0.7rem 0.7rem",
+                                    whiteSpace: 'nowrap',
+                                    overflowX: 'auto',
+                                    color: "#495057"
+                                  }}
                                   onClick={() => {
                                     setSelectedClient(c.id);
                                     setClientSearch(c.text);
@@ -504,10 +583,11 @@ const UserHistory = () => {
 
                         <div className="form-group col-xl-3">
                           <RangePicker
-                            style={{ width: "100%" }}
+                            style={{ width: "100%", height: "100%" }}
                             value={dateRange}
                             onChange={handleDateChange}
                             format="DD/MM/YYYY"
+                            className="ant_custom_date"
                           />
                         </div>
 
@@ -560,6 +640,8 @@ const UserHistory = () => {
                             <option value="50">50</option>
                             <option value="75">75</option>
                             <option value="100">100</option>
+                            <option value="125">125</option>
+                            <option value="150">150</option>
                           </select>
                           &nbsp;entries
                         </label>
@@ -583,7 +665,7 @@ const UserHistory = () => {
 
                     <div className="table-responsive mb-0">
                       <div className="table no-footer table-responsive-sm">
-                        <Table role="table" aria-busy="false" aria-colcount="4" className="b-table" bordered hover>
+                        <Table role="table" aria-busy="false" aria-colcount="4" className="b-table" hover>
                           <thead role="rowgroup">
                             <tr role="row">
                               <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'username' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('username')}>
@@ -624,7 +706,12 @@ const UserHistory = () => {
                                 <td colSpan="4" role="cell">
                                   <div role="alert" aria-live="polite">
                                     <div className="text-center my-2">
-                                      {loading ? "Loading..." : "No records to show"}
+                                      {loading
+                                        ? "Loading..."
+                                        : search?.length
+                                          ? "There are no records matching your request"
+                                          : "There are no records to show"
+                                      }
                                     </div>
                                   </div>
                                 </td>

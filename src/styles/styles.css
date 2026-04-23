@@ -302,6 +302,7 @@ body.login {
 
 body.login .login-bg {
     background-image: url("../../admin/img/login-bg.jpg");
+    /* background-image: url("../../admin_new/img/login-bg.jpg"); */
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
@@ -647,6 +648,7 @@ body[data-sidebar="dark"] #sidebar-menu ul li a:hover i {
 .suspended:before {
     content: "";
     background-image: url("/admin/img/lock.svg");
+    /* background-image: url("/admin_new/img/lock.svg"); */
     background-size: 15px 15px;
     background-repeat: no-repeat;
     position: absolute;

@@ -62,8 +62,8 @@ const CurrentBets = () => {
           matchDeleted === "deletebet"
             ? "deleted"
             : matchDeleted === "matchbet"
-            ? ""
-            : ""
+              ? ""
+              : ""
       };
 
       const res = await getCurrentBets(payload);
@@ -193,6 +193,7 @@ const CurrentBets = () => {
                         <div className="custom-control custom-radio custom-control-inline">
                           <input
                             type="radio"
+                            id="customRadio"
                             name="example"
                             value="matchbet"
                             checked={matchDeleted === "matchbet"}
@@ -202,9 +203,10 @@ const CurrentBets = () => {
                           <label htmlFor="customRadio" className="custom-control-label">Matched</label>
                         </div>
 
-                        <div className="custom-control custom-radio custom-control-inline">
+                        <div className="custom-control custom-radio custom-control-inline" style={{ marginLeft: "4px" }}>
                           <input
                             type="radio"
+                            id="customRadio2"
                             name="example"
                             value="deletebet"
                             checked={matchDeleted === "deletebet"}
@@ -217,12 +219,13 @@ const CurrentBets = () => {
                     )}
                   </div>
 
-                  <div className="col-md-8 col-lg-4 d-flex">
+                  <div className="col-md-8 col-lg-4">
                     <div className="custom-control custom-radio custom-control-inline pl-0">
 
                       <div className="custom-control custom-radio custom-control-inline">
                         <input
                           type="radio"
+                          id="soda-all"
                           name="bettype"
                           value="all"
                           checked={betType === "all"}
@@ -235,6 +238,7 @@ const CurrentBets = () => {
                       <div className="custom-control custom-radio custom-control-inline">
                         <input
                           type="radio"
+                          id="soda-back"
                           name="bettype"
                           value="back"
                           checked={betType === "back"}
@@ -247,6 +251,7 @@ const CurrentBets = () => {
                       <div className="custom-control custom-radio custom-control-inline">
                         <input
                           type="radio"
+                          id="soda-lay"
                           name="bettype"
                           value="lay"
                           checked={betType === "lay"}
@@ -310,7 +315,13 @@ const CurrentBets = () => {
                   <div className="col-6 text-right">
                     <div className="dataTables_filter text-md-right">
                       <label className="d-inline-flex align-items-center">
-                        <input type="search" placeholder="Search..." className="form-control form-control-sm ml-2 form-control" />
+                        <input
+                          type="search"
+                          placeholder="Search..."
+                          className="form-control form-control-sm ml-2 form-control"
+                          value={search}
+                          onChange={(e) => setSearch(e.target.value)}
+                        />
                       </label>
                     </div>
                   </div>
@@ -395,7 +406,9 @@ const CurrentBets = () => {
                           <tr role="row" className="b-table-empty-row">
                             <td colSpan={sportType === "sport" ? 11 : 9} role="cell">
                               <div role="alert" aria-live="polite">
-                                <div className="text-center my-2">There are no records to show</div>
+                                <div className="text-center my-2">
+                                  {search?.length ? "There are no records matching your request" : "There are no records to show"}
+                                </div>
                               </div>
                             </td>
                           </tr>

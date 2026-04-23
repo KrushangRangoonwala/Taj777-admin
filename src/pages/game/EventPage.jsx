@@ -792,7 +792,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                     {selectedMatch?.inPlay && !isCricket && !isLeague &&
                         <div
                             className="banner scorestats mb-1"
-                            style={{ backgroundImage: `url('/admin/images/events-banner/${selectedMatch?.SportId}.png')` }}
+                            style={{ backgroundImage: `url('/${import.meta.env.VITE_IMAGE_PATH}/assets/images/events-banner/${selectedMatch?.SportId}.png')` }}
                         >
                             <iframe src={scoreCardUrl} frameborder="0" />
                         </div>

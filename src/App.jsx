@@ -43,6 +43,13 @@ import TotalProfitLoss from './pages/reports/TotalProfitLoss'
 import SecureAuth from './pages/reports/SecureAuth'
 import { logout } from './store/slices/userSlice'
 import UserWinLoss from './pages/reports/UserWinLoss'
+import { apiBalance, sendUserInfoAPI } from './api/API'
+import FirstTimeLogin from './pages/users/FirstTimeLogin'
+import VirtualCasino from './pages/casino/VirtualCasino'
+import VipCasino from './pages/casino/VipCasino'
+import PremiumCasino from './pages/casino/PremiumCasino'
+import TemboCasino from './pages/casino/TemboCasino'
+import AssignAgent from './pages/users/AssignAgent'
 
 function putLiveFirst(arr) {
   if (arr && Array.isArray(arr)) {
@@ -55,6 +62,8 @@ function putLiveFirst(arr) {
 }
 
 function AppContent() {
+  const location = useLocation();
+  const { isLoggedIn } = useSelector((state) => state.user);
   const dispatch = useDispatch();
   const socket = useSocket("casino");
   const activeTab = useSelector(state => state.match.activeTab);
@@ -65,6 +74,10 @@ function AppContent() {
   const [initialSocketData, setInitialSocketData] = useState();
   const [socketData, setSocketData] = useState();
   const [willCall, setWillCall] = useState(false);
+
+  useEffect(() => {
+    console.log('admi location.pathname', location.pathname)
+  }, [location.pathname])
 
   useEffect(() => {
     if (userdata?.user_type == 1) { // IT SHOULD NOT BE USER (user_type = 1 for role : User)
@@ -160,6 +173,12 @@ function AppContent() {
     };
   }, [socket, game_id]);
 
+  useEffect(() => {
+    if (isLoggedIn) {
+      setTimeout(() => apiBalance(dispatch), 300);
+    }
+  }, [isLoggedIn])
+
   return (
     <Routes>
       <Route element={<AuthGuard />}>
@@ -168,8 +187,10 @@ function AppContent() {
           <Route path="admin/home" element={<Dashboard />} />
           <Route path="admin/secureauth" element={<SecureAuth />} />
           <Route path="admin/users" element={<AccountList />} />
+          <Route path="admin/child/:id" element={<AccountList />} />
           <Route path="admin/activeusers" element={<ActiveUsers />} />
           <Route path="admin/users/insertuser" element={<InsertUser />} />
+          <Route path="admin/assign-agent" element={<AssignAgent />} />
           <Route path="admin/reports/bank" element={<Bank />} />
           <Route path="admin/reports/accountstatement" element={<AccountStatement />} />
           <Route path="admin/reports/profitloss" element={<ProfitLoss />} />
@@ -204,11 +225,16 @@ function AppContent() {
           }
           />
           <Route path="admin/casino/list" element={<CasinoList />} />
+          <Route path="admin/casino/vip" element={<VipCasino />} />
+          <Route path="admin/vcasino/list" element={<VirtualCasino />} />
+          <Route path="admin/pcasino/list" element={<PremiumCasino />} />
+          <Route path="admin/tcasino/list" element={<TemboCasino />} />
           <Route path="admin/casino/:casinoPath" element={<CasinoCenter />} />
           <Route path="admin/market-analysis" element={<MarketAnalysis />} />
         </Route>
       </Route>
       <Route path="/admin" element={<AdminPage />} />
+      <Route path="/admin/change-password-success/:id" element={<FirstTimeLogin />} />
     </Routes>
   );
 }
@@ -223,3 +249,9 @@ function App() {
 }
 
 export default App
+
+// WHEN BUILD, GLOBAL SEARCH `admin_new` REMOVE COMMENT AND COMMENT OUT `admin` 
+
+// "List is empty." -> WROKED PERFACTLY IN GENERAL LOCK
+
+// getUserList

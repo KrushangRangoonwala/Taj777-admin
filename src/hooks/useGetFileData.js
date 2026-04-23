@@ -181,7 +181,9 @@ export function useGetFileData() { // BY URL PATH
         const path = location.split('/').pop();
 
         const type = gamePath_MapTo_gametype[path] ?? path;
-        return casino_list[type] ?? default_;
+        const gg = casino_list[type] ?? default_;
+        console.log("game data", gg);
+        return gg;
     }
 }
 

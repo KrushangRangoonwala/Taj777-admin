@@ -24,6 +24,7 @@ const TotalProfitLoss = () => {
 
   const [fromDate, setFromDate] = useState(dayjs().subtract(7, "day"));
   const [toDate, setToDate] = useState(dayjs());
+  const [search, setSearch] = useState('');
 
   const [type, setType] = useState("0");
 
@@ -96,7 +97,8 @@ const TotalProfitLoss = () => {
         from_date: fromDate.format("YYYY-MM-DD"),
         to_date: toDate.format("YYYY-MM-DD"),
         page: 1,
-        per_page: 1000
+        per_page: 1000,
+        search: search,
       };
 
       const res = await getTotalProfitLoss(payload);
@@ -273,10 +275,19 @@ const TotalProfitLoss = () => {
 
                     {/* CLIENT SEARCH */}
                     <div className="col-lg-3">
-                      <div className="form-group user-lock-search" style={{ position: "relative" }}>
+                      <div className="form-group user-lock-search mb-4px-plus" style={{ position: "relative" }}>
                         <label>Search By Client Name</label>
-
-                        <Select
+                        <input
+                          type="search"
+                          className="form-control"
+                          placeholder="Select option"
+                          value={clientSearch}
+                          onChange={(e) => {
+                            setClientSearch(e.target.value);
+                            fetchClients(e.target.value);
+                          }}
+                        />
+                        {/* <Select
                           options={[]}
                           placeholder="Select option"
                           className="react-select-container"
@@ -287,12 +298,12 @@ const TotalProfitLoss = () => {
                           }}
                           noOptionsMessage={() => "List is empty."}
                           value={clientSearch}
-                          onChange={(e) => {
-                            setClientSearch(e.target.value);
-                            fetchClients(e.target.value);
+                          onInputChange={(value) => {
+                            setClientSearch(value);
+                            fetchClients(value);
                           }}
                           styles={customSelectStyles}
-                        />
+                        /> */}
 
 
                         {clientList.length > 0 && (
@@ -325,15 +336,40 @@ const TotalProfitLoss = () => {
                     <div className="col-lg-3">
                       <label>Select Date Range</label>
                       <RangePicker
+                        className="date-input ant_custom_date"
                         value={[fromDate, toDate]}
+                        format="DD/MM/YYYY"
+                        style={{ width: "100%" }}
+
+                        onCalendarChange={(dates) => {
+                          if (dates && dates[0]) {
+                            const start = dates[0];
+
+                            let autoEnd = start.add(10, "day");
+
+                            // ❌ prevent future date
+                            if (autoEnd.isAfter(dayjs())) {
+                              autoEnd = dayjs();
+                            }
+
+                            setFromDate(start);
+                            setToDate(autoEnd);
+                          }
+                        }}
+
                         onChange={(dates) => {
                           if (dates) {
                             setFromDate(dates[0]);
                             setToDate(dates[1]);
+                          } else {
+                            setFromDate(null);
+                            setToDate(null);
                           }
                         }}
-                        format="DD/MM/YYYY"
-                        style={{ width: "100%" }}
+
+                        disabledDate={(current) => {
+                          return current.isAfter(dayjs(), "day");
+                        }}
                       />
                     </div>
 
@@ -359,14 +395,14 @@ const TotalProfitLoss = () => {
 
                   {/* BUTTONS */}
                   <div className="row row5">
-                    <div className="col-lg-3">
+                    <div className="col-lg-3 ml-3px-child">
                       <button type="submit" className="btn btn-primary">Load</button>
 
                       <button type="button" className="btn btn-light" onClick={handleReset}>
                         Reset
                       </button>
 
-                      <button type="button" className="btn btn-success" disabled={!isDataAvailable} onClick={exportToExcel}>
+                      <button type="button" className="btn btn-success" disabled={!isDataAvailable} onClick={exportToExcel} style={{ marginLeft: "4px" }}>
                         <i className="fas fa-file-excel"></i>
                       </button>
 
@@ -384,6 +420,28 @@ const TotalProfitLoss = () => {
                   <div className="spinner-border text-primary" role="status" />
                 </div>
               )}
+
+              {/* TOP BAR */}
+              <div className="row">
+                <div className="col-6">
+
+                </div>
+
+                <div className="col-6 text-right">
+                  <div id="tickets-table_filter" className="dataTables_filter text-md-right">
+                    <label className="d-inline-flex align-items-center">
+                      <input
+                        type="search"
+                        placeholder="Search..."
+                        className="form-control form-control-sm ml-2"
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        onKeyUp={(e) => { fetchData(1) }}
+                      />
+                    </label>
+                  </div>
+                </div>
+              </div>
 
               {/* ================= TABLES ================= */}
 
@@ -502,7 +560,7 @@ const TotalProfitLoss = () => {
 
                 </>
               )}
-              
+
               {/* THIRD PARTY */}
               {(type === "0" || type === "4") && (
                 <>

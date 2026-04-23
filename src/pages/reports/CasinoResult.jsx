@@ -11,6 +11,8 @@ import { Table } from 'react-bootstrap';
 // 👉 Replace with your API
 import { getCasinoResult } from "../../api/API";
 import { casino_list } from "../../utilies/casino_list";
+import Result_parent from "../casino/games/components/Result_parent";
+import PageNamePath from "../../components/PageNamePath";
 
 const casinoOptions = [
   { value: "", label: "Select Casino" },
@@ -141,6 +143,7 @@ const casinoTypes = [
 ];
 
 const CasinoResult = () => {
+  const [mid, setMid] = useState(false);
   const [date, setDate] = useState(dayjs());
   const [casinoType, setCasinoType] = useState("");
   const [data, setData] = useState([]);
@@ -177,7 +180,7 @@ const CasinoResult = () => {
     return 'ascending';
   };
 
-  const totalPages = Math.ceil(totalRecords / perPage);
+  const totalPages = Math.ceil(totalRecords / perPage) || 1;
 
 
   // 🔹 FETCH DATA (ONLY ON LOAD)
@@ -233,8 +236,8 @@ const CasinoResult = () => {
       end = totalPages;
       start = Math.max(end - totalNumbers + 1, 1);
     }
-
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    const aa = Array.from({ length: end - start + 1 }, (_, i) => start + i);
+    return aa?.length > 0 ? aa : [1];
   };
 
   // 🔹 EXPORT EXCEL
@@ -270,28 +273,33 @@ const CasinoResult = () => {
   return (
     <div>
       {/* HEADER */}
-      <div className="page-title-box d-flex justify-content-between">
+      {/* <div className="page-title-box d-flex justify-content-between">
         <h4>Our Casino Result</h4>
-      </div>
+      </div> */}
+      <PageNamePath
+        pageName="Our Casino Result"
+        pathArr={[{ path: "/admin/home", name: "Home" }, { path: "", name: "Our Casino Result" }]}
+      />
 
       {/* FILTER */}
-      <div className="card p-3">
-        <div className="row row5 mb-3">
+      <div className="card" style={{ padding: "20px" }}>
+        <div className="row row5 mb-3" style={{ marginBottom: "24px" }}>
 
           {/* DATE */}
-          <div className="col-md-3">
+          <div className="col-md-3 mb-2">
             <DatePicker
               value={date}
               onChange={(d) => setDate(d)}
               format="DD/MM/YYYY"
-              style={{ width: "100%" }}
+              style={{ width: "100%", height: "100%" }}
+              className="ant_custom_date"
             />
           </div>
 
           {/* CASINO TYPE */}
-          <div className="col-md-3">
+          <div className="col-md-3 mb-2">
             <select
-              className="form-control"
+              className={`form-control ${!casinoType && search.trim() ? "is-invalid" : ""}`}
               value={casinoType}
               onChange={(e) => setCasinoType(e.target.value)}
             >
@@ -305,22 +313,26 @@ const CasinoResult = () => {
           </div>
 
           {/* BUTTONS */}
-          <div className="col-md-6">
+          <div className="col-md-6  mb-2 ml-3px-child">
             <button className="btn btn-primary" onClick={() => fetchCasinoResult(1)}>
               Load
             </button>
 
-            <button className="btn btn-light ml-2" onClick={handleReset}>
+            <button className="btn btn-light" onClick={handleReset}>
               Reset
             </button>
             &nbsp;
-            <button type="button" className="btn btn-success" onClick={exportExcel} disabled={data.length === 0}>
-              <i className="fas fa-file-excel"></i>
-            </button>
-            &nbsp;
-            <button type="button" className="btn btn-danger" onClick={exportPDF} disabled={data.length === 0}>
-              <i className="fas fa-file-pdf"></i>
-            </button>
+            <div className="d-inline-block ml-3 ml-3px-child">
+              <div id="export_1776776380804" className="d-inline-block disabled">
+                <button type="button" className="btn btn-success" onClick={exportExcel} disabled={data.length === 0}>
+                  <i className="fas fa-file-excel"></i>
+                </button>
+              </div>
+              &nbsp;
+              <button type="button" className="btn btn-danger" onClick={exportPDF} disabled={data.length === 0}>
+                <i className="fas fa-file-pdf"></i>
+              </button>
+            </div>
           </div>
         </div>
 
@@ -365,7 +377,11 @@ const CasinoResult = () => {
         {/* TABLE */}
         <div className="table-responsive mb-0">
           <div className="table no-footer table-responsive-sm">
-            <Table id="casinoResultTable" role="table" aria-busy="false" aria-colcount="2" className="b-table mt-3" bordered>
+            <Table id="casinoResultTable" role="table" aria-busy="false" aria-colcount="2" className="b-table" bordered>
+              <colgroup>
+                <col style={{ width: "50%" }} />
+                <col style={{ width: "50%" }} />
+              </colgroup>
               <thead role="rowgroup">
                 <tr role="row">
                   <th role="columnheader" scope="col" tabIndex="0" aria-sort={sortColumn === 'marketId' ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort('marketId')}>
@@ -380,7 +396,13 @@ const CasinoResult = () => {
                 {data.length > 0 ? (
                   data.map((row, i) => (
                     <tr key={i} role="row" tabIndex="0" className="nocursor">
-                      <td role="cell" style={{ color: "#1f3dd0" }}>{row.round}</td>
+                      <td
+                        role="cell"
+                        style={{ color: "#1f3dd0", cursor: "pointer" }}
+                        onClick={() => setMid(row.round)}
+                      >
+                        {row.round}
+                      </td>
                       <td role="cell">{row.winner}</td>
                     </tr>
                   ))
@@ -389,7 +411,12 @@ const CasinoResult = () => {
                     <td colSpan="2" role="cell">
                       <div role="alert" aria-live="polite">
                         <div className="text-center my-2">
-                          {loading ? "Loading..." : "There are no records to show"}
+                          {loading
+                            // ? "Loading..."
+                            ? "There are no records to show"
+                            : search?.length
+                              ? "There are no records matching your request"
+                              : "There are no records to show"}
                         </div>
                       </div>
                     </td>
@@ -434,6 +461,8 @@ const CasinoResult = () => {
           </div>
         </div>
       </div>
+
+      <Result_parent mid={mid} setMid={setMid} game_type={casinoType} />
     </div>
   );
 };

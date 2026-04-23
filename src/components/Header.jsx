@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import SliderRaw from 'react-slick';
 import SelectRaw from 'react-select';
 import Dropdown from 'react-bootstrap/Dropdown';
@@ -7,8 +7,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../store/slices/userSlice';
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { apiGetUpcomingFixtures } from '../api/API';
+import { apiGetUpcomingFixtures, getUserList } from '../api/API';
 import ChangePasswordModal from './ChangePasswordModal';
+import MarketAnalysisModal from './MarketAnalysisModal';
 import useIsMobile from '../hooks/useIsMobile';
 
 const Slider = SliderRaw && typeof SliderRaw === 'object' && SliderRaw.default ? SliderRaw.default : SliderRaw;
@@ -42,27 +43,98 @@ export const customSelectStyles = {
         ...provided,
         color: '#495057',
     }),
-    placeholder: (provided) => ({
+    placeholder: (provided, state) => ({
         ...provided,
-        color: '#ced4da',
+        color: state.isFocused ? '#495057' : '#ced4da',
+    }),
+    input: (provided) => ({
+        ...provided,
+        color: '#495057',
     }),
     noOptionsMessage: (provided) => ({
         ...provided,
         textAlign: 'left',
         padding: '8px 12px',
-        color: '#74788d',
+        color: '#495057',
         fontSize: '14px'
     })
 };
+
+const customSelectStylesWithOption = {
+    ...customSelectStyles,
+    option: (provided, state) => ({
+        ...provided,
+        color: state.isFocused ? 'white' : '#495057',
+        backgroundColor: state.isSelected ? '#eee' : state.isFocused ? '#556ee6' : 'white',
+    })
+};
+
+function SearchUserDropDown({
+    search,
+    setSearch,
+    searchList,
+    setSearchList,
+    selectedOption,
+    setSelectedOption,
+    selectRef,
+    setShowMarketAnalysisModal
+}) {
+    return (
+        <Select
+            ref={selectRef}
+            options={searchList}
+            placeholder="Search User"
+            className="react-select-container"
+            classNamePrefix="react-select"
+            components={{
+                DropdownIndicator: () => null,
+                IndicatorSeparator: () => null
+            }}
+            noOptionsMessage={() => search.length ? "No elements found" : "List is empty."}
+            styles={customSelectStylesWithOption}
+            onInputChange={(value) => setSearch(value)}
+            onChange={(option) => {
+                setSelectedOption(option)
+                setShowMarketAnalysisModal(true)
+            }}
+            onBlur={(e) => {
+                setSearch("");
+                setSelectedOption([]);
+                setSearchList([]);
+            }}
+            value={selectedOption}
+        />
+    );
+}
 
 export default function Header() {
     const isMobile = useIsMobile(992)
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { name } = useSelector((state) => state.user);
+    const { point, exposure } = useSelector((state) => state.bet.balance);
     const [upcoming, setUpcoming] = useState([]);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
+    const [showMarketAnalysisModal, setShowMarketAnalysisModal] = useState(false);
     const [isCollapsed, setIsCollapsed] = useState(false);
+    const [search, setSearch] = useState("");
+    const [selectedOption, setSelectedOption] = useState(null);
+    const [searchList, setSearchList] = useState([]);
+    const selectRef = useRef(null);
+
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.hidden) {
+                selectRef.current?.blur(); // 👈 when TAB change, remove focus
+            }
+        };
+
+        document.addEventListener("visibilitychange", handleVisibilityChange);
+
+        return () => {
+            document.removeEventListener("visibilitychange", handleVisibilityChange);
+        };
+    }, []);
 
     const handleLogout = () => {
         dispatch(logout());
@@ -122,6 +194,34 @@ export default function Header() {
         upcomingApi();
     }, [])
 
+    async function fetchUserList(search = "") {
+        try {
+            const payload = {
+                user_status: "1",
+                searchKey: search
+            };
+            const res = await getUserList(payload);
+            if (res.status === "ok") {
+                const formatData = res.data.map(item => {
+                    return {
+                        value: item.id,
+                        label: item.username
+                    }
+                });
+                setSearchList(formatData);
+            } else {
+                setSearchList([]);
+            }
+        } catch (err) {
+            console.error(err);
+            setSearchList([]);
+        }
+    };
+
+    useEffect(() => {
+        search?.length > 2 && fetchUserList(search);
+    }, [search]);
+
     return (
         <header data-v-5a10e370="" id="page-topbar">
             <div className="navbar-header">
@@ -143,17 +243,15 @@ export default function Header() {
                     </button>
 
                     <div className="site-searchbox mt-3 d-none d-lg-inline-block" style={{ width: '250px' }}>
-                        <Select
-                            options={[]}
-                            placeholder="Search User"
-                            className="react-select-container"
-                            classNamePrefix="react-select"
-                            components={{
-                                DropdownIndicator: () => null,
-                                IndicatorSeparator: () => null
-                            }}
-                            noOptionsMessage={() => "List is empty."}
-                            styles={customSelectStyles}
+                        <SearchUserDropDown
+                            search={search}
+                            setSearch={setSearch}
+                            searchList={searchList}
+                            setSearchList={setSearchList}
+                            selectedOption={selectedOption}
+                            setSelectedOption={setSelectedOption}
+                            selectRef={selectRef}
+                            setShowMarketAnalysisModal={setShowMarketAnalysisModal}
                         />
                     </div>
                 </div>
@@ -190,15 +288,15 @@ export default function Header() {
                                 <form className="p-3">
                                     <div className="form-group m-0">
                                         <div className="input-group">
-                                            <Select
-                                                options={[]}
-                                                placeholder="Search User"
-                                                components={{
-                                                    DropdownIndicator: () => null,
-                                                    IndicatorSeparator: () => null
-                                                }}
-                                                noOptionsMessage={() => "List is empty."}
-                                                styles={customSelectStyles}
+                                            <SearchUserDropDown
+                                                search={search}
+                                                setSearch={setSearch}
+                                                searchList={searchList}
+                                                setSearchList={setSearchList}
+                                                selectedOption={selectedOption}
+                                                setSelectedOption={setSelectedOption}
+                                                selectRef={selectRef}
+                                                setShowMarketAnalysisModal={setShowMarketAnalysisModal}
                                             />
                                         </div>
                                     </div>
@@ -213,9 +311,14 @@ export default function Header() {
                     <div className="d-none d-sm-inline-block rules-icon nowrap"><span className="main-rules"><a
                         href="javascript:void(0)"><i className="fas fa-info-circle mr-1"></i>Rules</a></span>
                     </div>
-                    <div className="dropdown d-none d-sm-inline-block ml-1"><button type="button"
-                        className="btn header-item noti-icon"><span className="balance nowrap">pts:{' '}
-                            <span className="balance-value"><b>58,900</b></span> </span></button></div>
+                    <div className="dropdown d-none d-sm-inline-block ml-1">
+                        <button type="button" className="btn header-item noti-icon">
+                            <span className="balance nowrap">
+                                pts:{' '}<span className="balance-value"><b>{point}</b></span>
+                                {Number(exposure) ? <>{' | '}<span className="balance-value">{exposure}</span></> : ''}
+                            </span>
+                        </button>
+                    </div>
 
                     <Dropdown className="btn-group" id="__BVID__18" align="end">
                         <Dropdown.Toggle variant="black" className="header-item" id="__BVID__18__BV_toggle_">
@@ -224,12 +327,12 @@ export default function Header() {
                         <Dropdown.Menu>
                             <div className="dropdown d-sm-none ml-1 mr-1">
                                 <div className="bal-box"><span className="balance nowrap">pts:{' '}
-                                    <span className="balance-value"><b>58,900</b></span> </span></div>
+                                    <span className="balance-value"><b>{point}</b></span> </span></div>
                             </div>
                             <Dropdown.Item href="javascript: void(0);" className="d-sm-none">
                                 <i className="fas fa-info-circle mr-1"></i> Rules
                             </Dropdown.Item>
-                            <Dropdown.Item onClick={() => navigate("/admin/secureauth")}>
+                            <Dropdown.Item onClick={() => navigate("/admin/secureauth")} className="hover-blue">
                                 <i className="bx bx-lock-open font-size-16 align-middle mr-1"></i> Secure Auth
                             </Dropdown.Item>
                             <Dropdown.Item href="javascript: void(0);" onClick={() => setShowChangePasswordModal(true)}>
@@ -244,6 +347,7 @@ export default function Header() {
                 </div>
             </div>
             {showChangePasswordModal && <ChangePasswordModal show={showChangePasswordModal} onHide={() => setShowChangePasswordModal(false)} />}
+            {showMarketAnalysisModal && <MarketAnalysisModal show={showMarketAnalysisModal} onHide={() => setShowMarketAnalysisModal(false)} />}
         </header>
     );
 }

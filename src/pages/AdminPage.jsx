@@ -2,32 +2,42 @@ import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { login } from '../store/slices/userSlice';
-import { apiGetUpcomingFixtures, loginAdmin } from '../api/API';
+import { login, logout } from '../store/slices/userSlice';
+import { apiGetUpcomingFixtures, loginAdmin, changeUserLoginPassword } from '../api/API';
 import dayjs from 'dayjs';
 import { getBannerImages } from '../api/API_games';
-import { errorToast } from '../utils/toast';
+import { errorToast, successToast } from '../utils/toast';
+import { footerText } from '../utilies/helpers';
+import LoginModal from '../components/LoginModal';
 
 const AdminPage = () => {
   const { isJustLogout } = useSelector((state) => state.notPersist);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
+  const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [loginErrors, setLoginErrors] = useState({});
+  const [loginTouched, setLoginTouched] = useState({ username: false, password: false });
   const [isLoading, setIsLoading] = useState(false);
   const [carouselBanners, setCarouselBanners] = useState([]);
   const [activeBannerIndex, setActiveBannerIndex] = useState(0);
   const [upcoming, setUpcoming] = useState([]);
+  const [oldPassword, setOldPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changePasswordErrors, setChangePasswordErrors] = useState({});
+  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
+  const [touched, setTouched] = useState({ oldPassword: false, newPassword: false, confirmPassword: false });
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { isLoggedIn } = useSelector((state) => state.user);
+  const { isLoggedIn, userData } = useSelector((state) => state.user);
 
-  useEffect(() => {
-    if (isLoggedIn) {
-      navigate('/admin/home');
-    }
-  }, [isLoggedIn, navigate]);
+  // useEffect(() => {
+  //   if (isLoggedIn) {
+  //     navigate('/admin/home');
+  //   }
+  // }, [isLoggedIn, navigate]);
 
   useEffect(() => {
     async function fetchBanners() {
@@ -53,26 +63,30 @@ const AdminPage = () => {
   }, [carouselBanners]);
 
   const toggleLogin = () => setIsLoginOpen(!isLoginOpen);
+  const toggleChangePassword = () => setIsChangePasswordOpen(!isChangePasswordOpen);
+
+  useEffect(() => {
+    const newErrors = {};
+    if (!username) newErrors.username = 'The username field is required';
+    if (!password) newErrors.password = 'The password field is required';
+    setLoginErrors(prev => ({ ...newErrors }));
+  }, [username, password]);
 
   function handleLogin(e) {
-    let isError = false;
     e.preventDefault();
+    setLoginTouched({ username: true, password: true });
+
+    if (Object.keys(loginErrors).length > 0) return;
+
     if (isJustLogout) {
-      errorToast("Please reload page and try !");
-      isError = true;
+      errorToast("Please reload the page and retry!");
+      return;
     }
 
-    if (!username || !password) {
-      setError('Username and password are required');
-      setIsLoading(false);
-      isError = true;
-    }
-
-    if (!isError) loginApi(e);
+    loginApi(e);
   }
 
   async function loginApi(e) {
-    setError('');
     setIsLoading(true);
 
     try {
@@ -82,16 +96,20 @@ const AdminPage = () => {
         dispatch(login(result.data));
         sessionStorage.setItem('userdata', JSON.stringify(result.data));
         setIsLoginOpen(false);
-        setTimeout(() => {
-          navigate('/admin/home');
-        }, 500);
+        if (result.data.first_password_changed == "0") {
+          setIsChangePasswordOpen(true);
+        } else {
+          setTimeout(() => {
+            navigate('/admin/home');
+          }, 500);
+        }
       } else {
-        setError(result.message || 'Login failed');
+        errorToast(result.message || 'Login failed');
       }
     } catch (err) {
       console.error('Login error:', err);
       const errorMessage = err.response?.data?.message || err.response?.data?.error || err.message || 'An error occurred during login. Please try again.';
-      setError(errorMessage);
+      errorToast(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -105,12 +123,74 @@ const AdminPage = () => {
   }, [])
 
   useEffect(() => {
-    if (isLoginOpen) {
+    if (isLoginOpen || isChangePasswordOpen) {
       document.body.classList.add('right-bar-enabled');
     } else {
       document.body.classList.remove('right-bar-enabled');
     }
-  }, [isLoginOpen])
+  }, [isLoginOpen, isChangePasswordOpen])
+
+  useEffect(() => {
+    const newErrors = {};
+    if (!oldPassword) {
+      newErrors.oldPassword = 'The OldPassword field is required';
+    }
+    if (!newPassword) {
+      newErrors.newPassword = 'The NewPassword field is required';
+    } else {
+      const hasUpper = /[A-Z]/.test(newPassword);
+      const hasLower = /[a-z]/.test(newPassword);
+      const hasNumber = /[0-9]/.test(newPassword);
+      if (!hasUpper || !hasLower || !hasNumber) {
+        newErrors.newPassword = 'The password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 number';
+      } else if (newPassword.length < 8) {
+        newErrors.newPassword = 'The NewPassword field must be at least 8 characters';
+      }
+    }
+    if (!confirmPassword) {
+      newErrors.confirmPassword = 'The NewPassword field is required';
+    } else if (newPassword !== confirmPassword) {
+      newErrors.confirmPassword = 'The NewPassword confirmation does not match';
+    }
+    setChangePasswordErrors(newErrors);
+  }, [oldPassword, newPassword, confirmPassword]);
+
+  async function handleChangePassword(e) {
+    e.preventDefault();
+
+    // Mark all as touched on submit
+    setTouched({ oldPassword: true, newPassword: true, confirmPassword: true });
+
+    if (Object.keys(changePasswordErrors).length > 0) return;
+
+    setChangePasswordLoading(true);
+    try {
+      const payload = {
+        changepwd_user_id: userData?.user_id,
+        changepwd_password: newPassword,
+        changepwd_cpassword: confirmPassword,
+        changepwd_master_password: oldPassword,
+      };
+      const response = await changeUserLoginPassword(payload);
+
+      if (response.status === 'ok') {
+        successToast("Welcome, You are logged in first time. Please change your password to continue.");
+        dispatch(logout());
+        sessionStorage.removeItem('userdata');
+        setIsChangePasswordOpen(false);
+
+        const transactionID = response.transaction_code;
+        navigate(`/admin/change-password-success/${transactionID}`);
+      } else {
+        errorToast(response.message || 'Failed to change password');
+      }
+    } catch (error) {
+      console.error('Change password error:', error);
+      errorToast('An error occurred while changing password');
+    } finally {
+      setChangePasswordLoading(false);
+    }
+  }
 
   // --- slide ---
   const latestCasinos = [
@@ -321,9 +401,7 @@ const AdminPage = () => {
               <div data-v-019a5d71="" className="row row5">
                 <div data-v-019a5d71="" className="col-lg-12 text-center">
                   <div data-v-019a5d71="" className="footer-bottom">
-                    <span data-v-019a5d71="">
-                      This website is owned and operated by (WORLD777.COM) Seven Investments America N.V.. registration number: 152581, registered address: Zuikertuintjeweg Z/N (Zuikertuin Tower), Curaçao. Contact us info@world7.com. world7.com is licensed and regulated by the Government of the Autonomous Island of Anjouan, Union of Comoros and operates under License No. ALSI-122310018-F16. world7.com has passed all regulatory compliance and is legally authorized to conduct gaming operations for any and all games of chance and wagering.
-                    </span>
+                    <span data-v-019a5d71="">{footerText}</span>
                   </div>
                   <div data-v-019a5d71="" className="mt-2 gt">
                     <a data-v-019a5d71="" href="javascript:void(0)" role="button">
@@ -342,89 +420,151 @@ const AdminPage = () => {
             </div>
           </footer>
         </div>
-
-        <div data-v-019a5d71="">
-          <div data-v-019a5d71="" className="right-bar">
+        {!isChangePasswordOpen && (
+          <LoginModal toggleLogin={toggleLogin}>
             <div data-v-019a5d71="">
-              <div data-v-019a5d71="" className="rightbar-title px-3 py-4">
-                <a data-v-019a5d71="" href="javascript:void(0);" className="closebtn float-right" onClick={toggleLogin}></a>
-                <h3 data-v-019a5d71="" className="m-0 text-light">ADMIN LOGIN</h3>
-              </div>
-              <hr data-v-019a5d71="" className="mt-0" />
-              <div data-v-019a5d71="" className="p-4 mt-5">
-                <div data-v-019a5d71="" className="overflow-hidden">
-                  <div data-v-019a5d71="">
-                    <h3 data-v-019a5d71="" className="text-center mt-2 mb-0 text-secondary">
-                      Welcome to Admin Panel
-                    </h3>
-                    <p data-v-019a5d71="" className="text-center text-secondary">
-                      Enter your Username and Password
-                    </p>
-                    <form data-v-019a5d71="" autoComplete="off" data-vv-scope="form-login" onSubmit={handleLogin} className="p-2 mt-4">
-                      <div data-v-019a5d71="" id="input-group-1" role="group" className="form-group">
-                        <div>
-                          <input
-                            data-v-019a5d71=""
-                            id="input-1"
-                            name="username"
-                            type="text"
-                            placeholder="Enter Username"
-                            className="form-control-lg form-control"
-                            value={username}
-                            onChange={(e) => setUsername(e.target.value)}
-                          />
-                          {/* {!username && (
-                            <span data-v-019a5d71="" className="error">
-                              The username field is required
-                            </span>
-                          )} */}
-                        </div>
-                      </div>
-                      <div data-v-019a5d71="" id="input-group-2" role="group" className="form-group">
-                        <div>
-                          <input
-                            data-v-019a5d71=""
-                            id="input-2"
-                            name="password"
-                            type="password"
-                            placeholder="Enter password"
-                            className="form-control-lg form-control"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                          />
-                        </div>
-                      </div>
-                      {error && (
-                        <div className="alert alert-danger p-2" role="alert">
-                          {error}
-                        </div>
-                      )}
-                      <div data-v-019a5d71="" className="mt-3">
-                        <button
-                          data-v-019a5d71=""
-                          type="submit"
-                          className="btn btn-block btn-theme1 btn-lg btn-submit btn-secondary"
-                          disabled={isLoading}
-                        >
-                          {isLoading ? 'Signing In...' : 'Sign In'}
-                        </button>
-                      </div>
-                      <small data-v-019a5d71="" className="recaptchaTerms">This site is protected by reCAPTCHA and the Google
-                        <a data-v-019a5d71="" href="https://policies.google.com/privacy"> Privacy Policy</a> and
-                        <a data-v-019a5d71="" href="https://policies.google.com/terms"> Terms of Service</a> apply.
-                      </small>
-                    </form>
-                  </div>
-                  <div data-v-019a5d71="" className="text-center text-secondary mt-2">
-                    <div data-v-019a5d71="" className="mb-2">© Copyright 2021. All Rights Reserved.</div>
-                    This website is owned and operated by (WORLD777.COM) Seven Investments America N.V.. registration number: 152581, registered address: Zuikertuintjeweg Z/N (Zuikertuin Tower), Curaçao. Contact us info@world7.com. world7.com is licensed and regulated by the Government of the Autonomous Island of Anjouan, Union of Comoros and operates under License No. ALSI-122310018-F16. world7.com has passed all regulatory compliance and is legally authorized to conduct gaming operations for any and all games of chance and wagering.
+              <h3 data-v-019a5d71="" className="text-center mt-2 mb-0 text-secondary">
+                Welcome to Admin Panel
+              </h3>
+              <p data-v-019a5d71="" className="text-center text-secondary">
+                Enter your Username and Password
+              </p>
+              <form data-v-019a5d71="" autoComplete="off" data-vv-scope="form-login" onSubmit={handleLogin} className="p-2 mt-4">
+                <div data-v-019a5d71="" id="input-group-1" role="group" className="form-group">
+                  <div>
+                    <input
+                      data-v-019a5d71=""
+                      id="input-1"
+                      name="username"
+                      type="text"
+                      placeholder="Enter Username"
+                      className="form-control-lg form-control"
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      onBlur={() => setLoginTouched(prev => ({ ...prev, username: true }))}
+                      aria-invalid={loginTouched.username && loginErrors.username ? "true" : "false"}
+                    />
+                    {loginTouched.username && loginErrors.username && (
+                      <span data-v-019a5d71="" className="error">
+                        {loginErrors.username}
+                      </span>
+                    )}
                   </div>
                 </div>
-              </div>
+                <div data-v-019a5d71="" id="input-group-2" role="group" className="form-group">
+                  <div>
+                    <input
+                      data-v-019a5d71=""
+                      id="input-2"
+                      name="password"
+                      type="password"
+                      placeholder="Enter password"
+                      className="form-control-lg form-control"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      onBlur={() => setLoginTouched(prev => ({ ...prev, password: true }))}
+                      aria-invalid={loginTouched.password && loginErrors.password ? "true" : "false"}
+                    />
+                    {loginTouched.password && loginErrors.password && (
+                      <span data-v-019a5d71="" className="error">
+                        {loginErrors.password}
+                      </span>
+                    )}
+                  </div>
+                </div>
+                <div data-v-019a5d71="" className="mt-3">
+                  <button
+                    data-v-019a5d71=""
+                    type="submit"
+                    className="btn btn-block btn-theme1 btn-lg btn-submit btn-secondary"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Signing In...' : 'Sign In'}
+                  </button>
+                </div>
+                <small data-v-019a5d71="" className="recaptchaTerms">This site is protected by reCAPTCHA and the Google
+                  <a data-v-019a5d71="" href="https://policies.google.com/privacy"> Privacy Policy</a> and
+                  <a data-v-019a5d71="" href="https://policies.google.com/terms"> Terms of Service</a> apply.
+                </small>
+              </form>
             </div>
-          </div>
-          <div data-v-019a5d71="" className="rightbar-overlay"></div>
-        </div>
+          </LoginModal>
+        )}
+
+        {/* {isChangePasswordOpen || true && ( */}
+        {isChangePasswordOpen && (
+          <LoginModal toggleLogin={toggleChangePassword}>
+            <div data-v-197edd3b="">
+              <h3 data-v-197edd3b="" className="text-center mt-2 text-uppercase">Change Password</h3>
+              <form data-v-197edd3b="" data-vv-scope="form-changepassword" className="change-form p-2" onSubmit={handleChangePassword}>
+                <div data-v-197edd3b="" className="form-group">
+                  <label data-v-197edd3b="" className="user-email-text">Old Password</label>
+                  <input
+                    data-v-197edd3b=""
+                    type="password"
+                    name="OldPassword"
+                    className="form-control"
+                    aria-required="true"
+                    aria-invalid={touched.oldPassword && changePasswordErrors.oldPassword ? "true" : "false"}
+                    value={oldPassword}
+                    onChange={(e) => setOldPassword(e.target.value)}
+                    onBlur={() => setTouched(prev => ({ ...prev, oldPassword: true }))}
+                  />
+                  {touched.oldPassword && changePasswordErrors.oldPassword && (
+                    <span data-v-197edd3b="" className="error">
+                      {changePasswordErrors.oldPassword}
+                    </span>
+                  )}
+                </div>
+                <div data-v-197edd3b="" className="form-group">
+                  <label data-v-197edd3b="" className="user-email-text">New Password</label>
+                  <input
+                    data-v-197edd3b=""
+                    type="password"
+                    name="NewPassword"
+                    className="form-control"
+                    aria-required="true"
+                    aria-invalid={touched.newPassword && changePasswordErrors.newPassword ? "true" : "false"}
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    onBlur={() => setTouched(prev => ({ ...prev, newPassword: true }))}
+                  />
+                  {touched.newPassword && changePasswordErrors.newPassword && (
+                    <span data-v-197edd3b="" className="error">
+                      {changePasswordErrors.newPassword}
+                    </span>
+                  )}
+                </div>
+                <div data-v-197edd3b="" className="form-group">
+                  <label data-v-197edd3b="" className="user-email-text">Confirm Password</label>
+                  <input
+                    data-v-197edd3b=""
+                    type="password"
+                    name="ConfirmNewPassword"
+                    data-vv-as="NewPassword"
+                    className="form-control"
+                    aria-required="true"
+                    aria-invalid={touched.confirmPassword && changePasswordErrors.confirmPassword ? "true" : "false"}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    onBlur={() => setTouched(prev => ({ ...prev, confirmPassword: true }))}
+                  />
+                  {touched.confirmPassword && changePasswordErrors.confirmPassword && (
+                    <span data-v-197edd3b="" className="error">
+                      {changePasswordErrors.confirmPassword}
+                    </span>
+                  )}
+                </div>
+                <div data-v-197edd3b="" className="form-group mb-0">
+                  <button data-v-197edd3b="" type="submit" className="btn-block btn-theme1 btn-lg btn-submit" disabled={changePasswordLoading}>
+                    {changePasswordLoading ? 'Changing...' : 'Change Password'}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </LoginModal>
+        )}
+
       </div>
     </div>
   );

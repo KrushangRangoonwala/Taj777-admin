@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Select from "react-select";
 import { io } from "socket.io-client";
 import { getClients, checkUserLockPwd, updateUserLockStatus } from "../../api/API";
 import { casino_list } from "../../utilies/casino_list";
+import { errorToast, successToast } from '../../utils/toast';
+import PageNamePath from "../../components/PageNamePath";
 
 // Event tree node component
 const EventTreeNode = ({ node, onChange }) => {
@@ -76,6 +78,7 @@ const EventTreeNode = ({ node, onChange }) => {
 
 // Main component
 const GeneralLock = () => {
+  const inputField = useRef(null);
   const [selectedClient, setSelectedClient] = useState(null);
   const [tpassword, setTpassword] = useState("");
 
@@ -86,6 +89,8 @@ const GeneralLock = () => {
 
   const [clientOptions, setClientOptions] = useState([]);
   const [clientSearch, setClientSearch] = useState("");
+  const [clientList, setClientList] = useState([]);
+  const [isListActive, setIsListActive] = useState(false);
 
   // SOCKET: fetch matches dynamically
   useEffect(() => {
@@ -137,17 +142,20 @@ const GeneralLock = () => {
   }, []);
 
   // CLIENT SEARCH
-  const fetchClients = async (inputValue) => {
+  const fetchClients = async (value) => {
+    if (!value) {
+      setClientList([{ id: '1', text: 'List is empty.' }]);
+      return;
+    }
+    if (value.trim() === "") {
+      setClientList([{ id: '1', text: 'No elements found' }]);
+      return;
+    }
+
     try {
-      const res = await getClients(inputValue);
-
-      const formatted =
-        (res?.results || []).map((c) => ({
-          value: c.id,
-          label: c.text,
-        })) || [];
-
-      setClientOptions(formatted);
+      console.log("value-----", value)
+      const res = await getClients(value);
+      res.results?.length > 0 ? setClientList(res.results) : setClientList([{ id: '1', text: 'No elements found' }]);
     } catch (err) {
       console.log(err);
     }
@@ -158,7 +166,7 @@ const GeneralLock = () => {
     e.preventDefault();
     /* if (!selectedClient || !tpassword) return; */
     if (!tpassword) {
-      alert("Transaction Code is required");
+      errorToast("Transaction Code is required");
       return;
     }
 
@@ -169,7 +177,7 @@ const GeneralLock = () => {
       });
 
       if (res.status !== "ok") {
-        alert(res.message);
+        errorToast(res.message || "Failed to load");
         return;
       }
 
@@ -315,26 +323,38 @@ const GeneralLock = () => {
     }
   };
 
-  return (
-    <div>
-      {/* PAGE TITLE */}
-      <div className="row">
-        <div className="col-12">
-          <div className="page-title-box d-flex align-items-center justify-content-between">
-            <h4 className="mb-0 font-size-18">General Lock</h4>
-          </div>
-        </div>
-      </div>
+  useEffect(() => {
+    fetchClients(clientSearch);
+  }, [clientSearch])
 
-      <div className="card">
-        <div className="card-body">
-          <div className="user-lock-container">
-            {/* FORM */}
-            <div className="m-t-20">
-              <form onSubmit={handleLoad}>
-                <div className="row row5 align-items-center">
-                  <div className="col-md-3">
-                    <Select
+  return (
+    <>
+      <style>
+        {`
+          .custom-placeholder::placeholder {
+            color: #ced4da !important;
+          }
+      `}
+      </style>
+      <div>
+        {/* PAGE TITLE */}
+        <PageNamePath
+          pageName="General Lock"
+          pathArr={[
+            { path: "/admin/home", name: "Home" },
+            { path: "", name: "General Lock" }
+          ]}
+        />
+
+        <div className="card">
+          <div className="card-body">
+            <div className="user-lock-container">
+              {/* FORM */}
+              <div className="m-t-20">
+                <form onSubmit={handleLoad}>
+                  <div className="row row5 align-items-center mb-3px-plus">
+                    <div className="col-md-3">
+                      {/* <Select
                       options={clientOptions}
                       placeholder="Search By Client Name"
                       classNamePrefix="react-select"
@@ -350,90 +370,135 @@ const GeneralLock = () => {
                         setClientSearch(inputValue);
                         fetchClients(inputValue);
                       }}
-                    />
-                  </div>
-                  <div className="col-md-2">
-                    <input
-                      type="password"
-                      className="form-control"
-                      placeholder="Transaction Code"
-                      value={tpassword}
-                      onChange={(e) => setTpassword(e.target.value)}
-                    />
-                  </div>
-                  <div className="col-md-2">
-                    <button type="submit" className="btn btn-primary me-1">
-                      Load
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-light"
-                      onClick={() => {
-                        setSelectedClient(null);
-                        setEventData([]);
-                        setCasinoData([]);
-                      }}
-                    >
-                      Reset
-                    </button>
-                  </div>
-                </div>
-              </form>
-            </div>
+                    /> */}
 
-            {/* DATA DISPLAY */}
-            {eventData.length > 0 && (
-              <div className="row mt-4">
-                {/* EVENTS */}
-                <div className="col-lg-6 col-md-6 col-12">
-                  <h4 className="ptitle">Events</h4>
-                  <ul
-                    id="accordian1"
-                    className="navbar-nav user-lock-nav list-unstyled"
-                  >
-                    {eventData.map((node) => (
-                      <EventTreeNode
-                        key={node.id}
-                        node={node}
-                        onChange={handleCheckbox}
+                      {/* <div className="form-group user-lock-search" style={{ position: "relative" }}> */}
+                      <input
+                        ref={inputField}
+                        type="search"
+                        className="form-control custom-placeholder"
+                        value={clientSearch}
+                        placeholder="Search By Client Name"
+                        onChange={(e) => setClientSearch(e.target.value)}
+                        onFocus={() => {
+                          setIsListActive(true);
+                        }}
+                        onBlur={() => {
+                          setClientSearch("");
+                          setIsListActive(false);
+                        }}
                       />
-                    ))}
-                  </ul>
-                </div>
 
-                {/* CASINO */}
-                <div className="col-lg-6 col-md-6 col-12">
-                  <h4 className="ptitle">Casino List</h4>
-                  <ul className="user-lock-nav list-unstyled mt-2">
-                    {casinoData.map((item) => (
-                      <li key={item.id}>
-                        <span className="custom-control custom-checkbox">
-                          <input
-                            type="checkbox"
-                            id={item.id}
-                            className="custom-control-input"
-                            checked={item.checked || false}
-                            onChange={(e) =>
-                              handleCheckbox(item, e.target.checked)
-                            }
-                          />
-                          <label
-                            htmlFor={item.id}
-                            className="custom-control-label"
-                          >
-                            {item.name}
-                          </label>
-                        </span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
+                      {isListActive && (
+                        <div style={{
+                          position: 'absolute',
+                          background: '#fff',
+                          border: '1px solid #ddd',
+                          width: '96%',
+                          zIndex: 1000
+                        }}>
+                          {clientList.map((c, i) => (
+                            <div
+                              key={i}
+                              style={{ padding: '5px', cursor: 'pointer', padding: "0.7rem 0.7rem" }}
+                              onClick={() => {
+                                setSelectedClient(c.id);
+                                setClientSearch(c.text);
+                                setClientList([]);
+                              }}
+                            >
+                              {c.text}
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                      {/* </div> */}
+
+                    </div>
+                    <div className="col-md-2">
+                      <input
+                        type="password"
+                        className="form-control"
+                        placeholder="Transaction Code"
+                        value={tpassword}
+                        onChange={(e) => setTpassword(e.target.value)}
+                      />
+                    </div>
+                    <div className="col-md-2">
+                      <button type="submit" className="btn btn-primary me-1">
+                        Load
+                      </button>
+                      &nbsp;
+                      <button
+                        type="button"
+                        className="btn btn-light"
+                        onClick={() => {
+                          setSelectedClient(null);
+                          setEventData([]);
+                          setCasinoData([]);
+                        }}
+                      >
+                        Reset
+                      </button>
+                    </div>
+                  </div>
+                </form>
               </div>
-            )}
+
+              {/* DATA DISPLAY */}
+              {eventData.length > 0 && (
+                <div className="row mt-4">
+                  {/* EVENTS */}
+                  <div className="col-lg-6 col-md-6 col-12">
+                    <h4 className="ptitle">Events</h4>
+                    <ul
+                      id="accordian1"
+                      className="navbar-nav user-lock-nav list-unstyled"
+                    >
+                      {eventData.map((node) => (
+                        <EventTreeNode
+                          key={node.id}
+                          node={node}
+                          onChange={handleCheckbox}
+                        />
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* CASINO */}
+                  <div className="col-lg-6 col-md-6 col-12">
+                    <h4 className="ptitle">Casino List</h4>
+                    <ul className="user-lock-nav list-unstyled mt-2">
+                      {casinoData.map((item) => (
+                        <li key={item.id}>
+                          <span className="custom-control custom-checkbox">
+                            <input
+                              type="checkbox"
+                              id={item.id}
+                              className="custom-control-input"
+                              checked={item.checked || false}
+                              onChange={(e) =>
+                                handleCheckbox(item, e.target.checked)
+                              }
+                            />
+                            <label
+                              htmlFor={item.id}
+                              className="custom-control-label"
+                            >
+                              {item.name}
+                            </label>
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </>
   );
 };
 

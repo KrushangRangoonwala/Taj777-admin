@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Collapse from 'react-bootstrap/Collapse';
+import OverlayTrigger from 'react-bootstrap/OverlayTrigger';
+import Tooltip from 'react-bootstrap/Tooltip';
 import { formatNumber, sanitizeNumber } from '../../../utilies/helpers';
 
 export const OddsBox = ({ type, level, odds, size, noVal, suspended, animateColor, is_1_OddBox }) => {
@@ -46,20 +48,28 @@ export const MarketTable = ({
                 <div className="bet-table-header" onClick={() => setIsOpen(!isOpen)} style={{ cursor: 'pointer' }}>
                     {/* <div className="bet-table-header" onClick={() => toggleSection(id)} style={{ cursor: 'pointer' }}> */}
                     <div className="nation-name">
-                        <span title={title}>
-                            <a href="javascript:void(0)" title="">
-                                <img
-                                    src="https://wver.sprintstaticdata.com/v208/static/front/img/arrow-down.svg"
-                                    className="mr-1"
-                                    // style={{
-                                    //     transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
-                                    //     transition: 'transform 0.3s ease-in-out'
-                                    // }}
-                                    alt=""
-                                />
-                            </a>
-                            {' '}{title}
-                        </span>
+                        <OverlayTrigger
+                            trigger={['hover', 'focus']}
+                            placement="top"
+                            overlay={<Tooltip>{title}</Tooltip>}
+                            container={document.body}
+                            popperConfig={{ strategy: 'fixed' }}
+                        >
+                            <span>
+                                <a role='button'>
+                                    <img
+                                        src="https://wver.sprintstaticdata.com/v208/static/front/img/arrow-down.svg"
+                                        className="mr-1"
+                                        // style={{
+                                        //     transform: isOpen ? 'rotate(0deg)' : 'rotate(-90deg)',
+                                        //     transition: 'transform 0.3s ease-in-out'
+                                        // }}
+                                        alt=""
+                                    />
+                                </a>
+                                {' '}{title}
+                            </span>
+                        </OverlayTrigger>
                     </div>
                     <div className="float-right">
                         {showBetLock && <a href="javascript:void(0)" className="btn btn-back">Bet Lock</a>}
