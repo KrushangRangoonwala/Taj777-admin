@@ -131,14 +131,28 @@
     fill: currentColor !important;
 }
 
-.form-control::placeholder {
+/* .form-control::placeholder {
     color: #ced4da !important;
-}
+} */
 
-.dark-placeholder .form-control::placeholder,
+/* .dark-placeholder .form-control::placeholder,
 .form-control.dark-placeholder::placeholder {
     color: #495057 !important;
     opacity: 0.8 !important;
+} */
+
+input[placeholder="Select option"].form-control::placeholder {
+    color: #ced4da !important;
+}
+
+input[placeholder="Select option"].form-control:focus::placeholder {
+    color: #495057 !important;
+}
+
+.light-placeholder .form-control::placeholder,
+.form-control.light-placeholder::placeholder {
+    color: #ced4da !important;
+    /* opacity: 0.8 !important; */
 }
 
 .form-control:focus::placeholder {
@@ -185,4 +199,10 @@ input[type="search"]::placeholder {
 
 .hover-blue:hover {
     color: #1f3dd0;
+}
+
+.border-radios-5px .css-1a6x3h5-control,
+.custome-css-select .css-1a6x3h5-control {
+    border-radius: 5px !important;
+    min-height: 36.6px;
 }

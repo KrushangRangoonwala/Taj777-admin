@@ -10,14 +10,14 @@ import autoTable from "jspdf-autotable";
 import { Table } from 'react-bootstrap';
 import Select from "react-select";
 import { customSelectStyles } from "../../components/Header";
-
+import { emptyList, notFoundQuery } from "../../utilies/helpers";
 
 const { RangePicker } = DatePicker;
 
 const UserHistory = () => {
   const [isListActive, setIsListActive] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
-  const [clientList, setClientList] = useState([]);
+  const [clientList, setClientList] = useState(emptyList);
   const [selectedClient, setSelectedClient] = useState("");
   const [clientSearch, setClientSearch] = useState('');
   const [dateRange, setDateRange] = useState([dayjs().subtract(7, "day"), dayjs()]);
@@ -58,7 +58,6 @@ const UserHistory = () => {
     return 'ascending';
   };
 
-
   // 🔹 Handle tab change
   const handleTabChange = (tab) => {
     setActiveTab(tab);
@@ -66,25 +65,26 @@ const UserHistory = () => {
     // 🔹 Reset all states
     setSelectedClient("");
     setClientSearch("");
-    setClientList([]);
+    setClientList(emptyList);
     setDateRange([dayjs().subtract(7, "day"), dayjs()]);
     setSearch("");
     setData([]);
     setCurrentPage(1);
     setTotalRecords(0);
+    setIsListActive(false);
   };
 
   // 🔹 Fetch clients
   const fetchClients = async (value) => {
     if (!value) {
-      setClientList([{ id: '1', text: 'List is empty.' }]);
+      setClientList(emptyList);
       return;
     }
 
     try {
       console.log("inininin");
       const res = await getClients(value);
-      res.results?.length > 0 ? setClientList(res.results) : setClientList([{ id: '1', text: 'No elements found. Consider changing search query.' }]);
+      res.results?.length > 0 ? setClientList(res.results) : setClientList(notFoundQuery);
     } catch (err) {
       console.error(err);
     }
@@ -321,7 +321,7 @@ const UserHistory = () => {
                                   onClick={() => {
                                     setSelectedClient(c.id);
                                     setClientSearch(c.text);
-                                    setClientList([]);
+                                    setClientList(emptyList);
                                   }}
                                 >
                                   {c.text}
@@ -555,7 +555,7 @@ const UserHistory = () => {
                               position: 'absolute',
                               background: '#fff',
                               border: '1px solid #ddd',
-                              width: '100%',
+                              width: '90.75%',
                               zIndex: 1000
                             }}>
                               {clientList.map((c, i) => (
@@ -571,7 +571,7 @@ const UserHistory = () => {
                                   onClick={() => {
                                     setSelectedClient(c.id);
                                     setClientSearch(c.text);
-                                    setClientList([]);
+                                    setClientList(emptyList);
                                   }}
                                 >
                                   {c.text}

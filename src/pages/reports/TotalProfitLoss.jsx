@@ -433,7 +433,7 @@ const TotalProfitLoss = () => {
                       <input
                         type="search"
                         placeholder="Search..."
-                        className="form-control form-control-sm ml-2"
+                        className="form-control form-control-sm ml-2 dark-placeholder"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyUp={(e) => { fetchData(1) }}

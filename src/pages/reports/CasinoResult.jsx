@@ -299,7 +299,8 @@ const CasinoResult = () => {
           {/* CASINO TYPE */}
           <div className="col-md-3 mb-2">
             <select
-              className={`form-control ${!casinoType && search.trim() ? "is-invalid" : ""}`}
+              className={`form-control ${!casinoType ? "is-invalid" : ""}`}
+              // className={`form-control ${true ? "is-invalid" : ""}`}
               value={casinoType}
               onChange={(e) => setCasinoType(e.target.value)}
             >
@@ -313,25 +314,23 @@ const CasinoResult = () => {
           </div>
 
           {/* BUTTONS */}
-          <div className="col-md-6  mb-2 ml-3px-child">
+          <div className="col-md-6  mb-2">
             <button className="btn btn-primary" onClick={() => fetchCasinoResult(1)}>
               Load
-            </button>
+            </button>{' '}
 
             <button className="btn btn-light" onClick={handleReset}>
               Reset
-            </button>
-            &nbsp;
-            <div className="d-inline-block ml-3 ml-3px-child">
+            </button>{' '}
+            <div className="d-inline-block ml-3">
               <div id="export_1776776380804" className="d-inline-block disabled">
-                <button type="button" className="btn btn-success" onClick={exportExcel} disabled={data.length === 0}>
+                <button type="button" className="btn btn-success mr-1" onClick={exportExcel} disabled={data.length === 0}>
                   <i className="fas fa-file-excel"></i>
                 </button>
-              </div>
-              &nbsp;
+              </div>{' '}
               <button type="button" className="btn btn-danger" onClick={exportPDF} disabled={data.length === 0}>
                 <i className="fas fa-file-pdf"></i>
-              </button>
+              </button>{' '}
             </div>
           </div>
         </div>
@@ -364,7 +363,7 @@ const CasinoResult = () => {
                 <input
                   type="search"
                   placeholder="Search..."
-                  className="form-control form-control-sm ml-2"
+                  className="form-control form-control-sm ml-2 dark-placeholder"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   onKeyUp={(e) => { fetchCasinoResult(1) }}
@@ -412,8 +411,8 @@ const CasinoResult = () => {
                       <div role="alert" aria-live="polite">
                         <div className="text-center my-2">
                           {loading
-                            // ? "Loading..."
-                            ? "There are no records to show"
+                            ? "Loading..."
+                            // ? "There are no records to show"
                             : search?.length
                               ? "There are no records matching your request"
                               : "There are no records to show"}

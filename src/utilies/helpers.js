@@ -74,7 +74,7 @@ export function format_casino_list(casino_list) {
     casino_list?.forEach((item) => {
         const game_type = item.game_socket;
         const details = gameType_To_details[game_type];
-        casinoDetails[game_type] = {
+        casinoDetails[game_type || item.game_code] = {
             ...item,
             game_type: game_type,
             ...details,
@@ -320,3 +320,9 @@ export const isPageAtTop = () => {
 };
 
 export const footerText = "This website is owned and operated by (WORLD777.COM) Seven Investments America N.V.. registration number: 152581, registered address: Zuikertuintjeweg Z/N (Zuikertuin Tower), Curaçao. Contact us info@world7.com. world7.com is licensed and regulated by the Government of the Autonomous Island of Anjouan, Union of Comoros and operates under License No. ALSI-122310018-F16. world7.com has passed all regulatory compliance and is legally authorized to conduct gaming operations for any and all games of chance and wagering.";
+
+export const emptyList = [{ id: '1', text: 'List is empty.' }]
+
+export const notFoundQuery = [{ id: '1', text: 'No elements found. Consider changing search query.' }]
+
+export const getNoRecordText = (searchTxt) => searchTxt?.length > 0 ? "There are no records matching your request" : "There are no records to show"

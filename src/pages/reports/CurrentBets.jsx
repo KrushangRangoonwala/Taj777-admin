@@ -331,8 +331,15 @@ const CurrentBets = () => {
                   <div className="table no-footer table-responsive-sm">
                     <Table id="currentBetsTable" role="table" aria-busy="false" aria-colcount={sportType === "sport" ? 11 : 9} className="b-table" bordered>
                       <colgroup>
-                        <col style={{ width: "auto" }} />
-                        <col style={{ width: "200px" }} />
+                        {sportType === "sport"
+                          ? <>
+                            <col style={{ width: "auto" }} />
+                            <col style={{ width: "200px" }} />
+                          </>
+                          : <>
+                            <col style={{ width: "200px" }} />
+                            <col style={{ width: "auto" }} />
+                          </>}
                         <col style={{ width: "auto" }} />
                         <col style={{ width: "auto" }} />
                         <col style={{ width: "auto" }} />

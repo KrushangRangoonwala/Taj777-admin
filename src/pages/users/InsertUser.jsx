@@ -69,7 +69,7 @@ const InsertUser = () => {
   const renderAccountTypeOptions = () => {
     if (!loginUser) return null;
 
-    console.log("loginUser", loginUser);
+    // console.log("loginUser", loginUser);
 
     const power = Number(loginUser.user_type);
 
@@ -115,6 +115,8 @@ const InsertUser = () => {
           error = "The User Name field must be at least 4 characters";
         } else if (!/^[a-zA-Z0-9]+$/.test(value)) {
           error = "The User Name field may only contain alpha-numeric characters";
+        } else if (value.length > 15) {
+          error = "The User Name field may not be greater than 15 characters";
         }
         break;
       case "fullname":
@@ -122,10 +124,14 @@ const InsertUser = () => {
           error = "The Full Name field is required";
         } else if (value.length < 4) {
           error = "The Full Name field must be at least 4 characters";
+        } else if (value.length > 50) {
+          error = "The Full Name field may not be greater than 50 characters";
         }
         break;
       case "password":
-        if (!value) {
+        if (value.length > 20) {
+          error = "The Password field may not be greater than 20 characters";
+        } else if (!value.trim()) {
           error = "The password field is required";
         } else if (value.length < 8) {
           error = "The Password field must be at least 8 characters";
@@ -134,7 +140,7 @@ const InsertUser = () => {
         }
         break;
       case "cpassword":
-        if (!value) {
+        if (!value.trim()) {
           error = "The Confirm Password field is required";
         } else if (value !== currentFormData.password) {
           error = "The Confirm Password confirmation does not match";
@@ -150,11 +156,37 @@ const InsertUser = () => {
           error = "true";
         }
         break;
-      case "newlvlno":
-        if (!value || value === "0") {
-          error = "Please select User Type";
+      case "city":
+        if (value?.length === 0) break; // if field is empty, don't show error
+        if (value?.length < 3) {
+          error = "The City field must be at least 3 characters";
+        } else if (value?.length > 20) {
+          error = "The City field may not be greater than 20 characters";
         }
         break;
+      case "mono":
+        if (value?.length === 0) break; // if field is empty, don't show error
+        if (!/^\d+$/.test(value)) {
+          error = "The Mobile Number field may only contain numeric characters";
+        } else if (value?.length < 10) {
+          error = "The Mobile Number field must be at least 10 characters";
+        }
+        break;
+      case "camt":
+        if (value?.length > 20) {
+          error = "The Credit Amount field may not be greater than 20 characters";
+        }
+        break;
+      case "remark":
+        if (value?.length > 500) {
+          error = "The Remark field may not be greater than 500 characters";
+        }
+        break;
+      // case "newlvlno":
+      //   if (!value || value === "0") {
+      //     error = "Please select User Type";
+      //   }
+      //   break;
       default:
         break;
     }
@@ -437,12 +469,16 @@ const InsertUser = () => {
                       type="text"
                       data-vv-as="City"
                       name="city"
-                      className="form-control animation"
+                      className={`form-control animation ${touched.city && errors.city ? 'is-invalid' : ''}`}
                       aria-required="false"
-                      aria-invalid="false"
+                      aria-invalid={!!errors.city}
                       value={formData.city}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                     />
+                    {touched.city && errors.city && (
+                      <small className="error">{errors.city}</small>
+                    )}
                   </div>
 
                   <div className="form-group">
@@ -453,12 +489,16 @@ const InsertUser = () => {
                       data-vv-as="Mobile Number"
                       name="mono"
                       maxLength="15"
-                      className="form-control animation"
+                      className={`form-control animation ${touched.mono && errors.mono ? 'is-invalid' : ''}`}
                       aria-required="false"
-                      aria-invalid="false"
+                      aria-invalid={!!errors.mono}
                       value={formData.mono}
                       onChange={handleChange}
+                      onBlur={handleBlur}
                     />
+                    {touched.mono && errors.mono && (
+                      <small className="error">{errors.mono}</small>
+                    )}
                   </div>
                 </div>
               </div>
@@ -472,21 +512,27 @@ const InsertUser = () => {
                     <input
                       placeholder="Credit Amount"
                       type="number"
+                      step="1"
+                      min={Math.floor(formData.camt)}
+                      max={Math.ceil(formData.camt)}
                       data-vv-as="Credit Amount"
                       name="camt"
-                      className="form-control"
+                      className={`form-control animation ${touched.camt && errors.camt ? 'is-invalid' : ''}`}
                       aria-required="false"
-                      aria-invalid="false"
+                      aria-invalid={!!errors.camt}
                       value={formData.camt}
                       onChange={handleChange}
                     />
+                    {touched.camt && errors.camt && (
+                      <small className="error">{errors.camt}</small>
+                    )}
                   </div>
 
                   <div className="form-group tag-select">
                     <label>User Type: <span className="text-danger">*</span></label>
                     <select
                       name="newlvlno"
-                      className={`form-control ${touched.newlvlno && errors.newlvlno ? 'is-invalid' : ''}`}
+                      className={`form-control animation ${touched.newlvlno && errors.newlvlno ? 'is-invalid' : ''}`}
                       value={formData.newlvlno}
                       onChange={handleChange}
                       onBlur={handleBlur}
@@ -533,12 +579,15 @@ const InsertUser = () => {
                       placeholder="Remark"
                       data-vv-as="Remark"
                       name="remark"
-                      className="form-control"
+                      className={`form-control animation ${touched.remark && errors.remark ? 'is-invalid' : ''}`}
                       aria-required="false"
-                      aria-invalid="false"
+                      aria-invalid={!!errors.remark}
                       value={formData.remark}
                       onChange={handleChange}
                     ></textarea>
+                    {touched.remark && errors.remark && (
+                      <small className="error">{errors.remark}</small>
+                    )}
                   </div>
 
                   {isUserTypeSelected && (

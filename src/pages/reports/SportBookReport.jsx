@@ -11,6 +11,7 @@ import { customSelectStyles } from "../../components/Header";
 import Select from "react-select";
 import { Table } from 'react-bootstrap';
 import Pagination from "../../components/Pagination";
+import { emptyList, notFoundQuery } from "../../utilies/helpers";
 
 
 const { RangePicker } = DatePicker;
@@ -22,7 +23,7 @@ const providerTypes = [
 const SportBookReport = () => {
   const [isListActive, setIsListActive] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
-  const [clientList, setClientList] = useState([]);
+  const [clientList, setClientList] = useState(emptyList);
   const [selectedClient, setSelectedClient] = useState("");
   const [clientSearch, setClientSearch] = useState('');
   const [date, setDate] = useState(dayjs());
@@ -72,25 +73,26 @@ const SportBookReport = () => {
     // 🔹 Reset all states
     setSelectedClient("");
     setClientSearch("");
-    setClientList([]);
+    setClientList(emptyList);
     setDate(dayjs());
     setDateRange([dayjs().subtract(7, "day"), dayjs()]);
     setSearch("");
     setData([]);
     setCurrentPage(1);
     setTotalRecords(0);
+    setIsListActive(false);
   };
 
   // 🔹 Fetch clients
   const fetchClients = async (value) => {
     if (!value) {
-      setClientList([{ id: '1', text: 'List is empty.' }]);
+      setClientList(emptyList);
       return;
     }
 
     try {
       const res = await getClients(value);
-      res.results?.length > 0 ? setClientList(res.results) : setClientList([{ id: '1', text: 'No elements found. Consider changing search query.' }]);
+      res.results?.length > 0 ? setClientList(res.results) : setClientList(notFoundQuery);
     } catch (err) {
       console.error(err);
     }
@@ -280,7 +282,7 @@ const SportBookReport = () => {
                         <input
                           type="text"
                           className="form-control"
-                          placeholder="Select option"
+                          placeholder="Select option 11"
                           value={clientSearch}
                           onChange={(e) => setClientSearch(e.target.value)}
                           onFocus={() => {
@@ -328,7 +330,7 @@ const SportBookReport = () => {
                                 onClick={() => {
                                   setSelectedClient(c.id);
                                   setClientSearch(c.text);
-                                  setClientList([]);
+                                  setClientList(emptyList);
                                 }}
                               >
                                 {c.text}

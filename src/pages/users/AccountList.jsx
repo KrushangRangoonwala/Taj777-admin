@@ -3,11 +3,13 @@ import UserMoreModal from '../../components/UserMoreModal';
 import DepositModal from '../../components/DepositModal';
 import WithdrawModal from '../../components/WithdrawModal';
 import { getUserList } from "../../api/API";
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useParams } from 'react-router-dom';
+import { Table } from 'react-bootstrap';
 
 const AccountList = () => {
   const pathName = useLocation().pathname;
   const isChild = pathName.includes("child");
+  const { id } = useParams();
   const [showModal, setShowModal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
@@ -19,8 +21,10 @@ const AccountList = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(25);
   const [total, setTotal] = useState(0);
+  const [sortColumn, setSortColumn] = useState(null);
+  const [sortDirection, setSortDirection] = useState('none');
 
-  const totalPages = Math.ceil(total / limit);
+  const totalPages = Math.ceil(total / limit) || 1;
 
   const changePage = (pageNo) => {
     if (pageNo >= 1 && pageNo <= totalPages) {
@@ -76,7 +80,7 @@ const AccountList = () => {
       pages.push(i);
     }
 
-    return pages;
+    return pages?.length > 0 ? pages : [1];
   };
 
   const handleMoreClick = (user) => {
@@ -100,7 +104,9 @@ const AccountList = () => {
         user_status: "1",
         searchKey: search,
         page: pageNo,
-        limit: limit
+        limit: limit,
+        isChild: isChild,
+        childId: id
       };
 
       const res = await getUserList(payload);
@@ -118,6 +124,29 @@ const AccountList = () => {
     } catch (err) {
       console.error(err);
     }
+  };
+
+  const handleSort = (colIndex) => {
+    if (sortColumn === colIndex) {
+      if (sortDirection === 'none') {
+        setSortDirection('ascending');
+      } else if (sortDirection === 'ascending') {
+        setSortDirection('descending');
+      } else {
+        setSortDirection('ascending');
+      }
+    } else {
+      setSortColumn(colIndex);
+      setSortDirection('ascending');
+    }
+  };
+
+  const getSortValueText = (colIndex) => {
+    const currentDirection = sortColumn === colIndex ? sortDirection : 'none';
+    if (currentDirection === 'none') return 'ascending';
+    if (currentDirection === 'ascending') return 'descending';
+    if (currentDirection === 'descending') return 'ascending';
+    return 'ascending';
   };
 
   useEffect(() => {
@@ -217,8 +246,8 @@ const AccountList = () => {
 
                       <button type="button" className="btn btn-danger">
                         <i className="fas fa-file-pdf"></i>
-                      </button>
-                    </div>
+                      </button>{' '}
+                    </div>{' '}
 
                     <div className="d-inline-block">
                       <Link to="/admin/users/insertuser" className="btn btn-success">
@@ -233,7 +262,15 @@ const AccountList = () => {
                     <div id="tickets-table_length" className="dataTables_length">
                       <label className="d-inline-flex align-items-center">
                         Show&nbsp;
-                        <select className="custom-select custom-select-sm">
+                        <select
+                          className="custom-select custom-select-sm"
+                          value={limit}
+                          onChange={(e) => {
+                            const newLimit = Number(e.target.value);
+                            setLimit(newLimit);
+                            fetchUserList(searchKey, 1);
+                          }}
+                        >
                           <option value="25">25</option>
                           <option value="50">50</option>
                           <option value="100">100</option>
@@ -250,21 +287,28 @@ const AccountList = () => {
 
                 <div className="table-responsive mb-0">
                   <div className="table no-footer table-responsive-sm">
-                    <table
+                    <Table
                       id="eventsListTbl"
                       role="table"
                       aria-busy="false"
                       aria-colcount="7"
-                      className="table b-table"
+                      className="b-table"
+                    // bordered
                     >
                       <thead>
                         <tr role="row">
-                          <th><div>User Name</div></th>
-                          <th className="text-right"><div>CR</div></th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="1" aria-sort={sortColumn === 1 ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort(1)}>
+                            <div>User Name</div><span className="sr-only"> (Click to sort {getSortValueText(1)})</span>
+                          </th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="2" aria-sort={sortColumn === 2 ? sortDirection : 'none'} className="position-relative text-right" onClick={() => handleSort(2)}>
+                            <div>CR</div><span className="sr-only"> (Click to sort {getSortValueText(2)})</span>
+                          </th>
                           <th><div>B st</div></th>
                           <th><div>U st</div></th>
                           <th><div>PName</div></th>
-                          <th><div>Account Type</div></th>
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="6" aria-sort={sortColumn === 6 ? sortDirection : 'none'} className="position-relative" onClick={() => handleSort(6)}>
+                            <div>Account Type</div><span className="sr-only"> (Click to sort {getSortValueText(6)})</span>
+                          </th>
                           <th><div>Action</div></th>
                         </tr>
                       </thead>
@@ -272,13 +316,13 @@ const AccountList = () => {
                       <tbody role="rowgroup">
                         {users.length > 0 ? (
                           users.map((user, index) => (
-                            <tr key={index} role="row">
+                            <tr key={index} role="row" tabIndex="0" aria-rowindex={(page - 1) * limit + index + 1} className="nocursor">
 
-                              <td role="cell">
+                              <td aria-colindex="1" role="cell">
                                 {user.accountType.toLowerCase() !== "user" ? (
                                   <Link
-                                    // to={`/admin/child/${user.id}`}
                                     onClick={() => openWithSession(`/admin/child/${user.id}`)}
+                                    // onClick={() => openWithSession(`/admin_new/admin/child/${user.id}`)}
                                     className="wrape-text"
                                     title={user.fullName}
                                     target="_blank"
@@ -293,13 +337,13 @@ const AccountList = () => {
                                 )}
                               </td>
 
-                              <td role="cell">
+                              <td aria-colindex="2" role="cell">
                                 <p className="text-right mb-0 cp text-warning">
                                   {user.cr}
                                 </p>
                               </td>
 
-                              <td role="cell">
+                              <td aria-colindex="3" role="cell">
                                 <div className="mb-1 custom-control custom-switch">
                                   <input
                                     type="checkbox"
@@ -315,7 +359,7 @@ const AccountList = () => {
                                 </div>
                               </td>
 
-                              <td role="cell">
+                              <td aria-colindex="4" role="cell">
                                 <div className="mb-1 custom-control custom-switch">
                                   <input
                                     type="checkbox"
@@ -331,15 +375,15 @@ const AccountList = () => {
                                 </div>
                               </td>
 
-                              <td role="cell">
+                              <td aria-colindex="5" role="cell">
                                 <p className="text-left mb-0">{user.pname}</p>
                               </td>
 
-                              <td role="cell">
+                              <td aria-colindex="6" role="cell">
                                 {user.accountType}
                               </td>
 
-                              <td role="cell">
+                              <td aria-colindex="7" role="cell">
                                 <div role="group" className="btn-group">
                                   <button
                                     type="button"
@@ -378,7 +422,7 @@ const AccountList = () => {
                         )}
                       </tbody>
 
-                    </table>
+                    </Table>
                   </div>
                 </div>
 

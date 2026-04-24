@@ -84,7 +84,7 @@ function SearchUserDropDown({
             ref={selectRef}
             options={searchList}
             placeholder="Search User"
-            className="react-select-container"
+            className="react-select-container custome-css-select border-radios-5px"
             classNamePrefix="react-select"
             components={{
                 DropdownIndicator: () => null,

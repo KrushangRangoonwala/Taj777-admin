@@ -9,7 +9,7 @@ import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Table } from 'react-bootstrap';
-
+import { getNoRecordText } from '../../utilies/helpers';
 
 const AccountStatement = () => {
 
@@ -234,7 +234,7 @@ const AccountStatement = () => {
                 {/* 🔍 FILTER */}
                 <div className="report-form mb-3">
                   <form onSubmit={(e) => { e.preventDefault(); fetchStatement(); }}>
-                    <div className="row row5">
+                    <div className="row row5" style={{ marginBottom: "3px" }}>
 
                       {/* CLIENT SEARCH */}
                       <div className="col-lg-3">
@@ -355,8 +355,8 @@ const AccountStatement = () => {
                     </div>
 
                     <div className="row row5">
-                      <div className="col-lg-3 ml-3px-child">
-                        <button type="submit" className="btn btn-primary">Load</button>
+                      <div className="col-lg-3">
+                        <button type="submit" className="btn btn-primary">Load</button>{' '}
                         <button type="button" className="btn btn-light"
                           onClick={() => {
                             setClientSearch('');
@@ -371,7 +371,7 @@ const AccountStatement = () => {
                           }}
                         >
                           Reset
-                        </button>
+                        </button>{' '}
                         <div id="export_1774426765439" className="d-inline-block">
                           <button
                             type="button"
@@ -381,7 +381,7 @@ const AccountStatement = () => {
                           >
                             <i className="fas fa-file-excel"></i>
                           </button>
-                        </div>
+                        </div>{' '}
                         <button
                           type="button"
                           className="btn btn-danger"
@@ -389,7 +389,7 @@ const AccountStatement = () => {
                           onClick={exportToPDF}
                         >
                           <i className="fas fa-file-pdf"></i>
-                        </button>
+                        </button>{' '}
                       </div>
                     </div>
                   </form>
@@ -507,7 +507,7 @@ const AccountStatement = () => {
                           <tr role="row" className="b-table-empty-row">
                             <td colSpan="7" role="cell">
                               <div role="alert" aria-live="polite">
-                                <div className="text-center my-2">There are no records to show</div>
+                                <div className="text-center my-2">{getNoRecordText(search)}</div>
                               </div>
                             </td>
                           </tr>

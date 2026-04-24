@@ -191,7 +191,7 @@ const AuthList = () => {
                         type="button"
                         className="btn mr-1 btn-success"
                         onClick={exportExcel}
-                        disabled={data.length === 0}
+                      // disabled={data.length === 0}
                       >
                         <i className="fas fa-file-excel"></i>
                       </button>
@@ -201,7 +201,7 @@ const AuthList = () => {
                       type="button"
                       className="btn btn-danger ml-3px"
                       onClick={exportPDF}
-                      disabled={data.length === 0}
+                    // disabled={data.length === 0}
                     >
                       <i className="fas fa-file-pdf"></i>
                     </button>
@@ -242,7 +242,7 @@ const AuthList = () => {
                       <input
                         type="search"
                         placeholder="Search..."
-                        className="form-control form-control-sm ml-2"
+                        className="form-control form-control-sm ml-2 dark-placeholder"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         onKeyUp={() => fetchAuthList(1)}

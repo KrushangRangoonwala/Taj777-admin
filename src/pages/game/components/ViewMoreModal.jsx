@@ -91,9 +91,10 @@ const ViewMoreModal = ({ show, onHide, betList = [] }) => {
                                                 </tbody>
                                             </table>
                                         </div>
-                                    ) : (
-                                        <div className="text-center">No records found</div>
-                                    )}
+                                    ) : activeTab !== "deleted"
+                                        ? <div className="text-center">No records found</div>
+                                        : ""
+                                    }
                                 </div>
                             </div>
 
@@ -105,7 +106,7 @@ const ViewMoreModal = ({ show, onHide, betList = [] }) => {
                                 aria-labelledby="__BVID__3000___BV_tab_button__"
                                 style={{ display: activeTab === 'deleted' ? 'block' : 'none' }}
                             >
-                                <div className="text-center">No records found</div>
+                                <div className="text-center">{activeTab !== "deleted" ? "No records found" : ""}</div>
                             </div>
                         </div>
                     </div>

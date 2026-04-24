@@ -74,7 +74,7 @@ const menuItems = [
     },
     {
         label: "Vip Casino",
-        // href: "/admin/casino/vip",
+        href: "/admin/casino/vip",
         icon: "mdi mdi-cards-playing-outline",
         linkClasses: "side-nav-link-ref",
         badge: "New",

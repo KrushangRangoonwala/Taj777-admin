@@ -94,6 +94,8 @@ const GeneralLock = () => {
 
   // SOCKET: fetch matches dynamically
   useEffect(() => {
+    inputField.current.focus();
+
     const socket = io("https://trubet9.bet:2053", {
       transports: ["websocket", "polling"],
       reconnection: true,

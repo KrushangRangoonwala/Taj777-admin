@@ -68,6 +68,7 @@ const Trap = lazy(() => import("./games/Trap"));
 const Lottery = lazy(() => import("./games/Lottery"));
 const AndarBahar = lazy(() => import("./games/AndarBahar"));
 const Worli = lazy(() => import("./games/Worli"));
+const Matka = lazy(() => import("./games/Matka"));
 const AndarBahar2 = lazy(() => import("./games/AndarBahar2"));
 
 const gamePath_To_Component = {
@@ -155,7 +156,7 @@ const gamePath_To_Component = {
 
     "instant_worli": Worli,
     "worli_matka": Worli,
-    "matka_market": Worli,
+    "matka_market": Matka,
 }
 
 const CasinoCenter = () => {

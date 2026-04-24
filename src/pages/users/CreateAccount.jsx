@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { createAccountApi } from "../../api/API";
 
 const CreateAccount = () => {
@@ -58,12 +58,18 @@ const CreateAccount = () => {
   };
 
   const handlePrivilegeChange = (value) => {
+    let aa;
     if (selectedPrivileges.includes(value)) {
-      setSelectedPrivileges(selectedPrivileges.filter((p) => p !== value));
+      aa = selectedPrivileges.filter((p) => p !== value);
     } else {
-      setSelectedPrivileges([...selectedPrivileges, value]);
+      aa = [...selectedPrivileges, value];
     }
-    if (errors.privileges) {
+    console.log("aa", aa)
+    setSelectedPrivileges(aa);
+
+    if (aa?.length === 0) {
+      setErrors({ ...errors, privileges: 'The Privileges field is required' });
+    } else {
       setErrors({ ...errors, privileges: null });
     }
   };
@@ -71,8 +77,10 @@ const CreateAccount = () => {
   const handleSelectAll = (e) => {
     if (e.target.checked) {
       setSelectedPrivileges(privileges.map((p) => p.value));
+      setErrors({ ...errors, privileges: null });
     } else {
       setSelectedPrivileges([]);
+      setErrors({ ...errors, privileges: 'The Privileges field is required' });
     }
   };
 
