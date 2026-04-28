@@ -242,7 +242,7 @@ const UserRegisterDetail = () => {
                     <div className="row row5">
 
                       {/* CLIENT SEARCH */}
-                      <div className="col-2">
+                      <div className="col-12 col-md-6 col-lg-2 mb-2">
                         <div className="form-group user-lock-search" style={{ position: "relative" }}>
                           <label>Search By Client Name</label>
                           <style>{`
@@ -305,7 +305,7 @@ const UserRegisterDetail = () => {
                       </div>
 
                       {/* TYPE */}
-                      <div className="col-2">
+                      <div className="col-12 col-md-6 col-lg-2 mb-2">
                         <div className="form-group">
                           <label>Type</label>
                           <select
@@ -322,7 +322,7 @@ const UserRegisterDetail = () => {
 
                       {/* DATE RANGE */}
                       {(filterType === "2" || filterType === "3") && (
-                        <div className="col-3">
+                        <div className="col-12 col-md-6 col-lg-3 mb-2">
                           <div className="form-group">
                             <label>Select Date Range</label>
                             <RangePicker
@@ -336,45 +336,47 @@ const UserRegisterDetail = () => {
                       )}
 
                       {/* BUTTONS */}
-                      <div className="col-3">
-                        <label style={{ width: "100%" }}>&nbsp;</label>
+                      <div className="col-12 col-lg-3 mb-2">
+                        <label className="d-none d-lg-block" style={{ width: "100%" }}>&nbsp;</label>
 
-                        <button type="submit" className="btn btn-primary">
-                          Load
-                        </button>
-                        &nbsp;
-                        <button type="button" className="btn btn-light"
-                          onClick={() => {
-                            setClientSearch('');
-                            setSelectedClient('');
-                            setSearch('');
-                            setDateRange([]);
-                            setFilterType("1");
-                            setData([]);
-                            setTotalRecords(0);
-                            setCurrentPage(1);
-                          }}
-                        >
-                          Reset
-                        </button>
-                        &nbsp;
-                        <button
-                          type="button"
-                          className="btn btn-success"
-                          disabled={!data.length}
-                          onClick={exportToExcel}
-                        >
-                          <i className="fas fa-file-excel"></i>
-                        </button>
-                        &nbsp;
-                        <button
-                          type="button"
-                          className="btn btn-danger"
-                          disabled={!data.length}
-                          onClick={exportToPDF}
-                        >
-                          <i className="fas fa-file-pdf"></i>
-                        </button>
+                        <div className="d-flex flex-wrap">
+                          <button type="submit" className="btn btn-primary">
+                            Load
+                          </button>
+                          &nbsp;
+                          <button type="button" className="btn btn-light"
+                            onClick={() => {
+                              setClientSearch('');
+                              setSelectedClient('');
+                              setSearch('');
+                              setDateRange([]);
+                              setFilterType("1");
+                              setData([]);
+                              setTotalRecords(0);
+                              setCurrentPage(1);
+                            }}
+                          >
+                            Reset
+                          </button>
+                          &nbsp;
+                          <button
+                            type="button"
+                            className="btn btn-success"
+                            disabled={!data.length}
+                            onClick={exportToExcel}
+                          >
+                            <i className="fas fa-file-excel"></i>
+                          </button>
+                          &nbsp;
+                          <button
+                            type="button"
+                            className="btn btn-danger"
+                            disabled={!data.length}
+                            onClick={exportToPDF}
+                          >
+                            <i className="fas fa-file-pdf"></i>
+                          </button>
+                        </div>
                       </div>
 
                     </div>
@@ -411,6 +413,7 @@ const UserRegisterDetail = () => {
                         Search:
                         <input
                           type="search"
+                          field-type="search"
                           placeholder="Search..."
                           className="form-control form-control-sm ml-2 dark-placeholder"
                           value={search}
@@ -519,7 +522,7 @@ const UserRegisterDetail = () => {
                           ))
                         ) : (
                           <tr role="row" className="b-table-empty-row">
-                            <td colSpan="11" role="cell">
+                            <td colSpan="12" role="cell">
                               <div role="alert" aria-live="polite">
                                 <div className="text-center my-2">
                                   {loading

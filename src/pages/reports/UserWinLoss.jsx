@@ -232,7 +232,7 @@ const UserWinLoss = () => {
                                         <div className="row row5">
 
                                             {/* CLIENT SEARCH */}
-                                            <div className="col-2">
+                                            <div className="col-12 col-md-6 col-lg-2 mb-2">
                                                 <div className="form-group user-lock-search" style={{ position: "relative" }}>
                                                     <label>Search By Client Name</label>
 
@@ -301,7 +301,7 @@ const UserWinLoss = () => {
                                             </div>
 
                                             {/* DATE RANGE */}
-                                            <div className="col-lg-3">
+                                            <div className="col-12 col-md-6 col-lg-3 mb-2">
                                                 <label>Select Date Range</label>
                                                 <div className="mb-3">
                                                     <RangePicker
@@ -340,45 +340,47 @@ const UserWinLoss = () => {
                                             </div>
 
                                             {/* BUTTONS */}
-                                            <div className="col-3">
-                                                <label style={{ width: "100%" }}>&nbsp;</label>
+                                            <div className="col-12 col-lg-3 mb-2">
+                                                <label className="d-none d-lg-block" style={{ width: "100%" }}>&nbsp;</label>
 
-                                                <button type="submit" className="btn btn-primary">
-                                                    Load
-                                                </button>
-                                                &nbsp;
-                                                <button type="button" className="btn btn-light"
-                                                    onClick={() => {
-                                                        setClientSearch('');
-                                                        setSelectedClient('');
-                                                        setSearch('');
-                                                        setDateRange([]);
-                                                        setFilterType("1");
-                                                        setData([]);
-                                                        setTotalRecords(0);
-                                                        setCurrentPage(1);
-                                                    }}
-                                                >
-                                                    Reset
-                                                </button>
-                                                &nbsp;
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-success"
-                                                    disabled={!data.length}
-                                                    onClick={exportToExcel}
-                                                >
-                                                    <i className="fas fa-file-excel"></i>
-                                                </button>
-                                                &nbsp;
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-danger"
-                                                    disabled={!data.length}
-                                                    onClick={exportToPDF}
-                                                >
-                                                    <i className="fas fa-file-pdf"></i>
-                                                </button>
+                                                <div className="d-flex flex-wrap gap-2">
+                                                    <button type="submit" className="btn btn-primary">
+                                                        Load
+                                                    </button>
+                                                    &nbsp;
+                                                    <button type="button" className="btn btn-light"
+                                                        onClick={() => {
+                                                            setClientSearch('');
+                                                            setSelectedClient('');
+                                                            setSearch('');
+                                                            setDateRange([]);
+                                                            setFilterType("1");
+                                                            setData([]);
+                                                            setTotalRecords(0);
+                                                            setCurrentPage(1);
+                                                        }}
+                                                    >
+                                                        Reset
+                                                    </button>
+                                                    &nbsp;
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-success"
+                                                        disabled={!data.length}
+                                                        onClick={exportToExcel}
+                                                    >
+                                                        <i className="fas fa-file-excel"></i>
+                                                    </button>
+                                                    &nbsp;
+                                                    <button
+                                                        type="button"
+                                                        className="btn btn-danger"
+                                                        disabled={!data.length}
+                                                        onClick={exportToPDF}
+                                                    >
+                                                        <i className="fas fa-file-pdf"></i>
+                                                    </button>
+                                                </div>
                                             </div>
 
                                         </div>
@@ -415,6 +417,7 @@ const UserWinLoss = () => {
                                                 Search:
                                                 <input
                                                     type="search"
+                                                    field-type="search"
                                                     placeholder="Search..."
                                                     className="form-control form-control-sm ml-2"
                                                     value={search}

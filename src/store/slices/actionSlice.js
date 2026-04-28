@@ -6,6 +6,7 @@ const initialState = {
     marque: "",
     isSettingOpen: false,
     theme: localStorage.getItem("theme") || "dark",
+    isSidebarCollapse: false,
 };
 
 const actionSlice = createSlice({
@@ -26,8 +27,11 @@ const actionSlice = createSlice({
             localStorage.setItem("theme", action.payload);
             changeTheme(action.payload);
         },
+        setIsSidebarCollapse: (state, action) => {
+            state.isSidebarCollapse = action.payload;
+        },
     },
 });
 
-export const { setIsLoading, setMarque, setIsSettingOpen, setTheme } = actionSlice.actions;
+export const { setIsLoading, setMarque, setIsSettingOpen, setTheme, setIsSidebarCollapse } = actionSlice.actions;
 export default actionSlice.reducer;

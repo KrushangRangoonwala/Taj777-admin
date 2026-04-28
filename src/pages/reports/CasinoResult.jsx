@@ -156,6 +156,7 @@ const CasinoResult = () => {
 
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('none');
+  const [isSelectoptTouched, setIsSelectoptTouched] = useState(false);
 
   const handleSort = (colKey) => {
     if (sortColumn === colKey) {
@@ -300,11 +301,14 @@ const CasinoResult = () => {
           <div className="col-md-3 mb-2">
             <select
               className={`form-control ${!casinoType ? "is-invalid" : ""}`}
-              // className={`form-control ${true ? "is-invalid" : ""}`}
               value={casinoType}
-              onChange={(e) => setCasinoType(e.target.value)}
+              onChange={(e) => {
+                setCasinoType(e.target.value)
+                setIsSelectoptTouched(true)
+              }}
             >
-              {/* {casinoTypes.map((t) => ( */}
+              {!isSelectoptTouched && (<option value="" style={{ display: "none" }}></option>)}
+
               {casinoOptions.map((t) => (
                 <option key={t.value} value={t.value}>
                   {t.label}
@@ -362,6 +366,7 @@ const CasinoResult = () => {
               <label className="d-inline-flex align-items-center">
                 <input
                   type="search"
+                  field-type="search"
                   placeholder="Search..."
                   className="form-control form-control-sm ml-2 dark-placeholder"
                   value={search}

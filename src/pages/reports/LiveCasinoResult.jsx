@@ -1,16 +1,17 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { DatePicker } from "antd";
 import Select from "react-select";
 import "antd/dist/reset.css";
-import { getClients, getCasinoResult } from "../../api/API";
+import { getCasinoResult } from "../../api/API";
 import dayjs from "dayjs";
 import * as XLSX from "xlsx";
-import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { customSelectStyles } from "../../components/Header";
 import { Table } from 'react-bootstrap';
 import Pagination from "../../components/Pagination";
+import { Link } from "react-router-dom";
+import SelectBootStrap from "../../components/SelectBootStrap";
+
 
 
 const { RangePicker } = DatePicker;
@@ -55,21 +56,18 @@ const providerTypes = [
 
 const LiveCasinoResult = () => {
   const [activeTab, setActiveTab] = useState("login");
-  const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
-  const [clientSearch, setClientSearch] = useState('');
+
   const [date, setDate] = useState(dayjs());
-  const [dateRange, setDateRange] = useState([dayjs().subtract(7, "day"), dayjs()]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+  const [isSelectoptTouched, setIsSelectoptTouched] = useState(false);
+  const [isSelectoptTouched2, setIsSelectoptTouched2] = useState(false);
 
   const [perPage, setPerPage] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
-
-  const [showModal, setShowModal] = useState(false);
-  const [modalData, setModalData] = useState(null);
 
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('none');
@@ -104,10 +102,8 @@ const LiveCasinoResult = () => {
 
     // 🔹 Reset all states
     setSelectedClient("");
-    setClientSearch("");
-    setClientList([]);
+
     setDate(dayjs());
-    setDateRange([dayjs().subtract(7, "day"), dayjs()]);
     setSearch("");
     setData([]);
     setCurrentPage(1);
@@ -115,14 +111,7 @@ const LiveCasinoResult = () => {
   };
 
   // 🔹 Fetch clients
-  const fetchClients = async (value) => {
-    try {
-      const res = await getClients(value);
-      setClientList(res.results || []);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+
 
   // 🔹 Fetch User History API
   const fetchUserHistory = async (page = 1) => {
@@ -177,31 +166,6 @@ const LiveCasinoResult = () => {
 
   const totalPages = Math.ceil(totalRecords / perPage) || 1;
 
-  const changePage = (page) => {
-    if (page >= 1 && page <= totalPages) {
-      fetchUserHistory(page);
-    }
-  };
-
-  const getPageNumbers = () => {
-    const totalNumbers = 5;
-
-    let start = Math.max(currentPage - 2, 1);
-    let end = start + totalNumbers - 1;
-
-    if (end > totalPages) {
-      end = totalPages;
-      start = Math.max(end - totalNumbers + 1, 1);
-    }
-
-    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
-  };
-
-  // 🔹 Date change
-  const handleDateChange = (dates) => {
-    setDateRange(dates);
-  };
-
   // 🔹 EXPORT EXCEL
   const exportExcel = () => {
     if (data.length === 0) return;
@@ -254,7 +218,7 @@ const LiveCasinoResult = () => {
             <div className="page-title-right">
               <ol className="breadcrumb m-0">
                 <li className="breadcrumb-item">
-                  <a href="/admin/home">Home</a>
+                  <Link to="/admin/home">Home</Link>
                 </li>
                 <li className="breadcrumb-item active">
                   <span>Casino Result</span>
@@ -300,33 +264,11 @@ const LiveCasinoResult = () => {
 
                       {/* CLIENT */}
                       <div className="col-xl-2 mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Select option"
-                          value={clientSearch}
-                          onChange={(e) => {
-                            setClientSearch(e.target.value);
-                            fetchClients(e.target.value);
-                          }}
+                        <SelectBootStrap
+                          selectedOption={selectedClient}
+                          setSelectedOption={setSelectedClient}
+                          fetchType="client"
                         />
-                        {/* <Select
-                          options={[]}
-                          placeholder="Select option"
-                          value={clientSearch}
-                          onInputChange={(value) => {
-                            setClientSearch(value);
-                            fetchClients(value);
-                          }}
-                          className="react-select-container"
-                          classNamePrefix="react-select"
-                          components={{
-                            DropdownIndicator: () => null,
-                            IndicatorSeparator: () => null
-                          }}
-                          noOptionsMessage={() => "List is empty."}
-                          styles={customSelectStyles}
-                        /> */}
                       </div>
 
                       {/* DATE */}
@@ -348,7 +290,10 @@ const LiveCasinoResult = () => {
 
                       {/* TYPE */}
                       <div className="col-xl-2 mb-3">
-                        <select className="form-control">
+                        <select
+                          className={`form-control ${isSelectoptTouched ? "is-invalid" : ""}`}
+                          onBlur={() => setIsSelectoptTouched(true)}
+                        >
                           {/* <option value="ezugi">Ezugi</option>
                           <option value="ss">Super Spade</option>
                           <option value="qt">Slot 3 | Holi</option>
@@ -373,9 +318,17 @@ const LiveCasinoResult = () => {
                         <button
                           type="button"
                           className="btn btn-light"
+                          onClick={() => {
+                            setSelectedClient("");
+                            setDate(dayjs());
+                            setSearch("");
+                            setData([]);
+                            setCurrentPage(1);
+                            setTotalRecords(0);
+                          }}
                         >
                           Reset
-                        </button>
+                        </button>{' '}
 
                         <div className="d-inline-block ml-3">
                           <button
@@ -384,7 +337,7 @@ const LiveCasinoResult = () => {
                             disabled={data.length === 0}
                           >
                             <i className="fas fa-file-excel"></i>
-                          </button>
+                          </button>{' '}
                           <button
                             className="btn btn-danger"
                             onClick={exportPDF}
@@ -423,6 +376,7 @@ const LiveCasinoResult = () => {
                         <label className="d-inline-flex align-items-center">
                           <input
                             type="search"
+                            field-type="search"
                             placeholder="Search..."
                             className="form-control form-control-sm ml-2 dark-placeholder"
                             value={search}
@@ -506,27 +460,18 @@ const LiveCasinoResult = () => {
                     <div className="row row5 mb-3 mb-20px">
 
                       <div className="col-xl-2 mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Select option"
+                        <SelectBootStrap
+                          selectedOption={selectedClient}
+                          setSelectedOption={setSelectedClient}
+                          fetchType="client"
                         />
-                        {/* <Select
-                          options={[]}
-                          placeholder="Select option"
-                          className="react-select-container"
-                          classNamePrefix="react-select"
-                          components={{
-                            DropdownIndicator: () => null,
-                            IndicatorSeparator: () => null
-                          }}
-                          noOptionsMessage={() => "List is empty."}
-                          styles={customSelectStyles}
-                        /> */}
                       </div>
 
                       <div className="col-xl-2 mb-3">
-                        <select className="form-control">
+                        <select
+                          className={`form-control ${isSelectoptTouched2 ? "is-invalid" : ""}`}
+                          onBlur={() => setIsSelectoptTouched2(true)}
+                        >
                           {providerTypes.map((p) => (
                             <option key={p.value} value={p.value}>
                               {p.label}
@@ -537,7 +482,10 @@ const LiveCasinoResult = () => {
 
                       <div className="col-xl-5 mb-3">
                         <button className="btn btn-primary">Load</button>{" "}
-                        <button className="btn btn-light">Reset</button>
+                        <button className="btn btn-light" onClick={(e) => {
+                            e.preventDefault();
+                            setSelectedClient("");
+                        }}>Reset</button>
                       </div>
 
                     </div>

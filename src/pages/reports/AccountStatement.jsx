@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { getAccountStatement, getClients } from '../../api/API';
+import { getAccountStatement } from '../../api/API';
+
 import { DatePicker } from "antd";
 import "antd/dist/reset.css"; // AntD 5+ reset styles
 import dayjs from "dayjs";
@@ -10,15 +11,16 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Table } from 'react-bootstrap';
 import { getNoRecordText } from '../../utilies/helpers';
+import SelectBootStrap from '../../components/SelectBootStrap';
+
 
 const AccountStatement = () => {
 
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
-  const [clientSearch, setClientSearch] = useState('');
-  const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState('');
+
 
   const [totalRecords, setTotalRecords] = useState(0);
   const [loading, setLoading] = useState(false);
@@ -42,16 +44,7 @@ const AccountStatement = () => {
 
   const isDataAvailable = data && data.length > 0;
 
-  // 🔹 Fetch clients
-  const fetchClients = async (value) => {
-    try {
-      console.log("value-----", value)
-      const res = await getClients(value);
-      setClientList(res.results || []);
-    } catch (err) {
-      console.log(err);
-    }
-  };
+
 
   // 🔹 Fetch statement
   const fetchStatement = async (page = currentPage) => {
@@ -240,47 +233,11 @@ const AccountStatement = () => {
                       <div className="col-lg-3">
                         <div className="form-group user-lock-search" style={{ position: "relative" }}>
                           <label>Search By Client Name</label>
-
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={clientSearch}
-                            placeholder="Select option"
-                            onChange={(e) => {
-                              setClientSearch(e.target.value);
-                              fetchClients(e.target.value);
-                            }}
-                            onBlur={() => {
-                              setTimeout(() => setClientList([]), 200)
-                            }}
-                            onFocus={() => {
-                              setClientList([{ id: '1', text: "List is empty." }]);
-                            }}
+                          <SelectBootStrap
+                            selectedOption={selectedClient}
+                            setSelectedOption={setSelectedClient}
+                            fetchType="clients"
                           />
-
-                          {clientList.length > 0 && (
-                            <div style={{
-                              position: 'absolute',
-                              background: '#fff',
-                              border: '1px solid #ddd',
-                              width: '100%',
-                              zIndex: 1000
-                            }}>
-                              {clientList.map((c, i) => (
-                                <div
-                                  key={i}
-                                  style={{ padding: '5px', cursor: 'pointer' }}
-                                  onClick={() => {
-                                    setSelectedClient(c.id);
-                                    setClientSearch(c.text);
-                                    setClientList([]);
-                                  }}
-                                >
-                                  {c.text}
-                                </div>
-                              ))}
-                            </div>
-                          )}
                         </div>
                       </div>
 
@@ -420,6 +377,7 @@ const AccountStatement = () => {
                       <label className="d-inline-flex align-items-center">
                         <input
                           type="search"
+                          field-type="search"
                           placeholder="Search..."
                           className="form-control form-control-sm ml-2"
                           value={search}

@@ -1,5 +1,12 @@
-copy below code's exact same html struture with exact same css classes and exactly same attributes in this react project
-if u find any library in below html code, then use that library in this react project
+
+Modal prompt : 
+
+take refference how to ceate modal from @viewmoremodal.jsx file 
+
+------------
+
+copy html code's exact same html struture with exact same css classes and exactly same attributes in this react project
+if u find any library in html code, then use that library in this react project
 
 if u find same structure repeating multiple time then use .map in react, or just made re-usable components
 also maintain code readability and maintainability, so dont make .map if it is not necessary

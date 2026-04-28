@@ -8,6 +8,7 @@ import './blink.css';
 import useSocket from '../../api/Socket/useSocket';
 import { getEventPage_Exposure } from '../../api/API';
 import { getEventActiveBets } from '../../api/API_games';
+import MoreMarketModal from './components/MoreMarketModal';
 
 const format = (num) => Number(parseFloat(num).toFixed(2)).toString();
 
@@ -594,6 +595,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
+    const [showMoreMarketModal, setShowMoreMarketModal] = useState(false);
     const [exposureData, setExposureData] = useState([]);
     const [activeBets, setActiveBets] = useState([]);
     const selectedMatchRedux = useSelector(store => store.match.selectedMatch);
@@ -601,6 +603,8 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
     const livePoints = useSelector(state => state.bet?.livePoints);
     const openedBetPoint = useSelector(state => state.bet?.openedBetPoint);
     const isCricket = selectedMatch?.SportId == 4;
+
+    const [selectmarket, setSelectmarket] = useState({}) // FOR FOOTBALL AND TENNISH
 
     const isLeague = selectedMatch?.matchName?.toLowerCase()?.includes("league");
     const leagueName = selectedMatch?.cname?.split(" ")?.map((item) => item[0]?.toUpperCase())?.join("");
@@ -733,6 +737,9 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
         }
     }, [socketData]);
 
+    // console.log('qq cricketmarkets', cricketMarkets);
+    // console.log('qq marketBookmakers', marketBookmakers);
+
     const getHeaderName = () => {
         if (selectedMatch) {
             if (selectedMatch.cname) return `${selectedMatch.cname} > ${selectedMatch.matchName}`;
@@ -792,17 +799,22 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                     {selectedMatch?.inPlay && !isCricket && !isLeague &&
                         <div
                             className="banner scorestats mb-1"
-                            style={{ backgroundImage: `url('/${import.meta.env.VITE_IMAGE_PATH}/assets/images/events-banner/${selectedMatch?.SportId}.png')` }}
+                            style={{ backgroundImage: `url('/${import.meta.env.VITE_IMAGE_PATH}/images/events-banner/${selectedMatch?.SportId}.png')` }}
                         >
                             <iframe src={scoreCardUrl} frameborder="0" />
                         </div>
                     }
+                    {!isCricket &&
+                        <div class="more-market text-right">
+                            <button class="btn btn-back" onClick={() => setShowMoreMarketModal(true)}>
+                                More Market
+                            </button>
+                        </div>}
+
 
                     <div className="market-container">
-                        {socketData ? (
+                        {socketData && isCricket ? (
                             <>
-                                {selectedMatch?.SportId != 4 && <CricketMarkets isTied={false} {...eventProps} cricketMarkets={cricketMarkets} marketBookmakers={marketBookmakers} />}
-
                                 <Single_Column_Section
                                     isDisplay={selectedMatch?.SportId == 4}
                                     sectionId="match_odds"
@@ -950,8 +962,6 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                                     {...eventProps}
                                 />
 
-                                {selectedMatch?.SportId != 4 && <CricketMarkets isTied={true} {...eventProps} cricketMarkets={cricketMarkets} marketBookmakers={marketBookmakers} />}
-
                                 {cricketcasino?.map((section, idx) => (
                                     <Double_Column_Section
                                         key={idx}
@@ -982,12 +992,24 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                                     {...eventProps}
                                 />
                             </>
+                        ) : socketData && !isCricket ? (
+                            <>
+                                <CricketMarkets isTied={false} {...eventProps} cricketMarkets={cricketMarkets} marketBookmakers={marketBookmakers} />
+                                <CricketMarkets isTied={true} {...eventProps} cricketMarkets={cricketMarkets} marketBookmakers={marketBookmakers} />
+                            </>
                         ) : (
                             <div style={{ color: 'white', textAlign: 'center', padding: '20px' }}>Loading live data...</div>
                         )}
                     </div>
                 </div>
                 <EventRightSidebar tvUrl={tvUrl} liveScoreData={liveScoreData} isLive={selectedMatch?.inPlay && !isLeague} activeBets={activeBets} />
+
+                <MoreMarketModal
+                    show={showMoreMarketModal}
+                    onHide={() => setShowMoreMarketModal(false)}
+                    markets={cricketMarkets}
+                    setSelectmarket={setSelectmarket}
+                />
             </div>
         </div>
     );

@@ -65,7 +65,7 @@ const AuthList = () => {
     setLoading(true);
     try {
       const payload = {
-        search: search,
+        search: search.trim(),
         iDisplayStart: (page - 1) * customPerPage,
         iDisplayLength: customPerPage,
       };
@@ -241,11 +241,12 @@ const AuthList = () => {
                     <label className="d-inline-flex align-items-center">
                       <input
                         type="search"
+                        field-type="search"
                         placeholder="Search..."
                         className="form-control form-control-sm ml-2 dark-placeholder"
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
-                        onKeyUp={() => fetchAuthList(1)}
+                        onKeyUp={(e) => e.target.value.trim() !== "" ? fetchAuthList(1) : null}
                       />
                     </label>
                   </div>

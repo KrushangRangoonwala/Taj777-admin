@@ -12,6 +12,7 @@ import Select from 'react-select';
 import { customSelectStyles } from '../../components/Header';
 import { Table } from 'react-bootstrap';
 import { errorToast, successToast } from '../../utils/toast';
+import { getNoRecordText } from '../../utilies/helpers';
 
 
 const TotalProfitLoss = () => {
@@ -432,6 +433,7 @@ const TotalProfitLoss = () => {
                     <label className="d-inline-flex align-items-center">
                       <input
                         type="search"
+                        field-type="search"
                         placeholder="Search..."
                         className="form-control form-control-sm ml-2 dark-placeholder"
                         value={search}
@@ -486,7 +488,7 @@ const TotalProfitLoss = () => {
                             <tr role="row" className="b-table-empty-row">
                               <td colSpan="5" role="cell">
                                 <div role="alert" aria-live="polite">
-                                  <div className="text-center my-2">There are no records to show</div>
+                                  <div className="text-center my-2">{getNoRecordText(search)}</div>
                                 </div>
                               </td>
                             </tr>
@@ -542,7 +544,7 @@ const TotalProfitLoss = () => {
                             <tr role="row" className="b-table-empty-row">
                               <td colSpan="4" role="cell">
                                 <div role="alert" aria-live="polite">
-                                  <div className="text-center my-2">There are no records to show</div>
+                                  <div className="text-center my-2">{getNoRecordText(search)}</div>
                                 </div>
                               </td>
                             </tr>
@@ -598,7 +600,7 @@ const TotalProfitLoss = () => {
                             <tr role="row" className="b-table-empty-row">
                               <td colSpan="4" role="cell">
                                 <div role="alert" aria-live="polite">
-                                  <div className="text-center my-2">There are no records to show</div>
+                                  <div className="text-center my-2">{getNoRecordText(search)}</div>
                                 </div>
                               </td>
                             </tr>
@@ -654,7 +656,7 @@ const TotalProfitLoss = () => {
                             <tr role="row" className="b-table-empty-row">
                               <td colSpan="4" role="cell">
                                 <div role="alert" aria-live="polite">
-                                  <div className="text-center my-2">There are no records to show</div>
+                                  <div className="text-center my-2">{getNoRecordText(search)}</div>
                                 </div>
                               </td>
                             </tr>

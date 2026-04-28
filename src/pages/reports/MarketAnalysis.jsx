@@ -80,7 +80,7 @@ const MarketAnalysis = () => {
                                     className={`text-dark pl-2 ${loading ? 'fa-spin' : ''}`}
                                     onClick={(e) => {
                                         e.preventDefault();
-                                        getMarketExposure();
+                                        getMarketExposure(true);
                                     }}
                                 >
                                     <i className="fa fa-sync"></i>

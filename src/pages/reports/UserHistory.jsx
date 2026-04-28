@@ -402,6 +402,7 @@ const UserHistory = () => {
                           <label className="d-inline-flex align-items-center">
                             <input
                               type="search"
+                              field-type="search"
                               placeholder="Search..."
                               className="form-control form-control-sm ml-2"
                               value={search}
@@ -652,6 +653,7 @@ const UserHistory = () => {
                           <label className="d-inline-flex align-items-center">
                             <input
                               type="search"
+                              field-type="search"
                               placeholder="Search..."
                               className="form-control form-control-sm ml-2"
                               value={search}

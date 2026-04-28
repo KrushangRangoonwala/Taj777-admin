@@ -101,6 +101,8 @@ const chart2Options = {
 const Dashboard = () => {
     const [casinoGames, setCasinoGames] = useState([]);
     const casino_list = useSelector(store => store.casino.casino_list);
+    const userData = useSelector(store => store.user.userData);
+    const user_type = userData?.user_type;
 
     const [stats, setStats] = useState([]);
 
@@ -220,6 +222,7 @@ const Dashboard = () => {
             </div>
 
             {/* ================= CHARTS ================= */}
+            {/* {user_type == '4' && */}
             <div className="row">
                 <ChartCard
                     options={chart1Options}
@@ -233,6 +236,7 @@ const Dashboard = () => {
                     legendData={chart2LegendData}
                 />
             </div>
+            {/* } */}
 
             {/* ================= CASINO ================= */}
             <div className="row">
@@ -300,3 +304,8 @@ const Dashboard = () => {
 };
 
 export default Dashboard;
+
+// Arpit6666
+// Arpit@6666
+// Arpit5555
+// Arpit@5555

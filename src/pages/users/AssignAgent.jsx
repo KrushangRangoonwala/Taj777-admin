@@ -66,6 +66,7 @@ const AssignAgent = () => {
                                                 Search:
                                                 <input
                                                     type="search"
+                                                    field-type="search"
                                                     placeholder="Search..."
                                                     className="form-control form-control-sm ml-2"
                                                     id="__BVID__2675"

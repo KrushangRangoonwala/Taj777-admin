@@ -7,9 +7,10 @@ import 'boxicons/css/boxicons.min.css';
 
 import './styles/all.css'
 import './styles/app.css'
-import './styles/custome.css'
+// import './styles/custome.css'
 import './styles/styles__ltr.css'
 import './styles/styles.css'
+import './styles/custome.css' // NEWLY ADDED IN THIS LINE : PREVIOUSLY IT IS ON ABOVE COMMENT LINE
 import './styles/responsive.css'
 import './styles/theme.css'
 import './styles/our.css'

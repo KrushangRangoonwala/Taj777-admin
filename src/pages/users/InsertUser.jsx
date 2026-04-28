@@ -34,7 +34,7 @@ const InsertUser = () => {
   const [touched, setTouched] = useState({});
   const [loading, setLoading] = useState(false);
   const [usernameTimer, setUsernameTimer] = useState(null);
-  const [isUsernameTaken, setIsUsernameTaken] = useState(false);
+  const [isUsernameTaken, setIsUsernameTaken] = useState(0);
 
   const [percentageData, setPercentageData] = useState({
     remaining: 0,
@@ -255,7 +255,7 @@ const InsertUser = () => {
 
       const timer = setTimeout(async () => {
         if (!updatedValue.trim()) {
-          setIsUsernameTaken(false);
+          setIsUsernameTaken(0);
           return;
         }
 
@@ -265,9 +265,9 @@ const InsertUser = () => {
           });
 
           if (res?.exists) {
-            setIsUsernameTaken(true);
+            setIsUsernameTaken(-1);
           } else {
-            setIsUsernameTaken(false);
+            setIsUsernameTaken(1);
           }
         } catch (err) {
           console.error("Username check error", err);
@@ -392,7 +392,13 @@ const InsertUser = () => {
                       name="username"
                       data-vv-as="User Name"
                       autoComplete="new-password"
-                      className={`form-control animation ${isUsernameTaken || (touched.username && errors.username) ? 'is-invalid' : ''}`} // if username exist then apply 'is-invalid' or if username exist and username have no error then apply 'is-valid'
+                      className={`form-control animation 
+                        ${isUsernameTaken == -1 || (touched.username && errors.username)
+                          ? 'is-invalid'
+                          : isUsernameTaken == 1
+                            ? 'is-valid'
+                            : ''}`
+                      } // if username exist then apply 'is-invalid' or if username exist and username have no error then apply 'is-valid'
                       aria-required="true"
                       aria-invalid={!!errors.username}
                       value={formData.username}

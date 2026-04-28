@@ -173,7 +173,7 @@ input[placeholder="Select option"].form-control:focus::placeholder {
 }
 
 /* Custom Search Input Clear Button */
-input[type="search"]::-webkit-search-cancel-button {
+input[field-type="search"]::-webkit-search-cancel-button {
     -webkit-appearance: none;
     height: 14px;
     width: 14px;
@@ -186,12 +186,12 @@ input[type="search"]::-webkit-search-cancel-button {
     transition: opacity 0.2s ease-in-out;
 }
 
-input[type="search"]:focus::-webkit-search-cancel-button,
-input[type="search"]:hover::-webkit-search-cancel-button {
+input[field-type="search"]:focus::-webkit-search-cancel-button,
+input[field-type="search"]:hover::-webkit-search-cancel-button {
     opacity: 1;
 }
 
-input[type="search"]::placeholder {
+input[field-type="search"]::placeholder {
     color: #495057;
     /* color: red; */
     opacity: 0.8;

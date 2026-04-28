@@ -42,6 +42,9 @@ const SportBookReport = () => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('none');
 
+  const [isSelectoptTouched, setIsSelectoptTouched] = useState(false);
+  const [isSelectoptTouched2, setIsSelectoptTouched2] = useState(false);
+
   const handleSort = (colKey) => {
     if (sortColumn === colKey) {
       if (sortDirection === 'none') {
@@ -282,7 +285,7 @@ const SportBookReport = () => {
                         <input
                           type="text"
                           className="form-control"
-                          placeholder="Select option 11"
+                          placeholder="Select option"
                           value={clientSearch}
                           onChange={(e) => setClientSearch(e.target.value)}
                           onFocus={() => {
@@ -295,7 +298,7 @@ const SportBookReport = () => {
                         />
                         {/* <Select
                           options={[]}
-                          placeholder="Select option 111"
+                          placeholder="Select option"
                           value={clientSearch}
                           onInputChange={(value) => {
                             setClientSearch(value);
@@ -359,7 +362,10 @@ const SportBookReport = () => {
 
                       {/* TYPE */}
                       <div className="col-xl-2 mb-3">
-                        <select className="form-control">
+                        <select
+                          className={`form-control ${isSelectoptTouched ? "is-invalid" : ""}`}
+                          onBlur={() => setIsSelectoptTouched(true)}
+                        >
                           {providerTypes.map((p) => (
                             <option key={p.value} value={p.value}>
                               {p.label}
@@ -430,6 +436,7 @@ const SportBookReport = () => {
                         <label className="d-inline-flex align-items-center">
                           <input
                             type="search"
+                            field-type="search"
                             placeholder="Search..."
                             className="form-control form-control-sm ml-2"
                             value={search}
@@ -529,7 +536,10 @@ const SportBookReport = () => {
                       </div>
 
                       <div className="col-xl-2 mb-3">
-                        <select className="form-control">
+                        <select
+                          className={`form-control ${isSelectoptTouched2 ? "is-invalid" : ""}`}
+                          onBlur={() => setIsSelectoptTouched2(true)}
+                        >
                           {providerTypes.map((p) => (
                             <option key={p.value} value={p.value}>
                               {p.label}

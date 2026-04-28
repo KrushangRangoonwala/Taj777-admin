@@ -11,9 +11,25 @@ import { apiGetUpcomingFixtures, getUserList } from '../api/API';
 import ChangePasswordModal from './ChangePasswordModal';
 import MarketAnalysisModal from './MarketAnalysisModal';
 import useIsMobile from '../hooks/useIsMobile';
+import RulesModal from './RulesModal';
+import { formatNumAfterDot } from '../utilies/helpers';
+import { setIsSidebarCollapse } from '../store/slices/actionSlice';
 
 const Slider = SliderRaw && typeof SliderRaw === 'object' && SliderRaw.default ? SliderRaw.default : SliderRaw;
 const Select = SelectRaw && typeof SelectRaw === 'object' && SelectRaw.default ? SelectRaw.default : SelectRaw;
+
+export const toggleSidebar = (dispatch, isMobile, isCollapsed) => {
+    // document.body.classList.toggle('sidebar-enable');
+    // document.body.classList.toggle('vertical-collpsed');
+    if (isCollapsed) {
+        document.body.classList.remove('sidebar-enable');
+        !isMobile && document.body.classList.add('vertical-collpsed');
+    } else {
+        document.body.classList.add('sidebar-enable');
+        !isMobile && document.body.classList.remove('vertical-collpsed');
+    }
+    dispatch(setIsSidebarCollapse(!isCollapsed));
+};
 
 export const customSelectStyles = {
     control: (provided, state) => ({
@@ -56,16 +72,22 @@ export const customSelectStyles = {
         textAlign: 'left',
         padding: '8px 12px',
         color: '#495057',
-        fontSize: '14px'
+        fontSize: '14px',
+        cursor: 'pointer',
+        whiteSpace: 'nowrap',
+        overflow: 'auto'
     })
 };
 
-const customSelectStylesWithOption = {
+export const customSelectStylesWithOption = {
     ...customSelectStyles,
     option: (provided, state) => ({
         ...provided,
         color: state.isFocused ? 'white' : '#495057',
-        backgroundColor: state.isSelected ? '#eee' : state.isFocused ? '#556ee6' : 'white',
+        // backgroundColor: state.isSelected ? '#eee' : state.isFocused ? '#556ee6' : 'white',
+        backgroundColor: state.isFocused ? '#556ee6' : state.isSelected ? '#eee' : 'white',
+        // whiteSpace: 'nowrap',
+        // overflow: 'auto'
     })
 };
 
@@ -108,6 +130,7 @@ function SearchUserDropDown({
 }
 
 export default function Header() {
+    const [showRulesModal, setShowRulesModal] = useState(false);
     const isMobile = useIsMobile(992)
     const dispatch = useDispatch();
     const navigate = useNavigate();
@@ -116,11 +139,13 @@ export default function Header() {
     const [upcoming, setUpcoming] = useState([]);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
     const [showMarketAnalysisModal, setShowMarketAnalysisModal] = useState(false);
-    const [isCollapsed, setIsCollapsed] = useState(false);
+    // const [isCollapsed, setIsCollapsed] = useState(false);
+    const isCollapsed = useSelector((state) => state.action.isSidebarCollapse);
     const [search, setSearch] = useState("");
     const [selectedOption, setSelectedOption] = useState(null);
     const [searchList, setSearchList] = useState([]);
     const selectRef = useRef(null);
+    const toggleSidebar2 = () => toggleSidebar(dispatch, isMobile, isCollapsed)
 
     useEffect(() => {
         const handleVisibilityChange = () => {
@@ -142,7 +167,7 @@ export default function Header() {
         navigate('/admin');
     };
 
-    const toggleSidebar = () => {
+    const toggleSidebar3 = () => {
         // document.body.classList.toggle('sidebar-enable');
         // document.body.classList.toggle('vertical-collpsed');
         if (isCollapsed) {
@@ -152,7 +177,7 @@ export default function Header() {
             document.body.classList.add('sidebar-enable');
             !isMobile && document.body.classList.remove('vertical-collpsed');
         }
-        setIsCollapsed(!isCollapsed);
+        dispatch(setIsSidebarCollapse(!isCollapsed));
     };
 
     const sliderSettings = {
@@ -237,7 +262,7 @@ export default function Header() {
                         id="vertical-menu-btn"
                         type="button"
                         className="btn btn-sm px-3 font-size-16 header-item"
-                        onClick={toggleSidebar}
+                        onClick={toggleSidebar2}
                     >
                         <i className="fa fa-fw fa-bars"></i>
                     </button>
@@ -308,13 +333,17 @@ export default function Header() {
                     <div className="dropdown d-none d-lg-inline-block ml-1" onClick={toggleFullscreen}>
                         <button type="button" className="btn header-item noti-icon"><i className="bx bx-fullscreen"></i></button>
                     </div>
-                    <div className="d-none d-sm-inline-block rules-icon nowrap"><span className="main-rules"><a
-                        href="javascript:void(0)"><i className="fas fa-info-circle mr-1"></i>Rules</a></span>
+                    <div className="d-none d-sm-inline-block rules-icon nowrap" onClick={() => setShowRulesModal(true)}>
+                        <span className="main-rules">
+                            <Link to="#">
+                                <i className="fas fa-info-circle mr-1"></i>Rules
+                            </Link>
+                        </span>
                     </div>
                     <div className="dropdown d-none d-sm-inline-block ml-1">
                         <button type="button" className="btn header-item noti-icon">
                             <span className="balance nowrap">
-                                pts:{' '}<span className="balance-value"><b>{point}</b></span>
+                                pts:{' '}<span className="balance-value"><b>{formatNumAfterDot(point)}</b></span>
                                 {Number(exposure) ? <>{' | '}<span className="balance-value">{exposure}</span></> : ''}
                             </span>
                         </button>
@@ -348,6 +377,8 @@ export default function Header() {
             </div>
             {showChangePasswordModal && <ChangePasswordModal show={showChangePasswordModal} onHide={() => setShowChangePasswordModal(false)} />}
             {showMarketAnalysisModal && <MarketAnalysisModal show={showMarketAnalysisModal} onHide={() => setShowMarketAnalysisModal(false)} />}
+
+            <RulesModal show={showRulesModal} onHide={() => setShowRulesModal(false)} />
         </header>
     );
 }

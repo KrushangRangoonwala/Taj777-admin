@@ -1,6 +1,41 @@
-import React from 'react';
+import React, { useState } from 'react';
 
 const Bank = () => {
+  const [formData, setFormData] = useState({
+    masterPassword: '',
+  });
+  const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
+
+  const validateField = (name, value) => {
+    let error = "";
+    switch (name) {
+      case "masterPassword":
+        if (!value.trim()) {
+          error = "true";
+        }
+        break;
+      default:
+        break;
+    }
+    return error;
+  };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const error = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    const error = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
   const dummyData = [
     {
       username: 'Arpit528',
@@ -81,6 +116,11 @@ const Bank = () => {
     },
   ];
 
+  const emptyData = []
+
+  const data = emptyData;
+  // const data = dummyData;
+
   return (
     <div data-v-5a10e370="">
       <div data-v-5a10e370="">
@@ -135,7 +175,16 @@ const Bank = () => {
                       </div>
                       <form data-vv-scope="transferAll" method="post" className="d-inline-block ml-2">
                         <div className="d-inline-block form-group form-group-feedback form-group-feedback-right" style={{ marginRight: '0.2rem' }}>
-                          <input type="password" name="masterPassword" placeholder="Transaction Code" className="form-control" />
+                          <input
+                            type="password"
+                            name="masterPassword"
+                            placeholder="Transaction Code"
+                            className={`form-control ${touched.masterPassword && errors.masterPassword ? 'is-invalid' : ''}`}
+                            value={formData.masterPassword}
+                            onChange={handleChange}
+                            onBlur={handleBlur}
+                          />
+
                         </div>
                         <div className="d-inline-block">
                           <button type="submit" id="transferSubmit" className="btn btn-primary">
@@ -193,37 +242,57 @@ const Bank = () => {
                         </tr>
                       </thead>
                       <tbody role="rowgroup">
-                        {dummyData.map((user, idx) => (
-                          <tr key={idx} role="row">
-                            <td aria-colindex="1" role="cell">
-                              <span title={`${user.username} (${user.fullName})`} className="text-ellipsis">{user.username}</span>
+                        {/* {dummyData.map((user, idx) => ( */}
+
+                        {data?.length > 0 ? (
+                          data?.map((user, idx) => (
+                            <tr key={idx} role="row">
+                              <td aria-colindex="1" role="cell">
+                                <span title={`${user.username} (${user.fullName})`} className="text-ellipsis">{user.username}</span>
+                              </td>
+                              <td aria-colindex="2" role="cell">
+                                <p className="text-right mb-0">{user.cr}</p>
+                              </td>
+                              <td aria-colindex="3" role="cell">
+                                <p className="text-right mb-0">{user.pts}</p>
+                              </td>
+                              <td aria-colindex="4" role="cell">
+                                <p className="text-right mb-0">{user.clientPL}</p>
+                              </td>
+                              <td aria-colindex="5" role="cell">
+                                <p className="text-right mb-0">{user.exposure}</p>
+                              </td>
+                              <td aria-colindex="6" role="cell">
+                                <p className="text-right mb-0">{user.availablePts}</p>
+                              </td>
+                              <td aria-colindex="7" role="cell">{user.accountType}</td>
+                              <td aria-colindex="8" role="cell">
+                                <a href="javascript:void(0)" className="text-success">All <i className="fas fa-arrow-right"></i></a>
+                                <input type="number" name="amount" placeholder="0" className="form-control form-control-sm transfer-amt d-inline-block mx-1" style={{ width: '122px' }} />
+                                <button className="btn btn-info btn-sm">
+                                  Submit
+                                </button>
+                              </td>
+                              <td aria-colindex="9" role="cell">{user.status}</td>
+                            </tr>
+                          ))
+                        ) : (
+                          <tr role="row" className="b-table-empty-row">
+                            <td colSpan="9" role="cell">
+                              <div role="alert" aria-live="polite">
+                                <div className="text-center my-2">
+                                  {/* {loading
+                                      ? "Loading..."
+                                      // ? "There are no records to show"
+                                      : search?.length
+                                        ? "There are no records matching your request"
+                                        : "There are no records to show"} */}
+                                  There are no records to show
+                                </div>
+                              </div>
                             </td>
-                            <td aria-colindex="2" role="cell">
-                              <p className="text-right mb-0">{user.cr}</p>
-                            </td>
-                            <td aria-colindex="3" role="cell">
-                              <p className="text-right mb-0">{user.pts}</p>
-                            </td>
-                            <td aria-colindex="4" role="cell">
-                              <p className="text-right mb-0">{user.clientPL}</p>
-                            </td>
-                            <td aria-colindex="5" role="cell">
-                              <p className="text-right mb-0">{user.exposure}</p>
-                            </td>
-                            <td aria-colindex="6" role="cell">
-                              <p className="text-right mb-0">{user.availablePts}</p>
-                            </td>
-                            <td aria-colindex="7" role="cell">{user.accountType}</td>
-                            <td aria-colindex="8" role="cell">
-                              <a href="javascript:void(0)" className="text-success">All <i className="fas fa-arrow-right"></i></a>
-                              <input type="number" name="amount" placeholder="0" className="form-control form-control-sm transfer-amt d-inline-block mx-1" style={{ width: '122px' }} />
-                              <button className="btn btn-info btn-sm">
-                                Submit
-                              </button>
-                            </td>
-                            <td aria-colindex="9" role="cell">{user.status}</td>
                           </tr>
-                        ))}
+                        )}
                       </tbody>
                     </table>
                   </div>
@@ -263,3 +332,7 @@ const Bank = () => {
 };
 
 export default Bank;
+
+
+//aaaaaaaaaabbbbbbbbbbbccccccccccc
+//10000000000000000000000000000

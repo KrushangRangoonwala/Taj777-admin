@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import SmoothMenu from "./SmoothMenu";
 import SidebarEventsTree from "./SidebarEventsTree";
 import { Link } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import useIsMobile from "../hooks/useIsMobile";
+import { toggleSidebar } from "./Header";
 
 const EVENT_IDX = 20; // JUST RANDOM NUMBER 
 
@@ -104,6 +107,11 @@ const menuItems = [
 
 
 export default function Sidebar() {
+    const isMobile = useIsMobile(992)
+    const dispatch = useDispatch();
+    const isCollapsed = useSelector((state) => state.action.isSidebarCollapse);
+    const toggleSidebar2 = () => setTimeout(() => isMobile && toggleSidebar(dispatch, isMobile, isCollapsed), 100)
+
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
     const [openSport, setOpenSport] = useState(null);
     const [openLeague, setOpenLeague] = useState(null);
@@ -165,6 +173,7 @@ export default function Sidebar() {
                                                                             <li key={subIndex}>
                                                                                 <Link
                                                                                     to={subItem.href || "#"}
+                                                                                    onClick={toggleSidebar2}
                                                                                     className="side-nav-link-ref"
                                                                                 >
                                                                                     {subItem.label}
@@ -175,7 +184,8 @@ export default function Sidebar() {
                                                                 </>
                                                             ) : (
                                                                 <Link
-                                                                    to={item.href}
+                                                                    to={item.href || "#"}
+                                                                    onClick={toggleSidebar2}
                                                                     aria-current={item.ariaCurrent}
                                                                     className={item.linkClasses}
                                                                 >

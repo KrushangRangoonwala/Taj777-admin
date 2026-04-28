@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { createAccountApi } from "../../api/API";
+import { checkUsername, createAccountApi } from "../../api/API";
 
 const CreateAccount = () => {
   const [formData, setFormData] = useState({
@@ -10,9 +10,65 @@ const CreateAccount = () => {
     mpass: '',
   });
 
+  const [usernameTimer, setUsernameTimer] = useState(null);
+  const [isUsernameTaken, setIsUsernameTaken] = useState(0);
   const [selectedPrivileges, setSelectedPrivileges] = useState([]);
   const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
   const [submitted, setSubmitted] = useState(false);
+
+  const validateField = (name, value, currentFormData = formData) => {
+    let error = "";
+    switch (name) {
+      case "uname":
+        if (!value.trim()) {
+          error = "The User Name field is required";
+        } else if (value.length < 4) {
+          error = "The User Name field must be at least 4 characters";
+        } else if (!/^[a-zA-Z0-9]+$/.test(value)) {
+          error = "The User Name field may only contain alpha-numeric characters";
+        } else if (value.length > 15) {
+          error = "The User Name field may not be greater than 15 characters";
+        }
+        break;
+      case "fullname":
+        if (!value.trim()) {
+          error = "The Full Name field is required";
+        } else if (value.length < 4) {
+          error = "The Full Name field must be at least 4 characters";
+        } else if (value.length > 50) {
+          error = "The Full Name field may not be greater than 50 characters";
+        }
+        break;
+      case "password":
+        if (value.length > 20) {
+          error = "The Password field may not be greater than 20 characters";
+        } else if (!value.trim()) {
+          error = "The password field is required";
+        } else if (value.length < 8) {
+          error = "The Password field must be at least 8 characters";
+        } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value)) {
+          error = "The password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 number";
+        }
+        break;
+      case "cpass":
+        if (!value.trim()) {
+          error = "The Confirm Password field is required";
+        } else if (value !== currentFormData.password) {
+          error = "The Confirm Password confirmation does not match";
+        }
+        break;
+      case "mpass":
+        if (!value.trim()) {
+          error = "Transaction Code field is required";
+        }
+        break;
+      default:
+        break;
+    }
+    return error;
+  };
+
 
   const privileges = [
     { id: '2386', name: 'DashBoard', value: '1' },
@@ -51,11 +107,57 @@ const CreateAccount = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
-    if (errors[name]) {
-      setErrors({ ...errors, [name]: null });
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    setFormData((prev) => {
+      const newData = { ...prev, [name]: value };
+      const error = validateField(name, value, newData);
+      setErrors((prevErr) => ({ ...prevErr, [name]: error }));
+
+      if (name === "password" && touched.cpass) {
+        const cError = validateField("cpass", prev.cpass, newData);
+        setErrors((prevErr) => ({ ...prevErr, cpass: cError }));
+      }
+      return newData;
+    });
+
+
+    if (name === "uname") {
+      if (usernameTimer) {
+        clearTimeout(usernameTimer);
+      }
+
+      const timer = setTimeout(async () => {
+        if (!value.trim()) {
+          setIsUsernameTaken(0);
+          return;
+        }
+
+        try {
+          const res = await checkUsername({
+            username: value,
+          });
+
+          if (res?.exists) {
+            setIsUsernameTaken(-1);
+          } else {
+            setIsUsernameTaken(1);
+          }
+        } catch (err) {
+          console.error("Username check error", err);
+        }
+      }, 500);
+
+      setUsernameTimer(timer);
     }
   };
+
+  const handleBlur = (e) => {
+    const { name, value } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
+    const error = validateField(name, value);
+    setErrors((prev) => ({ ...prev, [name]: error }));
+  };
+
 
   const handlePrivilegeChange = (value) => {
     let aa;
@@ -89,12 +191,23 @@ const CreateAccount = () => {
     setSubmitted(true);
 
     const newErrors = {};
-    if (!formData.uname) newErrors.uname = 'The Client ID field is required';
-    if (!formData.fullname) newErrors.fullname = 'The Full Name field is required';
-    if (!formData.password) newErrors.password = 'The Password field is required';
-    if (!formData.cpass) newErrors.cpass = 'The Confirm Password field is required';
-    if (selectedPrivileges.length === 0) newErrors.privileges = 'The Privileges field is required';
-    if (!formData.mpass) newErrors.mpass = 'Transaction Code field is required';
+    const newTouched = {};
+
+    Object.keys(formData).forEach((key) => {
+      const error = validateField(key, formData[key]);
+      if (error) {
+        newErrors[key] = error;
+      }
+      newTouched[key] = true;
+    });
+
+    if (selectedPrivileges.length === 0) {
+      newErrors.privileges = 'The Privileges field is required';
+      newTouched.privileges = true;
+    }
+
+    setTouched(newTouched);
+
 
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
@@ -126,7 +239,9 @@ const CreateAccount = () => {
         });
         setSelectedPrivileges([]);
         setErrors({});
+        setTouched({});
         setSubmitted(false);
+
 
       } else {
         setErrors({ api: result.message });
@@ -173,45 +288,56 @@ const CreateAccount = () => {
                           <input
                             type="text"
                             name="uname"
-                            className={`form-control ${errors.uname || true ? 'is-invalid' : ''}`}
+                            className={`form-control animation 
+                              ${isUsernameTaken == -1 || (touched.uname && errors.uname)
+                                ? 'is-invalid'
+                                : isUsernameTaken == 1
+                                  ? 'is-valid'
+                                  : ''}`
+                            }
                             value={formData.uname}
                             onChange={handleInputChange}
+                            onBlur={handleBlur}
                           />
-                          {errors.uname && <small className="error">{errors.uname}</small>}
+                          {touched.uname && errors.uname && <small className="error">{errors.uname}</small>}
                         </div>
                         <div className="col-md-3 form-group">
                           <label>Full Name</label>
                           <input
                             type="text"
                             name="fullname"
-                            className={`form-control ${errors.fullname ? 'is-invalid' : ''}`}
+                            className={`form-control ${touched.fullname && errors.fullname ? 'is-invalid' : ''}`}
                             value={formData.fullname}
                             onChange={handleInputChange}
+                            onBlur={handleBlur}
                           />
-                          {errors.fullname && <small className="error">{errors.fullname}</small>}
+                          {touched.fullname && errors.fullname && <small className="error">{errors.fullname}</small>}
                         </div>
                         <div className="col-md-3 form-group">
                           <label>Password</label>
                           <input
                             type="password"
                             name="password"
-                            className={`form-control ${errors.password ? 'is-invalid' : ''}`}
+                            className={`form-control ${touched.password && errors.password ? 'is-invalid' : ''}`}
                             value={formData.password}
                             onChange={handleInputChange}
+                            onBlur={handleBlur}
                           />
-                          {errors.password && <small className="error">{errors.password}</small>}
+                          {touched.password && errors.password && <small className="error">{errors.password}</small>}
                         </div>
                         <div className="col-md-3 form-group">
                           <label>Confirm Password</label>
                           <input
                             type="password"
                             name="cpass"
-                            className={`form-control ${errors.cpass ? 'is-invalid' : ''}`}
+                            className={`form-control ${touched.cpass && errors.cpass ? 'is-invalid' : ''}`}
                             value={formData.cpass}
                             onChange={handleInputChange}
+                            onBlur={handleBlur}
                           />
-                          {errors.cpass && <small className="error">{errors.cpass}</small>}
+                          {touched.cpass && errors.cpass && <small className="error">{errors.cpass}</small>}
                         </div>
+
                       </div>
                     </div>
 
@@ -259,10 +385,12 @@ const CreateAccount = () => {
                             type="password"
                             name="mpass"
                             placeholder="Transaction Code"
-                            className={`form-control dark-placeholder mpass-text ${errors.mpass ? 'is-invalid' : ''}`}
+                            className={`form-control dark-placeholder mpass-text ${touched.mpass && errors.mpass ? 'is-invalid' : ''}`}
                             value={formData.mpass}
                             onChange={handleInputChange}
+                            onBlur={handleBlur}
                           />
+
                           <button type="submit" className="btn btn-success ml-3px-child">Submit</button>
                           <button
                             type="button"
@@ -271,7 +399,9 @@ const CreateAccount = () => {
                               setFormData({ uname: '', fullname: '', password: '', cpass: '', mpass: '' });
                               setSelectedPrivileges([]);
                               setErrors({});
+                              setTouched({});
                               setSubmitted(false);
+
                             }}
                           >
                             Reset
