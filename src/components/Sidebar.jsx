@@ -5,106 +5,11 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import useIsMobile from "../hooks/useIsMobile";
 import { toggleSidebar } from "./Header";
+import { menuItems } from "./SidebarPages";
 
 const EVENT_IDX = 20; // JUST RANDOM NUMBER 
 
-const menuItems = [
-    {
-        label: "Dashboard",
-        href: "/admin/home",
-        icon: "bx bx-home-circle",
-        liClassName: "mm-active",
-        linkClasses: "side-nav-link-ref router-link-exact-active router-link-active ", // active    
-        ariaCurrent: "page",
-    },
-    {
-        label: "Market Analysis",
-        href: "/admin/market-analysis",
-        icon: "bx bxs-bar-chart-alt-2",
-        linkClasses: "side-nav-link-ref",
-    },
-    {
-        label: "Multi Login Account",
-        href: "/admin/createaccount",
-        icon: "bx bx-user-plus",
-        linkClasses: "side-nav-link-ref",
-    },
-    {
-        label: "Account",
-        icon: "bx bx-user-circle",
-        subItems: [
-            { label: "Account List For Active Users", href: "/admin/activeusers" },
-            { label: "Account List", href: "/admin/users" },
-            { label: "Create Account", href: "/admin/users/insertuser" },
-        ],
-    },
-    {
-        label: "Assign Agent",
-        href: "/admin/assign-agent",
-        icon: "bx bx-user",
-        linkClasses: "side-nav-link-ref",
-    },
-    {
-        label: "Bank",
-        href: "/admin/reports/bank",
-        icon: "bx bxs-bank",
-        linkClasses: "side-nav-link-ref",
-    },
-    {
-        label: "Reports",
-        icon: "bx bx-file",
-        subItems: [
-            { label: "Account Statement", href: "/admin/reports/accountstatement" },
-            { label: "Party Win Loss", href: "/admin/reports/profitloss" },
-            { label: "Current Bets", href: "/admin/reports/currentbets" },
-            { label: "User History", href: "/admin/reports/userhistory" },
-            { label: "General Lock", href: "/admin/reports/userlock" },
-            { label: "Our Casino Result", href: "/admin/reports/casinoresult" },
-            { label: "Live Casino Result", href: "/admin/reports/livecasinoreport" },
-            { label: "Sportbook Report", href: "/admin/reports/sportbookreport" },
-            { label: "Turn Over", href: "/admin/reports/turnover" },
-            { label: "User Authentication", href: "/admin/reports/authlist" },
-            { label: "User Register Detail", href: "/admin/reports/userregisterdetail" },
-            { label: "Total Profit Loss", href: "/admin/reports/totalprofitloss" },
-            { label: "User Win Loss", href: "/admin/reports/userwinloss" },
-        ],
-    },
-    {
-        label: "Our Casino",
-        href: "/admin/casino/list",
-        icon: "mdi mdi-cards-playing-outline",
-        linkClasses: "side-nav-link-ref",
-    },
-    {
-        label: "Vip Casino",
-        href: "/admin/casino/vip",
-        icon: "mdi mdi-cards-playing-outline",
-        linkClasses: "side-nav-link-ref",
-        badge: "New",
-    },
-    {
-        label: "Virtual Casino",
-        // href: "/admin/vcasino/list",
-        icon: "mdi mdi-cards-playing-outline",
-        linkClasses: "side-nav-link-ref",
-        badge: "New",
-    },
-    {
-        label: "Premium Casino",
-        // href: "/admin/pcasino/list",
-        icon: "mdi mdi-cards-playing-outline",
-        linkClasses: "side-nav-link-ref",
-        badge: "New",
-    },
-    {
-        label: "Tembo Casino",
-        // href: "/admin/tcasino/list",
-        icon: "mdi mdi-cards-playing-outline",
-        linkClasses: "side-nav-link-ref",
-        badge: "New",
-    },
-];
-
+const privileges = ["dashboard", "account-list", "market-analysis"]  //  backend key array 
 
 export default function Sidebar() {
     const isMobile = useIsMobile(992)
@@ -119,6 +24,8 @@ export default function Sidebar() {
     const toggleMenu = (index) => {
         setOpenMenuIndex(openMenuIndex === index ? null : index);
     };
+
+    const filterdMenuItems = menuItems.filter((item) => (privileges || []).includes(item.backend_key));
 
     const isEventopen = openMenuIndex === EVENT_IDX;
     return (
@@ -150,7 +57,10 @@ export default function Sidebar() {
                                     <div className="simplebar-content" style={{ padding: "0px" }}>
                                         <div id="sidebar-menu">
                                             <ul id="side-menu" className="metismenu list-unstyled">
-                                                {menuItems.map((item, index) => {
+
+
+                                                {/* {filterdMenuItems.map((item, index) => {  */}
+                                                {menuItems.map((item, index) => {  // 📌 USE ABOVE LINE WHEN BACKEND SENDS PRIVILEGES ARRAY
                                                     const isOpen = openMenuIndex === index;
                                                     return (
                                                         <li key={index} className={`${item.liClassName || ""} ${isOpen ? "mm-active" : ""}`.trim()}>

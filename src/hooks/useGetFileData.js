@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from "react-router-dom";
-import { gamePath_MapTo_gametype, getCasinoDetailsByPathName } from "../utilies/casinoDeatils_byType";
+import { gamePath_MapTo_gametype, gamePath_MapTo_gametype_vip, getCasinoDetailsByPathName } from "../utilies/casinoDeatils_byType";
 import { useSelector } from "react-redux";
 import { useEffect } from "react";
 // import { fetchCasinoList, isApiSuccess } from "../api/api";
@@ -179,8 +179,8 @@ export function useGetFileData() { // BY URL PATH
         return default_;
     } else {
         const path = location.split('/').pop();
-
-        const type = gamePath_MapTo_gametype[path] ?? path;
+        const isVip = location.includes("/vip/");
+        const type = isVip ? gamePath_MapTo_gametype_vip[path] : gamePath_MapTo_gametype[path] ?? path;
         const gg = casino_list[type] ?? default_;
         console.log("game data", gg);
         return gg;

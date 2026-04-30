@@ -1,10 +1,28 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
+import useIsMobile from '../hooks/useIsMobile';
 
 const ChartCard = ({ options, series, legendData, type = 'bar', height = 350 }) => {
-
+    const isMobile = useIsMobile(764);
     const safeSeries = Array.isArray(series) ? series : [];
     const safeLegend = Array.isArray(legendData) ? legendData : [];
+
+    const currentOptions = options || {};
+    const chartOptions = {
+        ...currentOptions,
+        legend: {
+            ...(currentOptions.legend || {}),
+            position: isMobile ? 'top' : (currentOptions.legend?.position || 'bottom')
+        },
+        plotOptions: {
+            ...(currentOptions.plotOptions || {}),
+            bar: {
+                ...(currentOptions.plotOptions?.bar || {}),
+                horizontal: isMobile ? false : currentOptions.plotOptions?.bar?.horizontal,
+                columnWidth: isMobile ? '25px' : currentOptions.plotOptions?.bar?.columnWidth
+            }
+        }
+    };
 
     return (
         <div className="col-xl-12">
@@ -12,7 +30,7 @@ const ChartCard = ({ options, series, legendData, type = 'bar', height = 350 }) 
                 <div className="card-body">
                     <div style={{ minHeight: '365px' }}>
                         <Chart
-                            options={options || {}}
+                            options={chartOptions}
                             series={safeSeries}
                             type={type}
                             height={height}

@@ -10,6 +10,8 @@ import autoTable from "jspdf-autotable";
 import { getClients, getTurnover } from "../../api/API";
 import { apiGetSports, apiGetGameType } from "../../api/API_games";
 import { casino_list } from "../../utilies/casino_list";
+import { Link } from "react-router-dom";
+import SelectBootStrap from "../../components/SelectBootStrap";
 
 const casinoTypes = [
   { value: "", label: "Select Type" },   // ✅ static first option
@@ -28,7 +30,7 @@ if (initialFromDate.month() !== today.month()) {
 }
 
 const Turnover = () => {
-
+  const [isSelectoptTouched, setIsSelectoptTouched] = useState({ a: false, b: false, c: false });
   const [type, setType] = useState('');
   const [sportsList, setSportsList] = useState([]);
   const [sportsListType, setSportsListType] = useState('');
@@ -36,10 +38,7 @@ const Turnover = () => {
   const [gameType, setGameType] = useState('');
   const [casinoList, setCasinoList] = useState('');
 
-  const [clientSearch, setClientSearch] = useState("");
-  const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState("");
-  const [isListActive, setIsListActive] = useState(false);
 
   const [fromDate, setFromDate] = useState(initialFromDate);
   const [toDate, setToDate] = useState(today);
@@ -98,24 +97,6 @@ const Turnover = () => {
     }
   };
 
-  const fetchClients = async (value) => {
-    if (!value) {
-      setClientList([{ id: '1', text: 'List is empty.' }]);
-      return;
-    }
-
-    try {
-      const res = await getClients(value);
-      res.results?.length > 0 ? setClientList(res.results) : setClientList([{ id: '1', text: 'No elements found. Consider changing search query.' }]);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchClients(clientSearch);
-  }, [clientSearch])
-
 
   async function getSports() {
     const data = await apiGetSports();
@@ -173,7 +154,6 @@ const Turnover = () => {
   };
 
   const handleReset = () => {
-    setClientSearch("");
     setSelectedClient("");
     setFromDate(dayjs().subtract(7, "day"));
     setToDate(dayjs());
@@ -234,7 +214,7 @@ const Turnover = () => {
             <div className="page-title-right">
               <ol className="breadcrumb m-0">
                 <li className="breadcrumb-item">
-                  <a href="/admin/home">Home</a>
+                  <Link to="/admin/home">Home</Link>
                 </li>
                 <li className="breadcrumb-item active">
                   <span>Turnover Report</span>
@@ -289,50 +269,11 @@ const Turnover = () => {
                   <div className="col-md-4 col-xl-2">
                     <div className="form-group user-lock-search mb-3px-plus" style={{ position: "relative" }}>
                       <label>Search By Client Name</label>
-
-                      <input
-                        type="text"
-                        className="form-control"
-                        placeholder="Select option"
-                        value={clientSearch}
-                        onChange={(e) => setClientSearch(e.target.value)}
-                        onFocus={() => {
-                          setIsListActive(true);
-                        }}
-                        onBlur={() => {
-                          setClientSearch("");
-                          setIsListActive(false);
-                        }}
+                      <SelectBootStrap
+                        selectedOption={selectedClient}
+                        setSelectedOption={setSelectedClient}
+                        fetchType="client"
                       />
-
-                      {isListActive && (
-                        <div style={{
-                          position: 'absolute',
-                          background: '#fff',
-                          border: '1px solid #ddd',
-                          width: '100%',
-                          zIndex: 1000
-                        }}>
-                          {clientList.map((c, i) => (
-                            <div
-                              key={i}
-                              style={{
-                                padding: '0.7rem',
-                                cursor: 'pointer',
-                                whiteSpace: 'nowrap',
-                                overflowX: 'auto',
-                              }}
-                              onClick={() => {
-                                setSelectedClient(c.id);
-                                setClientSearch(c.text);
-                                setClientList([]);
-                              }}
-                            >
-                              {c.text}
-                            </div>
-                          ))}
-                        </div>
-                      )}
                     </div>
                   </div>
 
@@ -401,6 +342,7 @@ const Turnover = () => {
                     <div className="form-group">
                       <label>Type</label>
                       <select
+                        // className={`form-control ${errors.type || isSelectoptTouched.a ? "is-invalid" : ""}`}
                         className={`form-control ${errors.type ? "is-invalid" : ""}`}
                         value={type}
                         onChange={(e) => {
@@ -409,6 +351,7 @@ const Turnover = () => {
                           setGameType('');
                           setCasinoList('');
                         }}
+                      // onBlur={() => setIsSelectoptTouched(prev => ({ ...prev, a: true }))}
                       >
                         <option value="">Select Type</option>
                         <option value="1">Sports</option>
@@ -587,8 +530,8 @@ const Turnover = () => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

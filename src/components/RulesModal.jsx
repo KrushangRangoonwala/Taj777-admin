@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Modal, Collapse } from 'react-bootstrap';
 import { RULES_DATA } from './RulesData';
 
@@ -13,15 +13,41 @@ const cssStyle = {
 const RulesModal = ({ show, onHide }) => {
     const [showLangOpt, setShowLangOpt] = useState(false)
     const [activeSport, setActiveSport] = useState(null);
-    const [activeCategory, setActiveCategory] = useState(null);
+    const [activeCategories, setActiveCategories] = useState({});
+    const dropdownRef = useRef(null);
+
+    useEffect(() => {
+        if (!show) {
+            setActiveSport(null);
+            setActiveCategories({});
+        }
+    }, [show])
+
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setShowLangOpt(false);
+            }
+        };
+
+        if (showLangOpt) {
+            document.addEventListener('mousedown', handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showLangOpt]);
 
     const toggleSport = (sportId) => {
         setActiveSport(activeSport === sportId ? null : sportId);
-        setActiveCategory(null); // Reset category when switching sports
     };
 
-    const toggleCategory = (categoryId) => {
-        setActiveCategory(activeCategory === categoryId ? null : categoryId);
+    const toggleCategory = (sportId, categoryId) => {
+        setActiveCategories(prev => ({
+            ...prev,
+            [sportId]: prev[sportId] === categoryId ? null : categoryId
+        }));
     };
 
     return (
@@ -41,16 +67,16 @@ const RulesModal = ({ show, onHide }) => {
                 </header>
                 <Modal.Body id="__BVID__42___BV_modal_body_">
                     <div className="main-rules-container">
-                        <div className={`dropdown rules-language-container ${showLangOpt ? 'show' : ''}`}>
+                        <div ref={dropdownRef} className={`dropdown rules-language-container ${showLangOpt ? 'show' : ''}`}>
                             <div data-toggle="dropdown" aria-expanded={showLangOpt} className="dropdown-toggle" onClick={() => setShowLangOpt(!showLangOpt)}>
                                 <img src="https://wver.sprintstaticdata.com/v219/static/front/img/flag_english.png" alt="English" />
-                                English
+                                {' '}English
                                 <i className="fas fa-angle-down ml-1"></i>
                             </div>
                             <div className={`dropdown-menu rules-language ${showLangOpt ? 'show' : ''}`} {...(showLangOpt ? { style: { ...cssStyle, 'x-placement': 'bottom-start' } } : {})}>
                                 <div>
                                     <img src="https://wver.sprintstaticdata.com/v219/static/front/img/flag_english.png" alt="English" />
-                                    <span>English</span>
+                                    <span>{' '}English</span>
                                 </div>
                             </div>
                         </div>
@@ -76,14 +102,14 @@ const RulesModal = ({ show, onHide }) => {
                                                             <div className="card-header">
                                                                 <a
                                                                     href="javascript:void(0)"
-                                                                    className={activeCategory === category.id ? "" : "collapsed"}
-                                                                    aria-expanded={activeCategory === category.id}
-                                                                    onClick={() => toggleCategory(category.id)}
+                                                                    className={activeCategories[sport.id] === category.id ? "" : "collapsed"}
+                                                                    aria-expanded={activeCategories[sport.id] === category.id}
+                                                                    onClick={() => toggleCategory(sport.id, category.id)}
                                                                 >
                                                                     {category.name}
                                                                 </a>
                                                             </div>
-                                                            <Collapse in={activeCategory === category.id}>
+                                                            <Collapse in={activeCategories[sport.id] === category.id}>
                                                                 <div id={category.id} className="card-body">
                                                                     {category.rules.map((rule, index) => (
                                                                         <div

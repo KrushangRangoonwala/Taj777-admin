@@ -3,6 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import SmoothMenu from "./SmoothMenu";
 import { setSelectedMatch } from "../store/slices/matchSlice";
+import useIsMobile from "../hooks/useIsMobile";
+import { toggleSidebar } from "./Header";
 
 const const_sportData = [
     { key: 40, sportLabel: 'Politics', sportIcon: 'politics', sportClass: 'sport40', path: '/' },
@@ -90,6 +92,11 @@ const SidebarEventsTree = ({
 }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
+
+    const isMobile = useIsMobile(992)
+    const isCollapsed = useSelector((state) => state.action.isSidebarCollapse);
+    const toggleSidebar2 = () => setTimeout(() => isMobile && toggleSidebar(dispatch, isMobile, isCollapsed), 100)
+
     const liveDataBySport = useSelector(state => state.match.liveDataBySport);
     const selectedMatch = useSelector(state => state.match.selectedMatch);
     const [sportData, setSportData] = useState(const_sportData);
@@ -123,6 +130,7 @@ const SidebarEventsTree = ({
     }, [liveDataBySport]);
 
     const handleMatchClick = (match) => {
+        toggleSidebar2();
         sessionStorage.setItem('selectedMatch', JSON.stringify(match));
         dispatch(setSelectedMatch(match));
 

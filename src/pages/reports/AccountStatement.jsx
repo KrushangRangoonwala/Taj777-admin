@@ -12,6 +12,7 @@ import autoTable from "jspdf-autotable";
 import { Table } from 'react-bootstrap';
 import { getNoRecordText } from '../../utilies/helpers';
 import SelectBootStrap from '../../components/SelectBootStrap';
+import { Link } from 'react-router-dom';
 
 
 const AccountStatement = () => {
@@ -52,7 +53,7 @@ const AccountStatement = () => {
       setLoading(true);
 
       const payload = {
-        client_name: selectedClient,
+        client_name: selectedClient?.value,
         from_date: fromDate ? new Date(fromDate).toISOString().split("T")[0] : "",
         to_date: toDate ? new Date(toDate).toISOString().split("T")[0] : "",
         report_type: type,
@@ -208,7 +209,7 @@ const AccountStatement = () => {
               <div className="page-title-right">
                 <ol className="breadcrumb m-0">
                   <li className="breadcrumb-item">
-                    <a href="/admin/home">Home</a>
+                    <Link to="/admin/home">Home</Link>
                   </li>
                   <li className="breadcrumb-item active">
                     <span>Account Statement</span>
@@ -227,7 +228,7 @@ const AccountStatement = () => {
                 {/* 🔍 FILTER */}
                 <div className="report-form mb-3">
                   <form onSubmit={(e) => { e.preventDefault(); fetchStatement(); }}>
-                    <div className="row row5" style={{ marginBottom: "3px" }}>
+                    <div className="row row5">
 
                       {/* CLIENT SEARCH */}
                       <div className="col-lg-3">
@@ -236,7 +237,7 @@ const AccountStatement = () => {
                           <SelectBootStrap
                             selectedOption={selectedClient}
                             setSelectedOption={setSelectedClient}
-                            fetchType="clients"
+                            fetchType="client"
                           />
                         </div>
                       </div>
@@ -316,8 +317,7 @@ const AccountStatement = () => {
                         <button type="submit" className="btn btn-primary">Load</button>{' '}
                         <button type="button" className="btn btn-light"
                           onClick={() => {
-                            setClientSearch('');
-                            setSelectedClient('');
+                            setSelectedClient([]);
                             setFromDate(null);
                             setToDate(null);
                             setSearch('');

@@ -5,7 +5,8 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
-import { formatNumAfterDot } from "../../utilies/helpers";
+import { formatNumAfterDot, getNoRecordText } from "../../utilies/helpers";
+import { Link } from "react-router-dom";
 
 const ProfitLoss = () => {
   const [data, setData] = useState([]);
@@ -24,7 +25,7 @@ const ProfitLoss = () => {
     setLoading(true);
     try {
       const payload = {
-        client_name: selectedClient,
+        client_name: selectedClient?.value,
         from_date: fromDate,
         to_date: toDate,
         search_text: search,
@@ -151,7 +152,7 @@ const ProfitLoss = () => {
               <div className="page-title-right">
                 <ol className="breadcrumb m-0">
                   <li className="breadcrumb-item">
-                    <a href="/admin/home" target="_self">Home</a>
+                    <Link to="/admin/home">Home</Link>
                   </li>
                   <li className="breadcrumb-item active">
                     <span aria-current="location">Profit Loss</span>
@@ -284,7 +285,7 @@ const ProfitLoss = () => {
                         <tr className="b-table-empty-row">
                           <td colSpan="8" className="text-center">
                             <div role="alert" aria-live="polite">
-                              <div className="text-center my-2">There are no records to show</div>
+                              <div className="text-center my-2">{getNoRecordText(search)}</div>
                             </div>
                           </td>
                         </tr>

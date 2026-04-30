@@ -51,6 +51,8 @@ import VipCasino from './pages/casino/VipCasino'
 import PremiumCasino from './pages/casino/PremiumCasino'
 import TemboCasino from './pages/casino/TemboCasino'
 import AssignAgent from './pages/users/AssignAgent'
+import SetButton from './pages/SetButton'
+import { menuItems } from './components/SidebarPages'
 
 function putLiveFirst(arr) {
   if (arr && Array.isArray(arr)) {
@@ -185,15 +187,32 @@ function AppContent() {
       <Route element={<AuthGuard />}>
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/admin/home" replace />} />
-          <Route path="admin/home" element={<Dashboard />} />
+
+          {menuItems.map((item) => {
+            if (item.subItems && item.subItems.length > 0) {
+              return (
+                item.subItems.map((item) => (
+                  <Route key={item.label} path={item.href} element={<item.Component />} />
+                ))
+              )
+            }
+
+            return (
+              <Route key={item.label} path={item.href} element={<item.Component />} />
+            )
+          })}
+
+          {/* <Route path="admin/home" element={<Dashboard />} /> */}
           <Route path="admin/secureauth" element={<SecureAuth />} />
-          <Route path="admin/users" element={<AccountList />} />
+          {userdata?.user_type == 2 && <Route path="admin/setbutton" element={<SetButton />} />}
+          {/* <Route path="admin/users" element={<AccountList />} /> */}
           <Route path="admin/child/:id" element={<AccountList />} />
-          <Route path="admin/activeusers" element={<ActiveUsers />} />
+          {/* <Route path="admin/activeusers" element={<ActiveUsers />} />
           <Route path="admin/users/insertuser" element={<InsertUser />} />
           <Route path="admin/assign-agent" element={<AssignAgent />} />
-          <Route path="admin/reports/bank" element={<Bank />} />
-          <Route path="admin/reports/accountstatement" element={<AccountStatement />} />
+          <Route path="admin/reports/bank" element={<Bank />} /> */}
+
+          {/* <Route path="admin/reports/accountstatement" element={<AccountStatement />} />
           <Route path="admin/reports/profitloss" element={<ProfitLoss />} />
           <Route path="admin/reports/userhistory" element={<UserHistory />} />
           <Route path="admin/reports/currentbets" element={<CurrentBets />} />
@@ -205,8 +224,11 @@ function AppContent() {
           <Route path="admin/reports/authlist" element={<AuthList />} />
           <Route path="admin/reports/userregisterdetail" element={<UserRegisterDetail />} />
           <Route path="admin/reports/totalprofitloss" element={<TotalProfitLoss />} />
-          <Route path="admin/reports/userwinloss" element={<UserWinLoss />} />
-          <Route path="admin/createaccount" element={<CreateAccount />} />
+          <Route path="admin/reports/userwinloss" element={<UserWinLoss />} /> */}
+          {/* <Route path="admin/createaccount" element={<CreateAccount />} /> */}
+
+          <Route path="admin/reports/casinoresult/:id" element={<CasinoResult />} />
+
           <Route path="admin/game/details" element={
             <EventPage
               socketData={socketData}
@@ -225,13 +247,16 @@ function AppContent() {
             />
           }
           />
-          <Route path="admin/casino/list" element={<CasinoList />} />
+
+
+          {/* <Route path="admin/casino/list" element={<CasinoList />} />
           <Route path="admin/casino/vip" element={<VipCasino />} />
           <Route path="admin/vcasino/list" element={<VirtualCasino />} />
           <Route path="admin/pcasino/list" element={<PremiumCasino />} />
-          <Route path="admin/tcasino/list" element={<TemboCasino />} />
+          <Route path="admin/tcasino/list" element={<TemboCasino />} /> */}
           <Route path="admin/casino/:casinoPath" element={<CasinoCenter />} />
-          <Route path="admin/market-analysis" element={<MarketAnalysis />} />
+          <Route path="admin/casino/vip/:casinoPath" element={<CasinoCenter />} />
+          {/* <Route path="admin/market-analysis" element={<MarketAnalysis />} /> */}
         </Route>
       </Route>
       <Route path="/admin" element={<AdminPage />} />

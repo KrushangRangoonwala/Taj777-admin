@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { insertUser, getRemainingPercentage, checkUsername } from "../../api/API";
 
 const InsertUser = () => {
@@ -363,10 +363,10 @@ const InsertUser = () => {
               <div className="page-title-right">
                 <ol className="breadcrumb m-0">
                   <li className="breadcrumb-item">
-                    <a href="/admin/home" className="" target="_self">Home</a>
+                    <Link to="/admin/home" className="" target="_self">Home</Link>
                   </li>
                   <li className="breadcrumb-item">
-                    <a href="/admin/activeusers" className="" target="_self">Users</a>
+                    <Link to="/admin/activeusers" className="" target="_self">Users</Link>
                   </li>
                   <li className="breadcrumb-item active">
                     <span aria-current="location">Create Account</span>
@@ -520,7 +520,8 @@ const InsertUser = () => {
                       type="number"
                       step="1"
                       min={Math.floor(formData.camt)}
-                      max={Math.ceil(formData.camt)}
+                      // max={Math.ceil(formData.camt)}
+                      max={99999999999999999999}
                       data-vv-as="Credit Amount"
                       name="camt"
                       className={`form-control animation ${touched.camt && errors.camt ? 'is-invalid' : ''}`}

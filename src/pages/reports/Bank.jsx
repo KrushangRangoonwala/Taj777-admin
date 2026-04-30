@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 const Bank = () => {
   const [formData, setFormData] = useState({
@@ -131,7 +132,7 @@ const Bank = () => {
               <div className="page-title-right">
                 <ol className="breadcrumb m-0">
                   <li className="breadcrumb-item">
-                    <a href="/admin/home" className="" target="_self">Home</a>
+                    <Link to="/admin/home">Home</Link>
                   </li>
                   <li className="breadcrumb-item active">
                     <span aria-current="location">Bank</span>
@@ -173,7 +174,7 @@ const Bank = () => {
                           <i className="fas fa-file-pdf"></i>
                         </button>
                       </div>
-                      <form data-vv-scope="transferAll" method="post" className="d-inline-block ml-2">
+                      <form data-vv-scope="transferAll" method="post" className="d-inline-block ml-1">{' '}
                         <div className="d-inline-block form-group form-group-feedback form-group-feedback-right" style={{ marginRight: '0.2rem' }}>
                           <input
                             type="password"

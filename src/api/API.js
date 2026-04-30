@@ -89,6 +89,55 @@ export async function getClients(search = "") {
   }
 }
 
+export async function getUserBlock(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("getusers_block_data.php", fullPayload);
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user blocks:", error);
+    throw error;
+  }
+}
+
+export async function updateUserBlock(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("user_fancy_bet_status.php", fullPayload);
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user blocks:", error);
+    throw error;
+  }
+}
+
+export async function getUserBook(event_id, market_type) {
+  try {
+    const fullPayload = {
+      event_id: event_id,
+      market_type: market_type,
+      // ...payload,
+      ...getDefaultParams(),
+    };
+    console.log('User Book');
+
+    const { data } = await ajax_adm.post("get_userbook.php", fullPayload);
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching user book:", error);
+    throw error;
+  }
+}
+
 export async function getProfitLoss(payload) {
   try {
     const fullPayload = {
@@ -323,7 +372,20 @@ export async function createAccountApi(payload) {
     const { data } = await ajax_adm.post("create_account", fullPayload);
     return data;
   } catch (error) {
-    console.error("Error changing password:", error);
+    console.error("Error creating account:", error);
+    throw error;
+  }
+}
+export async function getPrivilegesApi(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("get_privileges", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching privileges:", error);
     throw error;
   }
 }
@@ -336,7 +398,7 @@ export async function getRemainingPercentage(payload) {
     const { data } = await ajax_adm.post("get_remaining_percentage", fullPayload);
     return data;
   } catch (error) {
-    console.error("Error changing password:", error);
+    console.error("Error fetching remaining percentage:", error);
     throw error;
   }
 }

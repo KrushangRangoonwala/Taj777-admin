@@ -4,8 +4,11 @@ import DepositModal from '../../components/DepositModal';
 import WithdrawModal from '../../components/WithdrawModal';
 import { getUserList } from "../../api/API";
 import { Link } from 'react-router-dom';
+import { setIsLoading } from '../../store/slices/actionSlice';
+import { useDispatch } from 'react-redux';
 
 const ActiveUsers = () => {
+  const dispatch = useDispatch();
   const [showModal, setShowModal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
@@ -59,6 +62,7 @@ const ActiveUsers = () => {
   };
 
   const fetchUserList = async (search = "", pageNo = page) => {
+    dispatch(setIsLoading(true));
     try {
       const payload = {
         user_status: "0",
@@ -81,6 +85,8 @@ const ActiveUsers = () => {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      dispatch(setIsLoading(false));
     }
   };
 
@@ -175,7 +181,7 @@ const ActiveUsers = () => {
               <div className="page-title-right">
                 <ol className="breadcrumb m-0">
                   <li className="breadcrumb-item">
-                    <a href="/admin/home" className="" target="_self">Home</a>
+                    <Link to="/admin/home">Home</Link>
                   </li>
                   <li className="breadcrumb-item active">
                     <span aria-current="location">Active Users</span>
@@ -237,7 +243,7 @@ const ActiveUsers = () => {
                       <button type="button" className="btn btn-danger">
                         <i className="fas fa-file-pdf"></i>
                       </button>
-                    </div>
+                    </div>{' '}
                     <div className="d-inline-block">
                       <Link to="/admin/users/insertuser" className="btn btn-success">
                         <i aria-hidden="true" className="fa fa-plus"></i> CREATE ACCOUNT

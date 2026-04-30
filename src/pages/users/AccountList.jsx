@@ -5,8 +5,11 @@ import WithdrawModal from '../../components/WithdrawModal';
 import { getUserList } from "../../api/API";
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Table } from 'react-bootstrap';
+import { setIsLoading } from '../../store/slices/actionSlice';
+import { useDispatch } from 'react-redux';
 
 const AccountList = () => {
+  const dispatch = useDispatch();
   const pathName = useLocation().pathname;
   const isChild = pathName.includes("child");
   const { id } = useParams();
@@ -99,6 +102,7 @@ const AccountList = () => {
   };
 
   const fetchUserList = async (search = "", pageNo = page) => {
+    dispatch(setIsLoading(true));
     try {
       const payload = {
         user_status: "1",
@@ -123,6 +127,8 @@ const AccountList = () => {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      dispatch(setIsLoading(false));
     }
   };
 
@@ -173,7 +179,7 @@ const AccountList = () => {
               <div className="page-title-right">
                 <ol className="breadcrumb m-0">
                   <li className="breadcrumb-item">
-                    <a href="/admin/home" className="" target="_self">Home</a>
+                    <Link to="/admin/home">Home</Link>
                   </li>
                   <li className="breadcrumb-item active">
                     <span aria-current="location">Account List</span>

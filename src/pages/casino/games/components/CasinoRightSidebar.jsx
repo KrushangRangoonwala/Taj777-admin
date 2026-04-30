@@ -1,7 +1,22 @@
 import React from 'react'
 import BetCountMob from './BetCountMob'
+import { Link } from 'react-router-dom';
+import CasinoViewMore from '../../../../components/CasinoViewMore';
+import { useState } from 'react';
 
 const CasinoRightSidebar = ({ RulesComponent }) => {
+    const [isViewMoreOpen, setIsViewMoreOpen] = useState(false);
+
+    const records = [
+        // {
+        //     nation: "Lionel Messi",
+        //     date: "29/04/2026 22:36:17",
+        //     userName: "Ras44",
+        //     rate: "5.53",
+        //     amount: "100"
+        // }
+    ];
+
     return (
         <div className="right-sidebar">
             <div className="right-sidebar">
@@ -24,9 +39,9 @@ const CasinoRightSidebar = ({ RulesComponent }) => {
                                             <div className="card m-b-10 my-bet">
                                                 <div className="card-header">
                                                     <h6 className="card-title float-left">My Bets</h6>
-                                                    <a href="javascript:void(0)" className="btn btn-back float-right">
+                                                    <Link to="#" className="btn btn-back float-right" onClick={() => setIsViewMoreOpen(true)}>
                                                         View More
-                                                    </a>
+                                                    </Link>
                                                 </div>
                                                 <div className="card-body1">
                                                     <div className="tab-content">
@@ -36,20 +51,36 @@ const CasinoRightSidebar = ({ RulesComponent }) => {
                                                                     <thead>
                                                                         <tr>
                                                                             <th style={{ minWidth: "90px" }}>UserName</th>
-                                                                            <th className="text-right" style={{ minWidth: "50px" }}>
-                                                                                Rate
-                                                                            </th>
-                                                                            <th className="text-right" style={{ minWidth: "70px" }}>
-                                                                                Amount
-                                                                            </th>
+                                                                            <th className="text-right" style={{ minWidth: "50px" }}>Rate</th>
+                                                                            <th className="text-right" style={{ minWidth: "70px" }}>Amount</th>
                                                                         </tr>
                                                                     </thead>
                                                                     <tbody>
-                                                                        <tr>
-                                                                            <td colSpan="4" className="text-center">
-                                                                                No records found
-                                                                            </td>
-                                                                        </tr>
+                                                                        {records && records.length > 0 ? (
+                                                                            records.map((record, index) => (
+                                                                                <React.Fragment key={index}>
+                                                                                    <tr className="back-border">
+                                                                                        <td colSpan="4">
+                                                                                            <b>{record.nation}</b> <span className="float-right">{record.date}</span>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                    <tr className="back-border">
+                                                                                        <td>{record.userName}</td>
+                                                                                        <td className="text-right">{record.rate}</td>
+                                                                                        <td className="text-right">{record.amount}</td>
+                                                                                    </tr>
+                                                                                    <tr>
+                                                                                        <td colSpan="4" className="" style={{ height: "3px", padding: "0px" }}></td>
+                                                                                    </tr>
+                                                                                </React.Fragment>
+                                                                            ))
+                                                                        ) : (
+                                                                            <tr>
+                                                                                <td colSpan="4" className="text-center">
+                                                                                    No records found
+                                                                                </td>
+                                                                            </tr>
+                                                                        )}
                                                                     </tbody>
                                                                 </table>
                                                             </div>
@@ -78,6 +109,8 @@ const CasinoRightSidebar = ({ RulesComponent }) => {
                     </div>
                 </div>
             </div>
+
+            <CasinoViewMore show={isViewMoreOpen} onHide={() => setIsViewMoreOpen(false)} />
         </div>
     )
 }

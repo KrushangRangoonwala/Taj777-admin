@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { DatePicker } from "antd";
 import "antd/dist/reset.css";
 import dayjs from "dayjs";
@@ -13,6 +13,7 @@ import { getCasinoResult } from "../../api/API";
 import { casino_list } from "../../utilies/casino_list";
 import Result_parent from "../casino/games/components/Result_parent";
 import PageNamePath from "../../components/PageNamePath";
+import { useParams } from "react-router-dom";
 
 const casinoOptions = [
   { value: "", label: "Select Casino" },
@@ -143,9 +144,10 @@ const casinoTypes = [
 ];
 
 const CasinoResult = () => {
+  const game_type = useParams().id;
   const [mid, setMid] = useState(false);
   const [date, setDate] = useState(dayjs());
-  const [casinoType, setCasinoType] = useState("");
+  const [casinoType, setCasinoType] = useState(game_type || "");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -210,6 +212,12 @@ const CasinoResult = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (game_type) {
+      fetchCasinoResult();
+    }
+  }, [game_type])
 
   // 🔹 RESET
   const handleReset = () => {

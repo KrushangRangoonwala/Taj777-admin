@@ -1,25 +1,23 @@
 import React, { useState, useEffect } from "react";
 import { DatePicker } from "antd";
 import "antd/dist/reset.css";
-import { getClients, getUserHistory } from "../../api/API";
+import { getUserHistory } from "../../api/API";
 import dayjs from "dayjs";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Table } from 'react-bootstrap';
-import Select from "react-select";
-import { customSelectStyles } from "../../components/Header";
-import { emptyList, notFoundQuery } from "../../utilies/helpers";
+import { Link } from "react-router-dom";
+import SelectBootStrap from "../../components/SelectBootStrap";
+import useIsMobile from "../../hooks/useIsMobile";
 
 const { RangePicker } = DatePicker;
 
 const UserHistory = () => {
-  const [isListActive, setIsListActive] = useState(false);
+  const isMobile = useIsMobile();
   const [activeTab, setActiveTab] = useState("login");
-  const [clientList, setClientList] = useState(emptyList);
   const [selectedClient, setSelectedClient] = useState("");
-  const [clientSearch, setClientSearch] = useState('');
   const [dateRange, setDateRange] = useState([dayjs().subtract(7, "day"), dayjs()]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -64,35 +62,12 @@ const UserHistory = () => {
 
     // 🔹 Reset all states
     setSelectedClient("");
-    setClientSearch("");
-    setClientList(emptyList);
     setDateRange([dayjs().subtract(7, "day"), dayjs()]);
     setSearch("");
     setData([]);
     setCurrentPage(1);
     setTotalRecords(0);
-    setIsListActive(false);
   };
-
-  // 🔹 Fetch clients
-  const fetchClients = async (value) => {
-    if (!value) {
-      setClientList(emptyList);
-      return;
-    }
-
-    try {
-      console.log("inininin");
-      const res = await getClients(value);
-      res.results?.length > 0 ? setClientList(res.results) : setClientList(notFoundQuery);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchClients(clientSearch);
-  }, [clientSearch])
 
   // 🔹 Fetch User History API
   const fetchUserHistory = async (page = 1) => {
@@ -111,7 +86,7 @@ const UserHistory = () => {
         from_date: fromDate,
         to_date: toDate,
         report_type: activeTab === "login" ? "endlogin" : "password",
-        client_name: selectedClient,
+        client_name: selectedClient?.value,
       };
 
       const res = await getUserHistory(payload);
@@ -224,7 +199,7 @@ const UserHistory = () => {
             <div className="page-title-right">
               <ol className="breadcrumb m-0">
                 <li className="breadcrumb-item">
-                  <a href="/admin/home">Home</a>
+                  <Link to="/admin/home">Home</Link>
                 </li>
                 <li className="breadcrumb-item active">
                   <span>User History</span>
@@ -268,72 +243,17 @@ const UserHistory = () => {
                     <form>
                       <div className="row row5">
 
-                        <div className="form-group col-xl-3 mb-20px">
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={clientSearch}
-                            placeholder="Select option"
-                            onChange={(e) => setClientSearch(e.target.value)}
-                            onFocus={() => {
-                              setIsListActive(true);
-                            }}
-                            onBlur={() => {
-                              setClientSearch("");
-                              setIsListActive(false);
-                            }}
+                        <div className="form-group col-xl-3">
+                          <SelectBootStrap
+                            selectedOption={selectedClient}
+                            setSelectedOption={setSelectedClient}
+                            fetchType="client"
                           />
-                          {/* <Select
-                            options={[]}
-                            placeholder="Select option"
-                            className="react-select-container"
-                            classNamePrefix="react-select"
-                            inputValue={clientSearch}
-                            onInputChange={(value) => {
-                              setClientSearch(value);
-                              fetchClients(value);
-                            }}
-                            components={{
-                              DropdownIndicator: () => null,
-                              IndicatorSeparator: () => null
-                            }}
-                            noOptionsMessage={() => "List is empty."}
-                            styles={customSelectStyles}
-                          /> */}
-                          {isListActive && (
-                            <div style={{
-                              position: 'absolute',
-                              background: '#fff',
-                              border: '1px solid #ddd',
-                              width: '96%',
-                              zIndex: 1000
-                            }}>
-                              {clientList.map((c, i) => (
-                                <div
-                                  key={i}
-                                  style={{
-                                    cursor: 'pointer',
-                                    padding: "0.7rem 0.7rem",
-                                    whiteSpace: 'nowrap',
-                                    overflowX: 'auto',
-                                    color: "#495057"
-                                  }}
-                                  onClick={() => {
-                                    setSelectedClient(c.id);
-                                    setClientSearch(c.text);
-                                    setClientList(emptyList);
-                                  }}
-                                >
-                                  {c.text}
-                                </div>
-                              ))}
-                            </div>
-                          )}
                         </div>
 
                         <div className="form-group col-xl-3">
                           <RangePicker
-                            style={{ width: "100%", height: "100%" }}
+                            style={{ width: "100%", height: isMobile ? "100%" : "84%" }}
                             value={dateRange}
                             onChange={handleDateChange}
                             format="DD/MM/YYYY"
@@ -351,7 +271,6 @@ const UserHistory = () => {
                             className="btn btn-light"
                             onClick={() => {
                               setSelectedClient("");
-                              setClientSearch("");
                               setDateRange([dayjs().subtract(7, "day"), dayjs()]);
                               setSearch("");
                               setData([]);
@@ -515,76 +434,17 @@ const UserHistory = () => {
                     <form>
                       <div className="row">
 
-                        <div className="form-group col-xl-3 mb-20px">
-                          <input
-                            type="text"
-                            className="form-control"
-                            value={clientSearch}
-                            placeholder="Select option"
-                            onChange={(e) => setClientSearch(e.target.value)}
-                            onFocus={() => {
-                              setIsListActive(true);
-                            }}
-                            onBlur={() => {
-                              setClientSearch("");
-                              setIsListActive(false);
-                            }}
+                        <div className="form-group col-xl-3">
+                          <SelectBootStrap
+                            selectedOption={selectedClient}
+                            setSelectedOption={setSelectedClient}
+                            fetchType="client"
                           />
-                          {/* <Select
-                            options={[]}
-                            placeholder="Select option"
-                            className="react-select-container"
-                            classNamePrefix="react-select"
-                            inputValue={clientSearch}
-                            onInputChange={(value) => {
-                              setClientSearch(value);
-                              fetchClients(value);
-                            }}
-                            // onChange={(value) => {
-                            //   setClientSearch(value);
-                            //   fetchClients(value);
-                            // }}
-                            components={{
-                              DropdownIndicator: () => null,
-                              IndicatorSeparator: () => null
-                            }}
-                            noOptionsMessage={() => "List is empty."}
-                            styles={customSelectStyles}
-                          /> */}
-                          {isListActive && (
-                            <div style={{
-                              position: 'absolute',
-                              background: '#fff',
-                              border: '1px solid #ddd',
-                              width: '90.75%',
-                              zIndex: 1000
-                            }}>
-                              {clientList.map((c, i) => (
-                                <div
-                                  key={i}
-                                  style={{
-                                    cursor: 'pointer',
-                                    padding: "0.7rem 0.7rem",
-                                    whiteSpace: 'nowrap',
-                                    overflowX: 'auto',
-                                    color: "#495057"
-                                  }}
-                                  onClick={() => {
-                                    setSelectedClient(c.id);
-                                    setClientSearch(c.text);
-                                    setClientList(emptyList);
-                                  }}
-                                >
-                                  {c.text}
-                                </div>
-                              ))}
-                            </div>
-                          )}
                         </div>
 
                         <div className="form-group col-xl-3">
                           <RangePicker
-                            style={{ width: "100%", height: "100%" }}
+                            style={{ width: "100%", height: isMobile ? "100%" : "84%" }}
                             value={dateRange}
                             onChange={handleDateChange}
                             format="DD/MM/YYYY"
@@ -602,7 +462,6 @@ const UserHistory = () => {
                             className="btn btn-light"
                             onClick={() => {
                               setSelectedClient("");
-                              setClientSearch("");
                               setDateRange([dayjs().subtract(7, "day"), dayjs()]);
                               setSearch("");
                               setData([]);

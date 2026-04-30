@@ -5,6 +5,7 @@ import { getClients, checkUserLockPwd, updateUserLockStatus } from "../../api/AP
 import { casino_list } from "../../utilies/casino_list";
 import { errorToast, successToast } from '../../utils/toast';
 import PageNamePath from "../../components/PageNamePath";
+import SelectBootStrap from "../../components/SelectBootStrap";
 
 // Event tree node component
 const EventTreeNode = ({ node, onChange }) => {
@@ -78,7 +79,6 @@ const EventTreeNode = ({ node, onChange }) => {
 
 // Main component
 const GeneralLock = () => {
-  const inputField = useRef(null);
   const [selectedClient, setSelectedClient] = useState(null);
   const [tpassword, setTpassword] = useState("");
 
@@ -87,15 +87,8 @@ const GeneralLock = () => {
 
   const [matchesBySport, setMatchesBySport] = useState({});
 
-  const [clientOptions, setClientOptions] = useState([]);
-  const [clientSearch, setClientSearch] = useState("");
-  const [clientList, setClientList] = useState([]);
-  const [isListActive, setIsListActive] = useState(false);
-
   // SOCKET: fetch matches dynamically
   useEffect(() => {
-    inputField.current.focus();
-
     const socket = io("https://trubet9.bet:2053", {
       transports: ["websocket", "polling"],
       reconnection: true,
@@ -142,26 +135,6 @@ const GeneralLock = () => {
 
     return () => socket.disconnect();
   }, []);
-
-  // CLIENT SEARCH
-  const fetchClients = async (value) => {
-    if (!value) {
-      setClientList([{ id: '1', text: 'List is empty.' }]);
-      return;
-    }
-    if (value.trim() === "") {
-      setClientList([{ id: '1', text: 'No elements found' }]);
-      return;
-    }
-
-    try {
-      console.log("value-----", value)
-      const res = await getClients(value);
-      res.results?.length > 0 ? setClientList(res.results) : setClientList([{ id: '1', text: 'No elements found' }]);
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   // LOAD USER LOCK DATA
   const handleLoad = async (e) => {
@@ -325,19 +298,8 @@ const GeneralLock = () => {
     }
   };
 
-  useEffect(() => {
-    fetchClients(clientSearch);
-  }, [clientSearch])
-
   return (
     <>
-      <style>
-        {`
-          .custom-placeholder::placeholder {
-            color: #ced4da !important;
-          }
-      `}
-      </style>
       <div>
         {/* PAGE TITLE */}
         <PageNamePath
@@ -356,66 +318,13 @@ const GeneralLock = () => {
                 <form onSubmit={handleLoad}>
                   <div className="row row5 align-items-center mb-3px-plus">
                     <div className="col-md-3">
-                      {/* <Select
-                      options={clientOptions}
-                      placeholder="Search By Client Name"
-                      classNamePrefix="react-select"
-                      isClearable
-                      value={selectedClient}
-                      onChange={(selected) => setSelectedClient(selected)}
-                      components={{
-                        DropdownIndicator: () => null,
-                        IndicatorSeparator: () => null
-                      }}
-                      noOptionsMessage={() => "List is empty."}
-                      onInputChange={(inputValue) => {
-                        setClientSearch(inputValue);
-                        fetchClients(inputValue);
-                      }}
-                    /> */}
-
-                      {/* <div className="form-group user-lock-search" style={{ position: "relative" }}> */}
-                      <input
-                        ref={inputField}
-                        type="search"
-                        className="form-control custom-placeholder"
-                        value={clientSearch}
+                      <SelectBootStrap
+                        selectedOption={selectedClient}
+                        setSelectedOption={setSelectedClient}
+                        fetchType="client"
                         placeholder="Search By Client Name"
-                        onChange={(e) => setClientSearch(e.target.value)}
-                        onFocus={() => {
-                          setIsListActive(true);
-                        }}
-                        onBlur={() => {
-                          setClientSearch("");
-                          setIsListActive(false);
-                        }}
+                        isFocusOnLoad={true}
                       />
-
-                      {isListActive && (
-                        <div style={{
-                          position: 'absolute',
-                          background: '#fff',
-                          border: '1px solid #ddd',
-                          width: '96%',
-                          zIndex: 1000
-                        }}>
-                          {clientList.map((c, i) => (
-                            <div
-                              key={i}
-                              style={{ padding: '5px', cursor: 'pointer', padding: "0.7rem 0.7rem" }}
-                              onClick={() => {
-                                setSelectedClient(c.id);
-                                setClientSearch(c.text);
-                                setClientList([]);
-                              }}
-                            >
-                              {c.text}
-                            </div>
-                          ))}
-                        </div>
-                      )}
-                      {/* </div> */}
-
                     </div>
                     <div className="col-md-2">
                       <input
@@ -436,6 +345,7 @@ const GeneralLock = () => {
                         className="btn btn-light"
                         onClick={() => {
                           setSelectedClient(null);
+                          setTpassword('');
                           setEventData([]);
                           setCasinoData([]);
                         }}

@@ -11,6 +11,7 @@ import { Table } from 'react-bootstrap';
 // 👉 Replace with your API
 import { getAuthList } from "../../api/API";
 import { casino_list } from "../../utilies/casino_list";
+import { Link } from "react-router-dom";
 
 const casinoTypes = [
   { value: "", label: "Select Type" },   // ✅ static first option
@@ -166,7 +167,7 @@ const AuthList = () => {
             <div className="page-title-right">
               <ol className="breadcrumb m-0">
                 <li className="breadcrumb-item">
-                  <a href="/admin/home">Home</a>
+                  <Link to="/admin/home">Home</Link>
                 </li>
                 <li className="breadcrumb-item active">
                   <span>User Authentication</span>

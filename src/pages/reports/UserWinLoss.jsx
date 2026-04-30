@@ -10,12 +10,11 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { customSelectStyles } from '../../components/Header';
 import Select from 'react-select';
+import { Link } from 'react-router-dom';
+import SelectBootStrap from '../../components/SelectBootStrap';
 
 const UserWinLoss = () => {
-    const [isListActive, setIsListActive] = useState(false);
     const [data, setData] = useState([]);
-    const [clientSearch, setClientSearch] = useState('');
-    const [clientList, setClientList] = useState([]);
     const [selectedClient, setSelectedClient] = useState('');
 
     const [totalRecords, setTotalRecords] = useState(0);
@@ -37,25 +36,6 @@ const UserWinLoss = () => {
     const totalPages = Math.ceil(totalRecords / perPage) || 1;
 
     const getColor = (value) => (Number(value) < 0 ? "#bb2834" : "#128412");
-
-    // 🔹 Fetch Clients
-    const fetchClients = async (value) => {
-        if (!value) {
-            setClientList([{ id: '1', text: 'List is empty.' }]);
-            return;
-        }
-        // if (value.trim() === "") {
-        //     setClientList([{ id: '1', text: 'No elements found' }]);
-        //     return;
-        // }
-
-        try {
-            const res = await getClients(value);
-            res.results?.length > 0 ? setClientList(res.results) : setClientList([{ id: '1', text: 'No elements found. Consider changing search query.' }]);
-        } catch (err) {
-            console.log(err);
-        }
-    };
 
     // 🔹 Fetch Data
     const fetchData = async (page = 1) => {
@@ -196,10 +176,6 @@ const UserWinLoss = () => {
         doc.save(`UserRegister_${new Date().toISOString().slice(0, 19)}.pdf`);
     };
 
-    useEffect(() => {
-        fetchClients(clientSearch);
-    }, [clientSearch])
-
     return (
         <div>
             <div>
@@ -210,7 +186,7 @@ const UserWinLoss = () => {
                             <div className="page-title-right">
                                 <ol className="breadcrumb m-0">
                                     <li className="breadcrumb-item">
-                                        <a href="/admin/home">Home</a>
+                                        <Link to="/admin/home">Home</Link>
                                     </li>
                                     <li className="breadcrumb-item active">
                                         <span>User Win Loss</span>
@@ -232,76 +208,19 @@ const UserWinLoss = () => {
                                         <div className="row row5">
 
                                             {/* CLIENT SEARCH */}
-                                            <div className="col-12 col-md-6 col-lg-2 mb-2">
+                                            <div className="col-12 col-md-6 col-lg-2">
                                                 <div className="form-group user-lock-search" style={{ position: "relative" }}>
                                                     <label>Search By Client Name</label>
-
-                                                    <input
-                                                        type="text"
-                                                        className="form-control"
-                                                        value={clientSearch}
-                                                        placeholder="Select option"
-                                                        onChange={(e) => setClientSearch(e.target.value)}
-                                                        onFocus={() => {
-                                                            setIsListActive(true);
-                                                        }}
-                                                        onBlur={() => {
-                                                            setClientSearch("");
-                                                            setIsListActive(false);
-                                                        }}
+                                                    <SelectBootStrap
+                                                        selectedOption={selectedClient}
+                                                        setSelectedOption={setSelectedClient}
+                                                        fetchType="client"
                                                     />
-
-                                                    {/* <Select
-                                                        options={[]}
-                                                        placeholder="Select option"
-                                                        className="react-select-container"
-                                                        classNamePrefix="react-select"
-                                                        components={{
-                                                            DropdownIndicator: () => null,
-                                                            IndicatorSeparator: () => null
-                                                        }}
-                                                        noOptionsMessage={() => "List is empty."}
-                                                        value={clientSearch}
-                                                        onInputChange={(value) => {
-                                                            setClientSearch(value);
-                                                            fetchClients(value);
-                                                        }}
-                                                        styles={customSelectStyles}
-                                                    /> */}
-
-                                                    {isListActive && (
-                                                        <div style={{
-                                                            position: 'absolute',
-                                                            background: '#fff',
-                                                            border: '1px solid #ddd',
-                                                            width: '100%',
-                                                            zIndex: 1000
-                                                        }}>
-                                                            {clientList.map((c, i) => (
-                                                                <div
-                                                                    key={i}
-                                                                    style={{
-                                                                        cursor: 'pointer',
-                                                                        padding: "0.7rem 0.7rem",
-                                                                        whiteSpace: 'nowrap',
-                                                                        overflowX: 'auto',
-                                                                    }}
-                                                                    onClick={() => {
-                                                                        setSelectedClient(c.id);
-                                                                        setClientSearch(c.text);
-                                                                        setClientList([]);
-                                                                    }}
-                                                                >
-                                                                    {c.text}
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                    )}
                                                 </div>
                                             </div>
 
                                             {/* DATE RANGE */}
-                                            <div className="col-12 col-md-6 col-lg-3 mb-2">
+                                            <div className="col-12 col-md-6 col-lg-3">
                                                 <label>Select Date Range</label>
                                                 <div className="mb-3">
                                                     <RangePicker
@@ -340,7 +259,7 @@ const UserWinLoss = () => {
                                             </div>
 
                                             {/* BUTTONS */}
-                                            <div className="col-12 col-lg-3 mb-2">
+                                            <div className="col-12 col-lg-3">
                                                 <label className="d-none d-lg-block" style={{ width: "100%" }}>&nbsp;</label>
 
                                                 <div className="d-flex flex-wrap gap-2">
@@ -350,7 +269,6 @@ const UserWinLoss = () => {
                                                     &nbsp;
                                                     <button type="button" className="btn btn-light"
                                                         onClick={() => {
-                                                            setClientSearch('');
                                                             setSelectedClient('');
                                                             setSearch('');
                                                             setDateRange([]);

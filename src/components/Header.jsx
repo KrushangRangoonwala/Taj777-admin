@@ -136,6 +136,7 @@ export default function Header() {
     const navigate = useNavigate();
     const { name } = useSelector((state) => state.user);
     const { point, exposure } = useSelector((state) => state.bet.balance);
+    const userdata = useSelector(state => state.user.userData);
     const [upcoming, setUpcoming] = useState([]);
     const [showChangePasswordModal, setShowChangePasswordModal] = useState(false);
     const [showMarketAnalysisModal, setShowMarketAnalysisModal] = useState(false);
@@ -358,7 +359,7 @@ export default function Header() {
                                 <div className="bal-box"><span className="balance nowrap">pts:{' '}
                                     <span className="balance-value"><b>{point}</b></span> </span></div>
                             </div>
-                            <Dropdown.Item href="javascript: void(0);" className="d-sm-none">
+                            <Dropdown.Item href="javascript: void(0);" className="d-sm-none" onClick={() => setShowRulesModal(true)}>
                                 <i className="fas fa-info-circle mr-1"></i> Rules
                             </Dropdown.Item>
                             <Dropdown.Item onClick={() => navigate("/admin/secureauth")} className="hover-blue">
@@ -367,6 +368,10 @@ export default function Header() {
                             <Dropdown.Item href="javascript: void(0);" onClick={() => setShowChangePasswordModal(true)}>
                                 <i className="bx bx-wallet font-size-16 align-middle mr-1"></i> Change Password
                             </Dropdown.Item>
+                            {userdata?.user_type == 2 &&
+                                <Dropdown.Item onClick={() => navigate("/admin/setbutton")} className="hover-blue">
+                                    <i className="bx bx-square-rounded font-size-16 align-middle mr-1"></i> Set Button
+                                </Dropdown.Item>}
                             <Dropdown.Divider />
                             <Dropdown.Item href="javascript:void(0)" className="text-danger" onClick={handleLogout}>
                                 <i className="bx bx-power-off font-size-16 align-middle mr-1 text-danger"></i> Logout

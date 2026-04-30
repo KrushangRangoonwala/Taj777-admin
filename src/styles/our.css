@@ -206,3 +206,14 @@ input[field-type="search"]::placeholder {
     border-radius: 5px !important;
     min-height: 36.6px;
 }
+
+.page-content {
+    /* margin-top: 78px; */
+}
+
+.ant_custom_date:hover,
+.ant_custom_date.ant-picker-focused {
+    /* hovering on date picker, its border will not get blue */
+    border-color: #ced4da !important;
+    box-shadow: none !important;
+}

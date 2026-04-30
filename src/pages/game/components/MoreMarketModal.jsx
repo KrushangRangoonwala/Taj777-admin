@@ -21,8 +21,10 @@ const MoreMarketModal = ({ show, onHide, markets = [], setSelectmarket }) => {
         <>
             <style>
                 {`
-                    .custom-modal-padding.modal {
-                        padding-left: 23px !important;
+                    @media only screen and (min-width: 1280px) {
+                        .custom-modal-padding.modal {
+                            /*padding-left: 23px !important;*/
+                        }
                     }
                 `}
             </style>

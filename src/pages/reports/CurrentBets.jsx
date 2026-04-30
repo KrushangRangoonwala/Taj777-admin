@@ -1,14 +1,18 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { getCurrentBets, getClients } from '../../api/API';
 import { DatePicker } from "antd";
 import "antd/dist/reset.css";
 import dayjs from "dayjs";
 import { Table } from 'react-bootstrap';
-
+import { Link } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { setIsLoading } from "../../store/slices/actionSlice";
 
 const { RangePicker } = DatePicker;
 
 const CurrentBets = () => {
+  const isLoad = useRef(true);
+  const dispatch = useDispatch();
   const [data, setData] = useState([]);
   const [sportType, setSportType] = useState("sport");
   const [filteredData, setFilteredData] = useState([]);
@@ -52,6 +56,7 @@ const CurrentBets = () => {
 
   // 🔹 Fetch profit-loss
   const fetchProfitLoss = async () => {
+    dispatch(setIsLoading(true));
     try {
       const payload = {
         from_date: fromDate,
@@ -83,6 +88,8 @@ const CurrentBets = () => {
       }
     } catch (err) {
       console.error(err);
+    } finally {
+      dispatch(setIsLoading(false));
     }
   };
 
@@ -91,6 +98,15 @@ const CurrentBets = () => {
   }, []);
 
   useEffect(() => {
+    isLoad.current && dispatch(setIsLoading(true));
+    setTimeout(() => {
+      dispatch(setIsLoading(false));
+      isLoad.current = true;
+    }, 400);
+  }, [matchDeleted]);
+
+  useEffect(() => {
+    matchDeleted == "deletebet" && (isLoad.current = false);
     setMatchDeleted("matchbet");
     setBetType("all");
     setData([]);
@@ -146,7 +162,7 @@ const CurrentBets = () => {
               <div className="page-title-right">
                 <ol className="breadcrumb m-0">
                   <li className="breadcrumb-item">
-                    <a href="/admin/home" target="_self">Home</a>
+                    <Link to="/admin/home">Home</Link>
                   </li>
                   <li className="breadcrumb-item active">
                     <span aria-current="location">Current Bets</span>

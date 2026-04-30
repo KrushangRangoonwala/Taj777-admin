@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import lastResultTextMap from "./LastResultTextMap";
 import { useGetFileData } from "../../../../hooks/useGetFileData";
 import Result_parent from "./Result_parent";
+import { Link } from "react-router-dom";
 
 const LastResult = ({ results = [], isOpen = true }) => {
     const [mid, setMid] = useState(false);
@@ -26,9 +27,9 @@ const LastResult = ({ results = [], isOpen = true }) => {
                     </span>
                 );
             })}
-            <a href={`/admin/reports/casinoresult/${game_type}`} className="result-more">
+            <Link to={`/admin/reports/casinoresult/${game_type}`} className="result-more">
                 <b>...</b>
-            </a>
+            </Link>
 
             <Result_parent mid={mid} setMid={setMid} game_type={game_type} />
         </div>

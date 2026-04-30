@@ -12,6 +12,8 @@ import Select from "react-select";
 import { Table } from 'react-bootstrap';
 import Pagination from "../../components/Pagination";
 import { emptyList, notFoundQuery } from "../../utilies/helpers";
+import { Link } from "react-router-dom";
+import SelectBootStrap from "../../components/SelectBootStrap";
 
 
 const { RangePicker } = DatePicker;
@@ -21,11 +23,8 @@ const providerTypes = [
 ];
 
 const SportBookReport = () => {
-  const [isListActive, setIsListActive] = useState(false);
   const [activeTab, setActiveTab] = useState("login");
-  const [clientList, setClientList] = useState(emptyList);
   const [selectedClient, setSelectedClient] = useState("");
-  const [clientSearch, setClientSearch] = useState('');
   const [date, setDate] = useState(dayjs());
   const [dateRange, setDateRange] = useState([dayjs().subtract(7, "day"), dayjs()]);
   const [data, setData] = useState([]);
@@ -42,6 +41,8 @@ const SportBookReport = () => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('none');
 
+  const [selectopt, setSelectopt] = useState("");
+  const [selectopt2, setSelectopt2] = useState("");
   const [isSelectoptTouched, setIsSelectoptTouched] = useState(false);
   const [isSelectoptTouched2, setIsSelectoptTouched2] = useState(false);
 
@@ -73,38 +74,18 @@ const SportBookReport = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
 
-    // 🔹 Reset all states
+    setSelectopt("");
+    setSelectopt2("");
+    setIsSelectoptTouched(false);
+    setIsSelectoptTouched2(false);
     setSelectedClient("");
-    setClientSearch("");
-    setClientList(emptyList);
     setDate(dayjs());
     setDateRange([dayjs().subtract(7, "day"), dayjs()]);
     setSearch("");
     setData([]);
     setCurrentPage(1);
     setTotalRecords(0);
-    setIsListActive(false);
   };
-
-  // 🔹 Fetch clients
-  const fetchClients = async (value) => {
-    if (!value) {
-      setClientList(emptyList);
-      return;
-    }
-
-    try {
-      const res = await getClients(value);
-      res.results?.length > 0 ? setClientList(res.results) : setClientList(notFoundQuery);
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  useEffect(() => {
-    fetchClients(clientSearch);
-  }, [clientSearch])
-
 
   // 🔹 Fetch User History API
   const fetchUserHistory = async (page = 1) => {
@@ -123,7 +104,7 @@ const SportBookReport = () => {
         from_date: fromDate,
         to_date: toDate,
         report_type: activeTab === "login" ? "endlogin" : "password",
-        client_name: selectedClient,
+        client_name: selectedClient?.value,
       };
 
       const res = await getCasinoResult(payload);
@@ -226,6 +207,18 @@ const SportBookReport = () => {
     doc.save(`UserHistory_${dayjs().format("YYYYMMDD_HHmmss")}.pdf`);
   };
 
+  function handleReset() {
+    setSelectedClient("");
+    setDate(dayjs());
+    setSelectopt("");
+    setSelectopt2("");
+    setIsSelectoptTouched(false);
+    setIsSelectoptTouched2(false);
+    setSearch("");
+    setData([]);
+    setCurrentPage(1);
+    setTotalRecords(0);
+  }
 
   return (
     <div className="live-bets-report">
@@ -236,7 +229,7 @@ const SportBookReport = () => {
             <div className="page-title-right">
               <ol className="breadcrumb m-0">
                 <li className="breadcrumb-item">
-                  <a href="/admin/home">Home</a>
+                  <Link to="/admin/home">Home</Link>
                 </li>
                 <li className="breadcrumb-item active">
                   <span>SportBook Report</span>
@@ -282,65 +275,11 @@ const SportBookReport = () => {
 
                       {/* CLIENT */}
                       <div className="col-xl-2 mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Select option"
-                          value={clientSearch}
-                          onChange={(e) => setClientSearch(e.target.value)}
-                          onFocus={() => {
-                            setIsListActive(true);
-                          }}
-                          onBlur={() => {
-                            setClientSearch("");
-                            setIsListActive(false);
-                          }}
+                        <SelectBootStrap
+                          selectedOption={selectedClient}
+                          setSelectedOption={setSelectedClient}
+                          fetchType="client"
                         />
-                        {/* <Select
-                          options={[]}
-                          placeholder="Select option"
-                          value={clientSearch}
-                          onInputChange={(value) => {
-                            setClientSearch(value);
-                            fetchClients(value);
-                          }}
-                          className="react-select-container"
-                          classNamePrefix="react-select"
-                          components={{
-                            DropdownIndicator: () => null,
-                            IndicatorSeparator: () => null
-                          }}
-                          noOptionsMessage={() => "List is empty."}
-                          styles={customSelectStyles}
-                        /> */}
-                        {isListActive && (
-                          <div style={{
-                            position: 'absolute',
-                            background: '#fff',
-                            border: '1px solid #ddd',
-                            width: '95%',
-                            zIndex: 1000
-                          }}>
-                            {clientList.map((c, i) => (
-                              <div
-                                key={i}
-                                style={{
-                                  cursor: 'pointer',
-                                  padding: "0.7rem 0.7rem",
-                                  whiteSpace: 'nowrap',
-                                  overflowX: 'auto',
-                                }}
-                                onClick={() => {
-                                  setSelectedClient(c.id);
-                                  setClientSearch(c.text);
-                                  setClientList(emptyList);
-                                }}
-                              >
-                                {c.text}
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </div>
 
                       {/* DATE */}
@@ -363,8 +302,10 @@ const SportBookReport = () => {
                       {/* TYPE */}
                       <div className="col-xl-2 mb-3">
                         <select
-                          className={`form-control ${isSelectoptTouched ? "is-invalid" : ""}`}
+                          className={`form-control ${isSelectoptTouched && selectopt?.length === 0 ? "is-invalid" : ""}`}
                           onBlur={() => setIsSelectoptTouched(true)}
+                          value={selectopt}
+                          onChange={(e) => setSelectopt(e.target.value)}
                         >
                           {providerTypes.map((p) => (
                             <option key={p.value} value={p.value}>
@@ -386,6 +327,7 @@ const SportBookReport = () => {
                         <button
                           type="button"
                           className="btn btn-light"
+                          onClick={handleReset}
                         >
                           Reset
                         </button>
@@ -516,29 +458,19 @@ const SportBookReport = () => {
                     <div className="row row5 mb-3 mb-20px">
 
                       <div className="col-xl-2 mb-3">
-                        <input
-                          type="text"
-                          className="form-control"
-                          placeholder="Select option"
+                        <SelectBootStrap
+                          selectedOption={selectedClient}
+                          setSelectedOption={setSelectedClient}
+                          fetchType="client"
                         />
-                        {/* <Select
-                          options={[]}
-                          placeholder="Select option"
-                          className="react-select-container"
-                          classNamePrefix="react-select"
-                          components={{
-                            DropdownIndicator: () => null,
-                            IndicatorSeparator: () => null
-                          }}
-                          noOptionsMessage={() => "List is empty."}
-                          styles={customSelectStyles}
-                        /> */}
                       </div>
 
                       <div className="col-xl-2 mb-3">
                         <select
-                          className={`form-control ${isSelectoptTouched2 ? "is-invalid" : ""}`}
+                          className={`form-control ${isSelectoptTouched2 && selectopt2?.length === 0 ? "is-invalid" : ""}`}
                           onBlur={() => setIsSelectoptTouched2(true)}
+                          value={selectopt2}
+                          onChange={(e) => setSelectopt2(e.target.value)}
                         >
                           {providerTypes.map((p) => (
                             <option key={p.value} value={p.value}>
@@ -549,8 +481,8 @@ const SportBookReport = () => {
                       </div>
 
                       <div className="col-xl-5">
-                        <button className="btn btn-primary">Load</button>{" "}
-                        <button className="btn btn-light">Reset</button>
+                        <button type="button" className="btn btn-primary">Load</button>{" "}
+                        <button type="button" className="btn btn-light" onClick={handleReset}>Reset</button>
                       </div>
 
                     </div>

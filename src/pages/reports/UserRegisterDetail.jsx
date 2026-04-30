@@ -11,13 +11,12 @@ import autoTable from "jspdf-autotable";
 import { customSelectStyles } from '../../components/Header';
 import Select from 'react-select';
 import { Table } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
+import SelectBootStrap from '../../components/SelectBootStrap';
 
 
 const UserRegisterDetail = () => {
-
   const [data, setData] = useState([]);
-  const [clientSearch, setClientSearch] = useState('');
-  const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState('');
 
   const [totalRecords, setTotalRecords] = useState(0);
@@ -60,16 +59,6 @@ const UserRegisterDetail = () => {
   const totalPages = Math.ceil(totalRecords / perPage) || 1;
 
   const getColor = (value) => (Number(value) < 0 ? "#bb2834" : "#128412");
-
-  // 🔹 Fetch Clients
-  const fetchClients = async (value) => {
-    try {
-      const res = await getClients(value);
-      setClientList(res.results || []);
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   // 🔹 Fetch Data
   const fetchData = async (page = 1) => {
@@ -220,7 +209,7 @@ const UserRegisterDetail = () => {
               <div className="page-title-right">
                 <ol className="breadcrumb m-0">
                   <li className="breadcrumb-item">
-                    <a href="/admin/home">Home</a>
+                    <Link to="/admin/home">Home</Link>
                   </li>
                   <li className="breadcrumb-item active">
                     <span>User Registration Report</span>
@@ -242,70 +231,19 @@ const UserRegisterDetail = () => {
                     <div className="row row5">
 
                       {/* CLIENT SEARCH */}
-                      <div className="col-12 col-md-6 col-lg-2 mb-2">
+                      <div className="col-12 col-md-6 col-lg-2">
                         <div className="form-group user-lock-search" style={{ position: "relative" }}>
                           <label>Search By Client Name</label>
-                          <style>{`
-                            .form-control::placeholder {
-                            color: #ced4da ;
-                            opacity: 0 ;
-                            }`}</style>
-                          <input
-                            type="search"
-                            className="form-control"
-                            value={clientSearch}
-                            placeholder="Select option"
-                            onChange={(e) => {
-                              setClientSearch(e.target.value);
-                              fetchClients(e.target.value);
-                            }}
+                          <SelectBootStrap
+                            selectedOption={selectedClient}
+                            setSelectedOption={setSelectedClient}
+                            fetchType="client"
                           />
-                          {/* <Select
-                            options={[]}
-                            placeholder="Select option"
-                            className="react-select-container"
-                            classNamePrefix="react-select"
-                            components={{
-                              DropdownIndicator: () => null,
-                              IndicatorSeparator: () => null
-                            }}
-                            noOptionsMessage={() => "List is empty."}
-                            value={clientSearch}
-                            onInputChange={(value) => {
-                              setClientSearch(value);
-                              fetchClients(value);
-                            }}
-                            styles={customSelectStyles}
-                          /> */}
-
-                          {clientList.length > 0 && (
-                            <div style={{
-                              position: 'absolute',
-                              background: '#fff',
-                              border: '1px solid #ddd',
-                              width: '100%',
-                              zIndex: 1000
-                            }}>
-                              {clientList.map((c, i) => (
-                                <div
-                                  key={i}
-                                  style={{ padding: '5px', cursor: 'pointer' }}
-                                  onClick={() => {
-                                    setSelectedClient(c.id);
-                                    setClientSearch(c.text);
-                                    setClientList([]);
-                                  }}
-                                >
-                                  {c.text}
-                                </div>
-                              ))}
-                            </div>
-                          )}
                         </div>
                       </div>
 
                       {/* TYPE */}
-                      <div className="col-12 col-md-6 col-lg-2 mb-2">
+                      <div className="col-12 col-md-6 col-lg-2">
                         <div className="form-group">
                           <label>Type</label>
                           <select
@@ -322,7 +260,7 @@ const UserRegisterDetail = () => {
 
                       {/* DATE RANGE */}
                       {(filterType === "2" || filterType === "3") && (
-                        <div className="col-12 col-md-6 col-lg-3 mb-2">
+                        <div className="col-12 col-md-6 col-lg-3">
                           <div className="form-group">
                             <label>Select Date Range</label>
                             <RangePicker
@@ -336,7 +274,7 @@ const UserRegisterDetail = () => {
                       )}
 
                       {/* BUTTONS */}
-                      <div className="col-12 col-lg-3 mb-2">
+                      <div className="col-12 col-lg-3">
                         <label className="d-none d-lg-block" style={{ width: "100%" }}>&nbsp;</label>
 
                         <div className="d-flex flex-wrap">
@@ -346,7 +284,6 @@ const UserRegisterDetail = () => {
                           &nbsp;
                           <button type="button" className="btn btn-light"
                             onClick={() => {
-                              setClientSearch('');
                               setSelectedClient('');
                               setSearch('');
                               setDateRange([]);

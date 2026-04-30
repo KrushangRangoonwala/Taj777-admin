@@ -232,7 +232,7 @@ export function getCards_Sum(cards) {
     return cards.reduce((sum, card) => sum + getCardValue(card), 0);
 }
 
-export const gameCodeMap = {
+export const gameCodeMap = { // game_code map to game_pth
     // IF U CHANGE GAME_PATH, ALSO CHANGE IT IN CasinoCenterContent.JS , gamePath_MapTo_gametype IN casinoDeatils_byType.js , Casinomap.js
     "casino_war": "war",
     '32_cards-a': 'card32-A',
@@ -245,9 +245,16 @@ export const gameCodeMap = {
     'teensin': '29cardbaccarat',
     'aaa': 'aaa',
     'aaa2': 'aaa2',
+
     '20_teenpatti': 'teenpattit20',
+    'teen20v1': 'teenpattit20', // vip-teen-20
     'teen20c': 'teenpatti20c',
     'teen20b': 'teenpatti20b',
+
+    "teen20": "teenpattit20",
+    'teen20b': 'teenpattit20b',
+    "teen20c": "teenpattit20c",
+
     'teen33': 'instantteenpatti3',
     'teen32': 'instantteenpatti2',
     'test_teenpatti': 'teenpattitest',
@@ -278,9 +285,6 @@ export const gameCodeMap = {
     'btable2': 'bollywoodtable2',
     'poison20': 'poisonteenpatti20',
     'ddb': 'bollywoodtable',
-    "teen20": "teenpattit20",
-    "teen20b": "teenpattit20b",
-    "teen20c": "teenpattit20c",
     "ballbyball": "ball_by_ball",
     "thetrap": "trap",
     "lottcard": "lottery",
@@ -301,7 +305,7 @@ export const gameCodeMap = {
     "sicbo2": "sicbo2",
     "sicbo": "sicbo",
     "teen": "odi_teenpatti",
-};
+}; // game_code map to game_pth
 
 export function sanitizeNumber(val) {
     return isNaN(val) || val === null ? 0 : Number(val);
@@ -326,3 +330,24 @@ export const emptyList = [{ id: '1', text: 'List is empty.' }]
 export const notFoundQuery = [{ id: '1', text: 'No elements found. Consider changing search query.' }]
 
 export const getNoRecordText = (searchTxt) => searchTxt?.length > 0 ? "There are no records matching your request" : "There are no records to show"
+
+export function getUppercase_joined(value) {
+    let str = value;
+    if (value == "Match Odds") {
+        str = "MATCH_ODDS";
+    } else if (value == "Tied Match") {
+        str = "TIED_MATCH";
+    } else if (value == "To Win the Toss") {
+        str = "TOSS_ODDS";
+    } else {
+        if (value) {
+            value = value.split(".").join("_");
+            value = value.split(" ").join("_");
+            value = value.split("/").join("_");
+            value = value.split(" ").join("_");
+            str = value.toUpperCase();
+        }
+    }
+
+    return str;
+}

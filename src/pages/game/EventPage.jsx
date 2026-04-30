@@ -118,6 +118,7 @@ function getExposureCss(exposure) {
 
 const getTitle = (name) => {
     if (!name) return "";
+    if (name == "To Win the Toss") return "TOSS_ODDS";
     return name.toUpperCase().replace(/\s+/g, "_");
 };
 
@@ -286,6 +287,7 @@ function Boxes_6({ data, bet_market_type, market_odd_name, prevSocketData }) {
 function Double_Column_Section({
     title,
     sectionId,
+    event_id,
     data,
     isAllBackBox,
     isLayFirst,
@@ -315,6 +317,7 @@ function Double_Column_Section({
         <MarketTable
             title={title}
             id={sectionId}
+            event_id={event_id}
             min={min}
             max={max}
             marketClass={marketClass}
@@ -322,6 +325,8 @@ function Double_Column_Section({
             isSectionOpen={openSections[sectionId]}
             toggleSection={toggleSection}
             dataLen={data?.length}
+            bet_market_type={bet_market_type}
+            market_odd_name={market_odd_name}
         >
             {data?.map((item, index) => {
                 const exposureValue = getExposureValue({ exposureData, marketId: item.marketId, marketType: bet_market_type });
@@ -360,6 +365,7 @@ function Single_Column_Section({
     min,
     max,
     sectionId,
+    event_id,
     isCommonMinMax,
     isBookMaker = false,
     bet_market_type,
@@ -385,6 +391,7 @@ function Single_Column_Section({
         <MarketTable
             title={title_}
             id={sectionId}
+            event_id={event_id}
             min={min}
             max={max}
             marketClass="market-4"
@@ -393,6 +400,8 @@ function Single_Column_Section({
             isSectionOpen={openSections[sectionId]}
             toggleSection={toggleSection}
             dataLen={data2?.length}
+            bet_market_type={bet_market_type}
+            market_odd_name={market_odd_name}
         >
             {data2?.map((d, idx) => {
                 const exposureValue = getExposureValue({ exposureData, marketId: d.id, marketType: bet_market_type });
@@ -424,6 +433,7 @@ function Bookmaker({
     title,
     data,
     sectionId,
+    event_id,
     min,
     max,
     isSmall = false,
@@ -448,6 +458,7 @@ function Bookmaker({
         <MarketTable
             title={title}
             id={sectionId}
+            event_id={event_id}
             min={min}
             max={max}
             marketClass="market-2"
@@ -456,6 +467,8 @@ function Bookmaker({
             isSectionOpen={openSections[sectionId]}
             toggleSection={toggleSection}
             dataLen={data?.length}
+            bet_market_type={bet_market_type}
+            market_odd_name={market_odd_name}
         >
             {data?.map((b, idx) => {
                 const status = b.status || b.Active;
@@ -548,6 +561,7 @@ function CricketMarkets({
                     openedBetPoint={openedBetPoint}
                     livePoints={livePoints}
                     prevSocketData={prevSocketData}
+                    showUserBook={true}
                 />
 
                 <Bookmaker
@@ -564,6 +578,7 @@ function CricketMarkets({
                     openedBetPoint={openedBetPoint}
                     livePoints={livePoints}
                     prevSocketData={prevSocketData}
+                    showUserBook={true}
                 />
 
                 <Single_Column_Section
@@ -585,6 +600,7 @@ function CricketMarkets({
                     openedBetPoint={openedBetPoint}
                     livePoints={livePoints}
                     prevSocketData={prevSocketData}
+                    showUserBook={true}
                 />
             </React.Fragment>
         );
@@ -595,7 +611,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
     const navigate = useNavigate();
     const location = useLocation();
     const dispatch = useDispatch();
-    const [showMoreMarketModal, setShowMoreMarketModal] = useState(false);
+    const [isMoreMarketModalOpen, setIsMoreMarketModalOpen] = useState(false);
     const [exposureData, setExposureData] = useState([]);
     const [activeBets, setActiveBets] = useState([]);
     const selectedMatchRedux = useSelector(store => store.match.selectedMatch);
@@ -609,8 +625,6 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
     const isLeague = selectedMatch?.matchName?.toLowerCase()?.includes("league");
     const leagueName = selectedMatch?.cname?.split(" ")?.map((item) => item[0]?.toUpperCase())?.join("");
 
-    const [bookmaker_odds, setBookmaker_odds] = useState();
-    const [bookmaker_tied_odds, setBookmaker_tied_odds] = useState();
     const [normalData, setNormalData] = useState();
     const [fancy1, setFancy1] = useState();
     const [oddEven, setOddEven] = useState();
@@ -619,12 +633,15 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
     const [khado, setKhado] = useState();
     const [meter, setMeter] = useState();
     const [cricketcasino, setCricketcasino] = useState();
+
     const [match_Odds, setMatch_Odds] = useState();
     const [tied_match, setTied_match] = useState();
-    const [bookmakerSmall, setBookmakerSmall] = useState()
-
+    const [bookmaker_odds, setBookmaker_odds] = useState();
+    const [bookmaker_tied_odds, setBookmaker_tied_odds] = useState();
     const [cricketMarkets, setCricketMarkets] = useState([]);
     const [marketBookmakers, setMarketBookmakers] = useState({});
+
+    const [bookmakerSmall, setBookmakerSmall] = useState()
 
     const prevSocketData = useRef([]);
     const [openSections, setOpenSections] = useState({
@@ -724,7 +741,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                 setBookmakerSmall(normalizeBookmakerSmall(bmSession));
             }
 
-            const cricketRaw = socketData?.body?.cricket;
+            const cricketRaw = socketData?.body?.cricket; // ALL MARKET IN CRICKET HAVE `USER BOOK` btn
             const mainData = processMainMarketData(cricketRaw);
             setMatch_Odds(mainData.matchOdds);
             setTied_match(mainData.tiedMatch);
@@ -770,6 +787,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
 
 
     const eventProps = {
+        event_id: selectedMatch?.event_id || selectedMatch?.matchid,
         exposureData,
         openSections,
         toggleSection,
@@ -806,7 +824,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                     }
                     {!isCricket &&
                         <div class="more-market text-right">
-                            <button class="btn btn-back" onClick={() => setShowMoreMarketModal(true)}>
+                            <button class="btn btn-back" onClick={() => setIsMoreMarketModalOpen(true)}>
                                 More Market
                             </button>
                         </div>}
@@ -981,7 +999,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                                 <Single_Column_Section
                                     isDisplay={selectedMatch?.SportId == 4}
                                     sectionId="tied_match"
-                                    title={tied_match?.marketName}
+                                    title={"TIED_MATCH"} // tied_match?.marketName
                                     data={tied_match}
                                     isCommonMinMax={true}
                                     bet_market_type="TIED_MATCH"
@@ -1005,11 +1023,18 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                 <EventRightSidebar tvUrl={tvUrl} liveScoreData={liveScoreData} isLive={selectedMatch?.inPlay && !isLeague} activeBets={activeBets} />
 
                 <MoreMarketModal
-                    show={showMoreMarketModal}
-                    onHide={() => setShowMoreMarketModal(false)}
+                    show={isMoreMarketModalOpen}
+                    onHide={() => setIsMoreMarketModalOpen(false)}
                     markets={cricketMarkets}
                     setSelectmarket={setSelectmarket}
                 />
+
+                <div className="market-show-icon d-none-desktop" onClick={() => {
+                    document.getElementById('my-game-bets')?.scrollIntoView({ behavior: 'smooth' });
+                }}>
+                    <div className="bet-cnt">{activeBets?.length || 0}</div>
+                    <div className="bet-title">Bets</div>
+                </div>
             </div>
         </div>
     );

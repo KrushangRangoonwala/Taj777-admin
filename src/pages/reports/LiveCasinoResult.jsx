@@ -5,6 +5,7 @@ import "antd/dist/reset.css";
 import { getCasinoResult } from "../../api/API";
 import dayjs from "dayjs";
 import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { Table } from 'react-bootstrap';
@@ -59,15 +60,22 @@ const LiveCasinoResult = () => {
   const [selectedClient, setSelectedClient] = useState("");
 
   const [date, setDate] = useState(dayjs());
+  const [dateRange, setDateRange] = useState([dayjs().subtract(7, "day"), dayjs()]);
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [search, setSearch] = useState("");
+
+  const [selectopt, setSelectopt] = useState("");
+  const [selectopt2, setSelectopt2] = useState("");
   const [isSelectoptTouched, setIsSelectoptTouched] = useState(false);
   const [isSelectoptTouched2, setIsSelectoptTouched2] = useState(false);
 
   const [perPage, setPerPage] = useState(25);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalRecords, setTotalRecords] = useState(0);
+
+  const [showModal, setShowModal] = useState(false);
+  const [modalData, setModalData] = useState(null);
 
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('none');
@@ -100,10 +108,14 @@ const LiveCasinoResult = () => {
   const handleTabChange = (tab) => {
     setActiveTab(tab);
 
-    // 🔹 Reset all states
-    setSelectedClient("");
+    setSelectopt("");
+    setSelectopt2("");
+    setIsSelectoptTouched(false);
+    setIsSelectoptTouched2(false);
 
+    setSelectedClient("");
     setDate(dayjs());
+    setDateRange([dayjs().subtract(7, "day"), dayjs()]);
     setSearch("");
     setData([]);
     setCurrentPage(1);
@@ -130,7 +142,7 @@ const LiveCasinoResult = () => {
         from_date: fromDate,
         to_date: toDate,
         report_type: activeTab === "login" ? "endlogin" : "password",
-        client_name: selectedClient,
+        client_name: selectedClient?.value,
       };
 
       const res = await getCasinoResult(payload);
@@ -165,6 +177,31 @@ const LiveCasinoResult = () => {
   }, [activeTab]); */
 
   const totalPages = Math.ceil(totalRecords / perPage) || 1;
+
+  const changePage = (page) => {
+    if (page >= 1 && page <= totalPages) {
+      fetchUserHistory(page);
+    }
+  };
+
+  const getPageNumbers = () => {
+    const totalNumbers = 5;
+
+    let start = Math.max(currentPage - 2, 1);
+    let end = start + totalNumbers - 1;
+
+    if (end > totalPages) {
+      end = totalPages;
+      start = Math.max(end - totalNumbers + 1, 1);
+    }
+
+    return Array.from({ length: end - start + 1 }, (_, i) => start + i);
+  };
+
+  // 🔹 Date change
+  const handleDateChange = (dates) => {
+    setDateRange(dates);
+  };
 
   // 🔹 EXPORT EXCEL
   const exportExcel = () => {
@@ -291,8 +328,10 @@ const LiveCasinoResult = () => {
                       {/* TYPE */}
                       <div className="col-xl-2 mb-3">
                         <select
-                          className={`form-control ${isSelectoptTouched ? "is-invalid" : ""}`}
+                          className={`form-control ${isSelectoptTouched && selectopt?.length === 0 ? "is-invalid" : ""}`}
                           onBlur={() => setIsSelectoptTouched(true)}
+                          value={selectopt}
+                          onChange={(e) => setSelectopt(e.target.value)}
                         >
                           {/* <option value="ezugi">Ezugi</option>
                           <option value="ss">Super Spade</option>
@@ -321,6 +360,7 @@ const LiveCasinoResult = () => {
                           onClick={() => {
                             setSelectedClient("");
                             setDate(dayjs());
+                            setSelectopt("");
                             setSearch("");
                             setData([]);
                             setCurrentPage(1);
@@ -469,8 +509,10 @@ const LiveCasinoResult = () => {
 
                       <div className="col-xl-2 mb-3">
                         <select
-                          className={`form-control ${isSelectoptTouched2 ? "is-invalid" : ""}`}
+                          className={`form-control ${isSelectoptTouched2 && selectopt2?.length === 0 ? "is-invalid" : ""}`}
                           onBlur={() => setIsSelectoptTouched2(true)}
+                          value={selectopt2}
+                          onChange={(e) => setSelectopt2(e.target.value)}
                         >
                           {providerTypes.map((p) => (
                             <option key={p.value} value={p.value}>
@@ -482,10 +524,21 @@ const LiveCasinoResult = () => {
 
                       <div className="col-xl-5 mb-3">
                         <button className="btn btn-primary">Load</button>{" "}
-                        <button className="btn btn-light" onClick={(e) => {
+                        <button
+                          className="btn btn-light"
+                          onClick={(e) => {
                             e.preventDefault();
                             setSelectedClient("");
-                        }}>Reset</button>
+                            setDate(dayjs());
+                            setSelectopt2("");
+                            setSearch("");
+                            setData([]);
+                            setCurrentPage(1);
+                            setTotalRecords(0);
+                          }}
+                        >
+                          Reset
+                        </button>
                       </div>
 
                     </div>
@@ -539,8 +592,8 @@ const LiveCasinoResult = () => {
             </div>
           </div>
         </div>
-      </div>
-    </div>
+      </div >
+    </div >
   );
 };
 

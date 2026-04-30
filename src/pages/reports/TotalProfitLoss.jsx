@@ -13,14 +13,12 @@ import { customSelectStyles } from '../../components/Header';
 import { Table } from 'react-bootstrap';
 import { errorToast, successToast } from '../../utils/toast';
 import { getNoRecordText } from '../../utilies/helpers';
+import { Link } from 'react-router-dom';
+import SelectBootStrap from '../../components/SelectBootStrap';
 
 
 const TotalProfitLoss = () => {
-
   const [loading, setLoading] = useState(false);
-
-  const [clientSearch, setClientSearch] = useState('');
-  const [clientList, setClientList] = useState([]);
   const [selectedClient, setSelectedClient] = useState('');
 
   const [fromDate, setFromDate] = useState(dayjs().subtract(7, "day"));
@@ -68,16 +66,6 @@ const TotalProfitLoss = () => {
     data.casino.length ||
     data.third_party.length ||
     data.sportbook.length;
-
-  /* ================= CLIENT SEARCH ================= */
-  const fetchClients = async (value) => {
-    try {
-      const res = await getClients(value);
-      setClientList(res.results || []);
-    } catch (err) {
-      console.log(err);
-    }
-  };
 
   /* ================= TOTAL CALC ================= */
   const getTotalPL = (arr) => {
@@ -146,7 +134,6 @@ const TotalProfitLoss = () => {
   };
 
   const handleReset = () => {
-    setClientSearch('');
     setSelectedClient('');
     setFromDate(dayjs().subtract(7, "day"));
     setToDate(dayjs());
@@ -240,7 +227,7 @@ const TotalProfitLoss = () => {
             <div className="page-title-right">
               <ol className="breadcrumb m-0">
                 <li className="breadcrumb-item">
-                  <a href="/admin/home">Home</a>
+                  <Link to="/admin/home">Home</Link>
                 </li>
                 <li className="breadcrumb-item active">
                   <span>Total Profit Loss</span>
@@ -278,58 +265,11 @@ const TotalProfitLoss = () => {
                     <div className="col-lg-3">
                       <div className="form-group user-lock-search mb-4px-plus" style={{ position: "relative" }}>
                         <label>Search By Client Name</label>
-                        <input
-                          type="search"
-                          className="form-control"
-                          placeholder="Select option"
-                          value={clientSearch}
-                          onChange={(e) => {
-                            setClientSearch(e.target.value);
-                            fetchClients(e.target.value);
-                          }}
+                        <SelectBootStrap
+                          selectedOption={selectedClient}
+                          setSelectedOption={setSelectedClient}
+                          fetchType="client"
                         />
-                        {/* <Select
-                          options={[]}
-                          placeholder="Select option"
-                          className="react-select-container"
-                          classNamePrefix="react-select"
-                          components={{
-                            DropdownIndicator: () => null,
-                            IndicatorSeparator: () => null
-                          }}
-                          noOptionsMessage={() => "List is empty."}
-                          value={clientSearch}
-                          onInputChange={(value) => {
-                            setClientSearch(value);
-                            fetchClients(value);
-                          }}
-                          styles={customSelectStyles}
-                        /> */}
-
-
-                        {clientList.length > 0 && (
-                          <div style={{
-                            position: 'absolute',
-                            background: '#fff',
-                            border: '1px solid #ddd',
-                            width: '100%',
-                            zIndex: 1000
-                          }}>
-                            {clientList.map((c, i) => (
-                              <div
-                                key={i}
-                                style={{ padding: '5px', cursor: 'pointer' }}
-                                onClick={() => {
-                                  setSelectedClient(c.id);
-                                  setClientSearch(c.text);
-                                  setClientList([]);
-                                }}
-                              >
-                                {c.text}
-                              </div>
-                            ))}
-                          </div>
-                        )}
                       </div>
                     </div>
 
@@ -416,11 +356,11 @@ const TotalProfitLoss = () => {
                 </form>
               </div>
 
-              {loading && (
+              {/* {loading && (
                 <div style={{ textAlign: "center", padding: "20px" }}>
                   <div className="spinner-border text-primary" role="status" />
                 </div>
-              )}
+              )} */}
 
               {/* TOP BAR */}
               <div className="row">

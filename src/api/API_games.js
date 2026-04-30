@@ -4,6 +4,7 @@ import { getDefaultParams } from "./API";
 import { format_casino_list } from "../utilies/helpers";
 import { store } from "../store/store";
 import { setAllCasinoGames } from "../store/slices/casinoSlice";
+import { setPlaceBetBtns } from "../store/slices/userSlice";
 
 export function isApiSuccess(response) {
     return (
@@ -126,6 +127,35 @@ export async function getEventActiveBets(eventId) {
         return data || [];
     } catch (error) {
         console.error("Error fetching event active bets:", error);
+        throw error;
+    }
+}
+
+
+export async function getButtonValuesApi(extraPayload = {}) {
+    try {
+        const payload = { ...getDefaultParams(), ...extraPayload };
+        const { data } = await ajax_files.post("/get_stake_button", payload);
+
+        const res = {
+            eventBetBtns: data?.data?.map(v => Number(v)),
+            casinoBetBtns: data?.casino_data?.map(v => Number(v)),
+        }
+
+        store.dispatch(setPlaceBetBtns(res));
+    } catch (error) {
+        throw error;
+    }
+}
+
+
+export async function updateButtonValuesApi(extraPayload = {}) {
+    try {
+        const payload = { ...getDefaultParams(), ...extraPayload };
+
+        const { data } = await axiosInstance.post("/button_value_change", payload);
+        return data;
+    } catch (error) {
         throw error;
     }
 }

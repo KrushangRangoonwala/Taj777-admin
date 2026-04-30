@@ -13,8 +13,10 @@ const ViewMoreModal = ({ show, onHide, betList = [] }) => {
         <>
             <style>
                 {`
-                    .custom-modal-padding.modal {
-                        padding-left: 23px !important;
+                    @media only screen and (min-width: 1280px) {
+                        .custom-modal-padding.modal {
+                            /*padding-left: 23px !important;*/
+                        }
                     }
                 `}
             </style>

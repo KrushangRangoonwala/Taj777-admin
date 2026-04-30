@@ -11,7 +11,7 @@ const EventRightSidebar = ({ tvUrl, liveScoreData, isLive, activeBets }) => {
     const [showViewMore, setShowViewMore] = useState(false);
     const [betList, setBetList] = useState([]);
     const [isSticky, setIsSticky] = useState(false);
-    const isMobile = useIsMobile(992)
+    const isMobile = useIsMobile(1279)
 
     useEffect(() => {
         setBetList(activeBets);

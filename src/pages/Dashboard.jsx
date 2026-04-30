@@ -7,13 +7,32 @@ import { fetchDashboard } from '../api/API';
 import { gameCodeMap } from '../utilies/helpers';
 import { Link } from 'react-router-dom';
 
-const legendStruc = [
+const legendStruc1 = [
     { label: '', value: '', colorClass: 'text-primary', columnClass: 'col-6 col-sm' },
     { label: '', value: '', colorClass: 'text-warning', columnClass: 'col-6 col-sm' },
     { label: '', value: '', colorClass: 'text-info', columnClass: 'col-4 col-sm' },
     { label: '', value: '', colorClass: 'text-success', columnClass: 'col-4 col-sm' },
     { label: '', value: '', colorClass: 'text-dark', columnClass: 'col-4 col-sm' },
 ]
+
+const legendStruc2 = [
+    { label: '', value: '', colorClass: 'text-primary', columnClass: 'col-6 col-sm' },
+    { label: '', value: '', colorClass: 'text-warning', columnClass: 'col-6 col-sm' },
+    { label: '', value: '', colorClass: 'text-info', columnClass: 'col-6 col-sm' },
+    { label: '', value: '', colorClass: 'text-success', columnClass: 'col-6 col-sm' },
+]
+
+const formatNumber = (num) => {
+    return Number(num || 0).toLocaleString('en-IN', {
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 2
+    });
+};
+
+const formatAxisLabel = (val) => {
+    if (typeof val === 'string' && isNaN(Number(val))) return val;
+    return formatNumber(val);
+};
 
 
 const chart1Options = {
@@ -37,6 +56,14 @@ const chart1Options = {
     colors: ['#556ee6', '#f1b44c', '#50a5f1', '#34c38f', '#343a40'],
     xaxis: {
         categories: ['Credit pts', 'All pts', 'Settlement pts', 'Upper pts', 'Down pts'],
+        labels: {
+            formatter: formatAxisLabel
+        }
+    },
+    yaxis: {
+        labels: {
+            formatter: formatAxisLabel
+        }
     },
     legend: {
         show: true,
@@ -51,7 +78,7 @@ const chart1Options = {
     tooltip: {
         y: {
             formatter: function (val) {
-                return val.toLocaleString();
+                return formatNumber(val);
             }
         }
     }
@@ -78,6 +105,14 @@ const chart2Options = {
     colors: ['#556ee6', '#f1b44c', '#50a5f1', '#34c38f'],
     xaxis: {
         categories: ['Sports P/L', 'Casino P/L', 'Third Party Casino P/L', 'Total P/L'],
+        labels: {
+            formatter: formatAxisLabel
+        }
+    },
+    yaxis: {
+        labels: {
+            formatter: formatAxisLabel
+        }
     },
     legend: {
         show: true,
@@ -92,7 +127,7 @@ const chart2Options = {
     tooltip: {
         y: {
             formatter: function (val) {
-                return val.toLocaleString();
+                return formatNumber(val);
             }
         }
     }
@@ -109,12 +144,13 @@ const Dashboard = () => {
     const [chart1Series, setChart1Series] = useState([]);
     const [chart2Series, setChart2Series] = useState([]);
 
-    const [chart1LegendData, setChart1LegendData] = useState(legendStruc);
-    const [chart2LegendData, setChart2LegendData] = useState(legendStruc.slice(0, 4));
+    const [chart1LegendData, setChart1LegendData] = useState(legendStruc1);
+    const [chart2LegendData, setChart2LegendData] = useState(legendStruc2);
 
-    function setLegendData({ setState, ...data }) {
+    function setLegendData({ setState, chat1 = false, chat2 = false, ...data }) {
         const keys = Object.keys(data);
         const values = Object.values(data);
+        const legendStruc = chat1 ? legendStruc1 : legendStruc2;
         let legendData = keys.map((val, idx) => {
             return {
                 ...legendStruc[idx],
@@ -126,12 +162,7 @@ const Dashboard = () => {
         setState(legendData)
     }
 
-    const formatNumber = (num) => {
-        return Number(num || 0).toLocaleString('en-IN', {
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 2
-        });
-    };
+
 
     useEffect(() => {
         const loadDashboardData = async () => {
@@ -162,7 +193,7 @@ const Dashboard = () => {
                             acc[val] = data.points_chart.series[0].data[idx];
                             return acc;
                         }, {});
-                        setLegendData({ setState: setChart1LegendData, ...qqq })
+                        setLegendData({ setState: setChart1LegendData, ...qqq, chat1: true })
                     }
 
                     if (data.profit_loss_chart?.series) {
@@ -177,7 +208,7 @@ const Dashboard = () => {
                             acc[val] = data.profit_loss_chart.series[0].data[idx];
                             return acc;
                         }, {});
-                        setLegendData({ setState: setChart2LegendData, ...qqq })
+                        setLegendData({ setState: setChart2LegendData, ...qqq, chat2: true })
                     }
                 }
             } catch (error) {

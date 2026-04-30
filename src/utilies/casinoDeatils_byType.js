@@ -1,3 +1,7 @@
+export const gamePath_MapTo_gametype_vip = {
+    "teenpattit20": "",
+}
+
 export const gamePath_MapTo_gametype = {
     "superover3": "superover3",
     "superover2": "superover2",

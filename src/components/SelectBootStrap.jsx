@@ -19,7 +19,7 @@ const CustomOption = (props) => {
     );
 };
 
-function SelectBootStrap({ selectedOption, setSelectedOption, placeholder = "Select option", fetchType: fetchType_ = "user" }) {
+function SelectBootStrap({ selectedOption, setSelectedOption, placeholder = "Select option", fetchType: fetchType_, isFocusOnLoad = false }) {
     const fetchType = fetchType_.toLowerCase();
     const selectRef = useRef(null);
     const [search, setSearch] = useState("");
@@ -27,6 +27,10 @@ function SelectBootStrap({ selectedOption, setSelectedOption, placeholder = "Sel
     const [isFocused, setIsFocused] = useState(false);
 
     useEffect(() => {
+        if (isFocusOnLoad) {
+            selectRef.current?.focus();
+        }
+
         const handleVisibilityChange = () => {
             if (document.hidden) {
                 selectRef.current?.blur(); // 👈 when TAB change, remove focus
@@ -88,7 +92,7 @@ function SelectBootStrap({ selectedOption, setSelectedOption, placeholder = "Sel
         }
     };
 
-    const fetchApi = fetchType === "user" ? fetchUserList : fetchClients;
+    const fetchApi = fetchType === "user" ? fetchUserList : fetchType === "client" ? fetchClients : () => { console.error("⚠️ No fetch type specified !!") };
 
     useEffect(() => {
         search?.length > 2 && fetchApi(search);
@@ -99,7 +103,7 @@ function SelectBootStrap({ selectedOption, setSelectedOption, placeholder = "Sel
             ref={selectRef}
             options={searchList}
             placeholder={placeholder}
-            className="react-select-container custome-css-select border-radios-5px"
+            className="react-select-container custome-css-select border-radios-5px multiselect"
             classNamePrefix="react-select"
             components={{
                 DropdownIndicator: () => null,
