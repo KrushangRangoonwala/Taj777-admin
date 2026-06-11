@@ -305,6 +305,7 @@ const LiveCasinoResult = () => {
                           selectedOption={selectedClient}
                           setSelectedOption={setSelectedClient}
                           fetchType="client"
+                          isOnlyUser={true}
                         />
                       </div>
 
@@ -504,6 +505,7 @@ const LiveCasinoResult = () => {
                           selectedOption={selectedClient}
                           setSelectedOption={setSelectedClient}
                           fetchType="client"
+                          isOnlyUser={true}
                         />
                       </div>
 
@@ -523,11 +525,10 @@ const LiveCasinoResult = () => {
                       </div>
 
                       <div className="col-xl-5 mb-3">
-                        <button className="btn btn-primary">Load</button>{" "}
+                        <button className="btn btn-primary" onClick={() => fetchUserHistory(1)}>Load</button>{" "}
                         <button
                           className="btn btn-light"
                           onClick={(e) => {
-                            e.preventDefault();
                             setSelectedClient("");
                             setDate(dayjs());
                             setSelectopt2("");

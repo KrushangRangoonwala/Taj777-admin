@@ -415,7 +415,7 @@ const CasinoResult = () => {
                       >
                         {row.round}
                       </td>
-                      <td role="cell">{row.winner}</td>
+                      <td role="cell">{(row.winner).split("#")[0]}</td>
                     </tr>
                   ))
                 ) : (

@@ -5,17 +5,29 @@ import SafeIframe from '../../../components/SafeIframe';
 import ViewMoreModal from './ViewMoreModal';
 import { isPageAtTop } from '../../../utilies/helpers';
 import useIsMobile from '../../../hooks/useIsMobile';
+import { getViewMoreMatch } from '../../../api/API';
 
-const EventRightSidebar = ({ tvUrl, liveScoreData, isLive, activeBets }) => {
+function getBetType(betData) {
+    const type = betData?.bet_type?.toLowerCase();
+    if (type == 'lay' || type == 'no') return "lay";
+    if (type == 'back' || type == 'yes') return "back";
+    return 'back';
+}
+
+const EventRightSidebar = ({ tvUrl, liveScoreData, isLive, activeBets, event_id }) => {
     const [isTvOn, setIsTvOn] = useState(false);
     const [showViewMore, setShowViewMore] = useState(false);
     const [betList, setBetList] = useState([]);
+    const [viewMoreLoading, setViewMoreLoading] = useState(false);
+    const [viewMoreData, setViewMoreData] = useState([]);
     const [isSticky, setIsSticky] = useState(false);
     const isMobile = useIsMobile(1279)
 
     useEffect(() => {
         setBetList(activeBets);
     }, [activeBets]);
+
+    console.log("ACTIVE BETS IN SIDEBAR", activeBets);
 
     useEffect(() => {
         const handleScroll = () => {
@@ -24,6 +36,44 @@ const EventRightSidebar = ({ tvUrl, liveScoreData, isLive, activeBets }) => {
         window.addEventListener("scroll", handleScroll);
         return () => window.removeEventListener("scroll", handleScroll);
     }, []);
+
+    const openViewMoreModal = async () => {
+
+        try {
+
+            setShowViewMore(true);
+            setViewMoreLoading(true);
+
+            const payload = {
+                event_id: event_id || "",
+                page: 1,
+                limit: 100
+            };
+
+            const response = await getViewMoreMatch(payload);
+
+            if (response?.status === "ok") {
+
+                setViewMoreData(
+                    response?.data || []
+                );
+
+            } else {
+
+                setViewMoreData([]);
+            }
+
+        } catch (error) {
+
+            console.log("VIEW MORE API ERROR", error);
+
+            setViewMoreData([]);
+
+        } finally {
+
+            setViewMoreLoading(false);
+        }
+    };
 
     return (
         <div className={`right-sidebar ${isSticky && !isMobile ? 'sticky' : ''}`} data-simplebar="true">
@@ -86,7 +136,13 @@ const EventRightSidebar = ({ tvUrl, liveScoreData, isLive, activeBets }) => {
             <div id="my-game-bets" className="card m-b-10 my-bet">
                 <div className="card-header">
                     <h6 className="card-title float-left">My Bets</h6>
-                    <a href="javascript:void(0)" className="btn btn-back float-right" onClick={() => setShowViewMore(true)}>View More</a>
+                        <a
+                        href="javascript:void(0)"
+                        className="btn btn-back float-right"
+                        onClick={openViewMoreModal}
+                        >
+                        View More
+                        </a>
                 </div>
                 <div className="card-body">
                     <div className="tabs">
@@ -111,10 +167,10 @@ const EventRightSidebar = ({ tvUrl, liveScoreData, isLive, activeBets }) => {
                                             {betList.length > 0 ? (
                                                 betList.map((bet, index) => (
                                                     <React.Fragment key={index}>
-                                                        <tr className="back-border">
+                                                        <tr className={`${getBetType(bet)}-border`}>
                                                             <td colSpan="4"><b>{bet.display_market_type}</b> <span className="float-right">{bet.bet_time}</span></td>
                                                         </tr>
-                                                        <tr className="back-border">
+                                                        <tr className={`${getBetType(bet)}-border`}>
                                                             <td className="bt0">{bet.email}</td>
                                                             <td className="bt0">
                                                                 {bet.marketName}
@@ -140,7 +196,12 @@ const EventRightSidebar = ({ tvUrl, liveScoreData, isLive, activeBets }) => {
                     </div>
                 </div>
             </div>
-            <ViewMoreModal show={showViewMore} onHide={() => setShowViewMore(false)} betList={[]} />
+            <ViewMoreModal
+                show={showViewMore}
+                onHide={() => setShowViewMore(false)}
+                betList={viewMoreData}
+                loading={viewMoreLoading}
+            />
         </div>
     );
 };

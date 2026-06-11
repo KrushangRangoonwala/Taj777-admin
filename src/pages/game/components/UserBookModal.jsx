@@ -52,9 +52,15 @@ const UserBookModal = ({
                                             <tr>
                                                 <td data-id={user.user_id}> {user.username} </td>
                                                 {markets.map((market, marketIndex) => {
-                                                    const score = user.pl?.[market.market_id] || 0;
+                                                    const score = Number(
+                                                        user.pl?.[market.market_id]?.pl || 0
+                                                    );
+
                                                     return (
-                                                        <td key={marketIndex} className={`text-right ${score >= 0 ? 'positive' : 'negative'}`}>
+                                                        <td
+                                                            key={marketIndex}
+                                                            className={`text-right ${score >= 0 ? 'positive' : 'negative'}`}
+                                                        >
                                                             {score}
                                                         </td>
                                                     );

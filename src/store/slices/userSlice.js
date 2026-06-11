@@ -17,6 +17,8 @@ const initialState = {
         eventBetBtns: defaultEventBetBtns,
         casinoBetBtns: defaultCasinoBetBtns,
     },
+
+    isJustLogoutPersisted: false,
 };
 
 const userSlice = createSlice({
@@ -56,8 +58,11 @@ const userSlice = createSlice({
                 casinoBetBtns: casinoBetBtns.length ? casinoBetBtns : defaultCasinoBetBtns,
             };
         },
+        setIsJustLogoutPersisted: (state, action) => {
+            state.isJustLogoutPersisted = action.payload;
+        },
     },
 });
 
-export const { login, logout, setIsLoginModalOpen, setIsSessionExpired, setIsAfterLoginImagePopupOpen, setAfterLoginImagePopup, setPlaceBetBtns } = userSlice.actions;
+export const { login, logout, setIsLoginModalOpen, setIsSessionExpired, setIsAfterLoginImagePopupOpen, setAfterLoginImagePopup, setPlaceBetBtns, setIsJustLogoutPersisted } = userSlice.actions;
 export default userSlice.reducer;

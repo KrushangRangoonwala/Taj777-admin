@@ -7,6 +7,10 @@ import { Table } from 'react-bootstrap';
 import { Link } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { setIsLoading } from "../../store/slices/actionSlice";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const { RangePicker } = DatePicker;
 
@@ -22,13 +26,17 @@ const CurrentBets = () => {
   const [toDate, setToDate] = useState(dayjs().format("YYYY-MM-DD"));
   const [search, setSearch] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const perPage = 25;
+  const [perPage, setPerPage] = useState(25);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalRecords, setTotalRecords] = useState(0);
 
   const [matchDeleted, setMatchDeleted] = useState("matchbet");
   const [betType, setBetType] = useState("all");
 
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('none');
+
+  const isDataAvailable = data && data.length > 0;
 
   const handleSort = (colKey) => {
     if (sortColumn === colKey) {
@@ -62,7 +70,11 @@ const CurrentBets = () => {
         from_date: fromDate,
         to_date: toDate,
         sport_type: sportType,
-        backlay: betType, // back / lay / all
+        backlay: betType,
+
+        page: currentPage,
+        limit: perPage,
+
         bet_type:
           matchDeleted === "deletebet"
             ? "deleted"
@@ -74,15 +86,19 @@ const CurrentBets = () => {
       const res = await getCurrentBets(payload);
 
       if (res.result) {
-        // Add serial numbers for table
+
         const numbered = res.result.map((item, index) => ({
-          sr_no: index + 1,
+          sr_no: ((currentPage - 1) * perPage) + index + 1,
           ...item
         }));
+
         setData(numbered);
         setFilteredData(numbered);
-        setCurrentPage(1);
-      } else {
+
+        setTotalPages(res.total_pages || 1);
+        setTotalRecords(res.total_records || 0);
+
+      } else{
         setData([]);
         setFilteredData([]);
       }
@@ -93,9 +109,81 @@ const CurrentBets = () => {
     }
   };
 
+  const exportToExcel = () => {
+    const formattedData = data.map((row, index) => ({
+      "Sr No": row.sr_no,
+      "Event Type": row.eventType || "",
+      "Event Name": row.eventName || "",
+      "User Name": row.userName || "",
+      "M Name": row.mName || "",
+      "Nation": row.nation || "",
+      "U Rate": row.uRate || "",
+      "Amount": row.amount || "",
+      "Place Date": dayjs(row.placeDate).format("DD/MM/YYYY HH:mm:ss"),
+      "IP": row.ip || "",
+      "Browser": row.browser || ""
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Current Bets");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array"
+    });
+
+    const file = new Blob(
+      [excelBuffer],
+      { type: "application/octet-stream" }
+    );
+
+    saveAs(file, "Current_Bets.xlsx");
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF("l", "mm", "a4");
+
+    const tableData = data.map((row) => ([
+      row.sr_no,
+      row.eventType || "",
+      row.eventName || "",
+      row.userName || "",
+      row.mName || "",
+      row.nation || "",
+      row.uRate || "",
+      row.amount || "",
+      dayjs(row.placeDate).format("DD/MM/YYYY HH:mm:ss"),
+      row.ip || "",
+    ]));
+
+    autoTable(doc, {
+      head: [[
+        "Sr No",
+        "Event Type",
+        "Event Name",
+        "User",
+        "M Name",
+        "Nation",
+        "U Rate",
+        "Amount",
+        "Place Date",
+        "IP"
+      ]],
+      body: tableData,
+      styles: {
+        fontSize: 7
+      }
+    });
+
+    doc.save("Current_Bets.pdf");
+  };
+
   useEffect(() => {
-    /* fetchProfitLoss(); */
-  }, []);
+    fetchProfitLoss();
+  }, [currentPage, perPage]);
 
   useEffect(() => {
     isLoad.current && dispatch(setIsLoading(true));
@@ -139,15 +227,16 @@ const CurrentBets = () => {
     }
 
     setFilteredData(temp);
-    setCurrentPage(1);
+    /* setCurrentPage(1); */
 
   }, [search, data, sortColumn, sortDirection]);
 
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [search, sportType, matchDeleted, betType, perPage]);
+
   // 🔹 Pagination
-  const indexOfLast = currentPage * perPage;
-  const indexOfFirst = indexOfLast - perPage;
-  const currentData = filteredData.slice(indexOfFirst, indexOfLast);
-  const totalPages = Math.ceil(filteredData.length / perPage);
+  const currentData = filteredData;
   const changePage = page => {
     if (page >= 1 && page <= totalPages) setCurrentPage(page);
   };
@@ -288,13 +377,25 @@ const CurrentBets = () => {
                         Load
                       </button>
 
-                      <div id="export_1774524830826" className="d-inline-block disabled">
-                        <button type="button" disabled className="btn mr-1 btn-success disabled">
+                      <div id="export_1774524830826" className="d-inline-block">
+
+                        <button
+                          type="button"
+                          className="btn mr-1 btn-success"
+                          disabled={!isDataAvailable}
+                          onClick={exportToExcel}
+                        >
                           <i className="fas fa-file-excel"></i>
                         </button>
+
                       </div>
 
-                      <button type="button" disabled className="btn btn-danger disabled">
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        disabled={!isDataAvailable}
+                        onClick={exportToPDF}
+                      >
                         <i className="fas fa-file-pdf"></i>
                       </button>
                     </div>
@@ -303,7 +404,7 @@ const CurrentBets = () => {
                   <div className="col-md-12 col-lg-5 text-right">
                     <div className="custom-control-inlinemr-0 mt-1">
                       <h5>
-                        Total Soda: <span className="mr-2">0</span> Total Amount: <span>0</span>
+                        Total Records: <span>{totalRecords}</span>
                       </h5>
                     </div>
                   </div>
@@ -315,7 +416,14 @@ const CurrentBets = () => {
                     <div className="dataTables_length">
                       <label className="d-inline-flex align-items-center">
                         Show&nbsp;
-                        <select className="custom-select custom-select-sm">
+                        <select
+                            className="custom-select custom-select-sm"
+                            value={perPage}
+                            onChange={(e) => {
+                              setPerPage(Number(e.target.value));
+                              setCurrentPage(1);
+                            }}
+                          >
                           <option value="25">25</option>
                           <option value="50">50</option>
                           <option value="75">75</option>
@@ -412,17 +520,36 @@ const CurrentBets = () => {
                       <tbody role="rowgroup">
                         {currentData.length > 0 ? (
                           currentData.map((row, index) => (
-                            <tr key={index} role="row" tabIndex="0" className="nocursor">
+                            <tr
+                                key={index}
+                                role="row"
+                                tabIndex="0"
+                                className={`nocursor ${
+                                  row.bet_type === 'Back' || row.bet_type === 'Yes'
+                                    ? 'back-border'
+                                    : 'lay-border'
+                                }`}
+                              >
                               {sportType === "sport" && <td>{row.eventType}</td>}
-                              <td>{row.event_name}</td>
-                              <td>{row.user_name}</td>
-                              {sportType === "sport" && <td>{row.market_name}</td>}
+                              <td>{row.eventName}</td>
+                              <td>{row.userName}</td>
+                              {sportType === "sport" && <td>{row.mName}</td>}
                               <td>{row.nation}</td>
-                              <td className="text-right">{row.user_rate}</td>
+                              <td className="text-right">{row.uRate}</td>
                               <td className="text-right">{row.amount}</td>
-                              <td>{dayjs(row.created_at).format("DD/MM/YYYY HH:mm:ss")}</td>
+                              <td>{dayjs(row.placeDate).format("DD/MM/YYYY HH:mm:ss")}</td>
                               <td>{row.ip}</td>
-                              <td>{row.browser}</td>
+                              <td>
+                                <span
+                                  title={row.browser || "No Browser Detail"}
+                                  style={{
+                                    cursor: "pointer",
+                                    color: "#128412"
+                                  }}
+                                >
+                                  Detail
+                                </span>
+                              </td>
                               <td role="cell"></td>
                             </tr>
                           ))
@@ -447,21 +574,63 @@ const CurrentBets = () => {
                   <div className="col">
                     <div className="dataTables_paginate paging_simple_numbers float-right">
                       <ul className="pagination pagination-rounded mb-0">
-                        <li className="page-item disabled">
-                          <span className="page-link">«</span>
+
+                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                          <button
+                            className="page-link"
+                            onClick={() => changePage(1)}
+                          >
+                            «
+                          </button>
                         </li>
-                        <li className="page-item disabled">
-                          <span className="page-link">‹</span>
+
+                        <li className={`page-item ${currentPage === 1 ? 'disabled' : ''}`}>
+                          <button
+                            className="page-link"
+                            onClick={() => changePage(currentPage - 1)}
+                          >
+                            ‹
+                          </button>
                         </li>
-                        <li className="page-item active">
-                          <button type="button" className="page-link">1</button>
+
+                        {Array.from({ length: totalPages }, (_, i) => i + 1)
+                          .slice(
+                            Math.max(currentPage - 3, 0),
+                            Math.min(currentPage + 2, totalPages)
+                          )
+                          .map(page => (
+                            <li
+                              key={page}
+                              className={`page-item ${currentPage === page ? 'active' : ''}`}
+                            >
+                              <button
+                                type="button"
+                                className="page-link"
+                                onClick={() => changePage(page)}
+                              >
+                                {page}
+                              </button>
+                            </li>
+                          ))}
+
+                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                          <button
+                            className="page-link"
+                            onClick={() => changePage(currentPage + 1)}
+                          >
+                            ›
+                          </button>
                         </li>
-                        <li className="page-item disabled">
-                          <span className="page-link">›</span>
+
+                        <li className={`page-item ${currentPage === totalPages ? 'disabled' : ''}`}>
+                          <button
+                            className="page-link"
+                            onClick={() => changePage(totalPages)}
+                          >
+                            »
+                          </button>
                         </li>
-                        <li className="page-item disabled">
-                          <span className="page-link">»</span>
-                        </li>
+
                       </ul>
                     </div>
                   </div>

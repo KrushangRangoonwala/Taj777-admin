@@ -11,6 +11,7 @@ import { footerText } from '../utilies/helpers';
 import LoginModal from '../components/LoginModal';
 
 const AdminPage = () => {
+  const { isJustLogoutPersisted } = useSelector((state) => state.user);
   const { isJustLogout } = useSelector((state) => state.notPersist);
   const [isLoginOpen, setIsLoginOpen] = useState(false);
   const [isChangePasswordOpen, setIsChangePasswordOpen] = useState(false);
@@ -78,7 +79,7 @@ const AdminPage = () => {
 
     if (Object.keys(loginErrors).length > 0) return;
 
-    if (isJustLogout) {
+    if (isJustLogout) { // isJustLogoutPersisted
       errorToast("Please reload the page and retry!");
       return;
     }
@@ -92,15 +93,23 @@ const AdminPage = () => {
     try {
       const result = await loginAdmin(username, password);
 
-      if (result.status === "ok") {
-        dispatch(login(result.data));
-        sessionStorage.setItem('userdata', JSON.stringify(result.data));
+      console.log("resss", result);
+
+      if (result.status === "auth") {
+        setTimeout(() => navigate("/admin/loginauth", { state: { user: result } }), 600);
+        return;
+      }
+
+      if (result.status !== "error") {
+        successToast("success");
+        dispatch(login(result));
+        sessionStorage.setItem('userdata', JSON.stringify(result));
         setIsLoginOpen(false);
-        if (result.data.first_password_changed == "0") {
+        if (result.first_password_changed == "0") {
           setIsChangePasswordOpen(true);
         } else {
           setTimeout(() => {
-            navigate('/admin/home');
+            navigate('/admin/home', { replace: true });
           }, 500);
         }
       } else {

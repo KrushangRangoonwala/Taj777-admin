@@ -13,14 +13,15 @@ import Select from 'react-select';
 import { Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import SelectBootStrap from '../../components/SelectBootStrap';
-
+import { useDispatch } from 'react-redux';
+import { setIsLoading } from '../../store/slices/actionSlice';
 
 const UserRegisterDetail = () => {
+  const dispatch = useDispatch();
   const [data, setData] = useState([]);
   const [selectedClient, setSelectedClient] = useState('');
 
   const [totalRecords, setTotalRecords] = useState(0);
-  const [loading, setLoading] = useState(false);
 
   const [search, setSearch] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
@@ -62,8 +63,8 @@ const UserRegisterDetail = () => {
 
   // 🔹 Fetch Data
   const fetchData = async (page = 1) => {
+    dispatch(setIsLoading(true));
     try {
-      setLoading(true);
 
       const payload = {
         selected_user_id: selectedClient,
@@ -104,7 +105,7 @@ const UserRegisterDetail = () => {
       console.log(err);
       setData([]);
     } finally {
-      setLoading(false);
+      dispatch(setIsLoading(false));
     }
   };
 
@@ -462,11 +463,9 @@ const UserRegisterDetail = () => {
                             <td colSpan="12" role="cell">
                               <div role="alert" aria-live="polite">
                                 <div className="text-center my-2">
-                                  {loading
-                                    ? "Loading..."
-                                    : search.length > 0
-                                      ? "There are no records matching your request"
-                                      : "There are no records to show"
+                                  {search.length > 0
+                                    ? "There are no records matching your request"
+                                    : "There are no records to show"
                                   }
                                 </div>
                               </div>

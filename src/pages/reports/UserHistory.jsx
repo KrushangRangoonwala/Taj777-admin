@@ -98,6 +98,8 @@ const UserHistory = () => {
         ...item
       }));
 
+      console.log("API Response:", numbered);
+
       setData(numbered);
       setTotalRecords(res?.recordsTotal || 0);
       setCurrentPage(page);
@@ -155,7 +157,6 @@ const UserHistory = () => {
       "Username": item.user,
       "Date": item.date,
       "IP": item.ip,
-      "Browser": item.browser
     }));
 
     const ws = XLSX.utils.json_to_sheet(wsData);
@@ -171,12 +172,11 @@ const UserHistory = () => {
 
     const doc = new jsPDF();
 
-    const tableColumn = ["Username", "Date", "IP", "Browser"];
+    const tableColumn = ["Username", "Date", "IP"];
     const tableRows = data.map(item => [
       item.user,
       item.date,
       item.ip,
-      item.browser
     ]);
 
     autoTable(doc, {
@@ -674,12 +674,12 @@ const UserHistory = () => {
 
                         <tr>
                           <td><b>Country:</b></td>
-                          <td>-</td>
+                          <td>{modalData.country}</td>
                         </tr>
 
                         <tr>
-                          <td><b>Browser:</b></td>
-                          <td>{modalData.browser}</td>
+                          <td><b>Mobile:</b></td>
+                          <td>{modalData.mobile}</td>
                         </tr>
                       </tbody>
                     </table>

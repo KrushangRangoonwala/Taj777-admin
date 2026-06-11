@@ -8,7 +8,9 @@ function handleUnauthorized() {
     sessionStorage.setItem('userdata', '');
     store.dispatch(logout());
     store.dispatch(setIsSessionExpired(true));
+    sessionStorage.removeItem('userdata');
     window.location.href = "/admin";
+    /* window.location.href = "/admin_new"; */
 }
 
 const createApiInstance = (baseURL) => {
@@ -22,15 +24,61 @@ const createApiInstance = (baseURL) => {
 
     instance.interceptors.response.use(
         (response) => {
-            if (response?.data?.message === "Unauthorised Access") {
+            const data = response?.data || {};
+
+            const message = (
+                data?.message ||
+                data?.msg ||
+                data?.error ||
+                ""
+            ).toLowerCase();
+
+            const code = data?.code || "";
+
+            const shouldLogout =
+                code === "UNAUTHORIZED" ||
+                code === "ACCOUNT_BLOCKED" ||
+                code === "SESSION_EXPIRED" ||
+
+                message.includes("unauthorized") ||
+                message.includes("unauthorised") ||
+                message.includes("account blocked") ||
+                message.includes("not logged in") ||
+                message.includes("session expired");
+
+            if (shouldLogout) {
                 handleUnauthorized();
+                return Promise.reject(response);
             }
+
             return response;
         },
         (error) => {
-            const message = error?.response?.data?.message;
+            const data = error?.response?.data || {};
 
-            if (message === "Unauthorised Access") {
+            console.log("API Error Response:", data);
+
+            const message = (
+                data?.message ||
+                data?.msg ||
+                data?.error ||
+                ""
+            ).toLowerCase();
+
+            const code = data?.code || "";
+
+            const shouldLogout =
+                code === "UNAUTHORIZED" ||
+                code === "ACCOUNT_BLOCKED" ||
+                code === "SESSION_EXPIRED" ||
+
+                message.includes("unauthorised") ||
+                message.includes("unauthorized") ||
+                message.includes("account blocked") ||
+                message.includes("not logged in") ||
+                message.includes("session expired");
+
+            if (shouldLogout) {
                 handleUnauthorized();
             }
 
@@ -46,8 +94,14 @@ const createApiInstance = (baseURL) => {
     return instance;
 };
 
-export const ajax_adm = createApiInstance("http://159.65.143.49/~sevennew/ajax_adm/");
-export const ajax_files = createApiInstance("http://159.65.143.49/~sevennew/ajaxfiles/");
-// 
-// export const ajax_adm = createApiInstance("https://worlds777.app/ajax_adm/"); // admin_new
-// export const ajax_files = createApiInstance("https://worlds777.app/ajaxfiles/");
+// export const ajax_adm = createApiInstance("http://159.65.143.49/~sevennew/ajax_adm/");
+// export const ajax_files = createApiInstance("http://159.65.143.49/~sevennew/ajaxfiles/");
+
+// export const ajax_adm = createApiInstance("http://159.65.143.49/~worlds7/ajax_adm/");
+// export const ajax_files = createApiInstance("http://159.65.143.49/~worlds7/ajaxfiles/");
+
+// const base_url = import.meta.env.VITE_IMAGE_PATH === "admin_new" ? "https://worlds777.app/" : "http://159.65.143.49/~sevennew/";
+const base_url = "https://worlds777.app/";
+
+export const ajax_adm = createApiInstance(base_url + "ajax_adm/");
+export const ajax_files = createApiInstance(base_url + "ajaxfiles/");

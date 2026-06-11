@@ -32,8 +32,7 @@ function getGameName(type, casino_list) {
 
 const Result_one = lazy(() => import('../results/Result_one'));
 
-const Result_parent = ({ mid, game_type, setMid }) => {
-    console.log('### game_type', game_type);
+const Result_parent = ({ mid, game_type, setMid, userId="" }) => {
     const midToPass = getValueAfterDot(mid);
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -50,7 +49,7 @@ const Result_parent = ({ mid, game_type, setMid }) => {
     async function getResultDataApi() {
         setIsLoading(true);
         try {
-            const response = await fetchResultById(midToPass, game_type);
+            const response = await fetchResultById(midToPass, game_type, userId);
 
             const data = response.data;
             if (data) {

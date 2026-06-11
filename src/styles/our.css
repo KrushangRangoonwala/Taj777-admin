@@ -217,3 +217,9 @@ input[field-type="search"]::placeholder {
     border-color: #ced4da !important;
     box-shadow: none !important;
 }
+
+.custome-kk :where(.css-dev-only-do-not-override-1t2537o).ant-picker .ant-picker-input>input[disabled] {
+    /* background: transparent; */
+    color: inherit;
+    cursor: not-allowed;
+}

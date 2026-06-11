@@ -6,7 +6,7 @@ import { errorToast, successToast } from '../utils/toast';
 import { Link, useNavigate } from 'react-router-dom';
 import { logout } from '../store/slices/userSlice';
 
-const ChangePasswordModal = ({ show, onHide }) => {
+const ChangePasswordModal = ({ show, onHide,  selectedUserId = null, isMultiUser = false }) => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
     const { userData } = useSelector((state) => state.user);
@@ -55,21 +55,40 @@ const ChangePasswordModal = ({ show, onHide }) => {
         setLoading(true);
         try {
             const payload = {
-                changepwd_user_id: userData?.user_id,
+                changepwd_user_id: isMultiUser
+                    ? selectedUserId
+                    : userData?.user_id,
+
                 changepwd_password: formData.NewPassword,
+
                 changepwd_cpassword: formData.ConfirmNewPassword,
+
                 changepwd_master_password: formData.password,
             };
 
             const response = await changeUserPassword(payload);
 
             if (response.status === "ok") {
+
                 successToast(response.message || "Password changed successfully");
-                /* onHide();
-                setFormData({ password: '', NewPassword: '', ConfirmNewPassword: '' }); */
-                dispatch(logout());
-                sessionStorage.removeItem('userdata');
-                navigate('/admin');
+
+                setFormData({
+                    password: '',
+                    NewPassword: '',
+                    ConfirmNewPassword: ''
+                });
+
+                onHide();
+
+                // logout ONLY when own password changed
+                if (!isMultiUser) {
+
+                    dispatch(logout());
+
+                    sessionStorage.removeItem('userdata');
+
+                    navigate('/admin');
+                }
             } else {
                 errorToast(response.message || "Failed to change password");
             }
@@ -81,10 +100,23 @@ const ChangePasswordModal = ({ show, onHide }) => {
         }
     };
 
+    const handleClose = () => {
+
+        setFormData({
+            password: '',
+            NewPassword: '',
+            ConfirmNewPassword: ''
+        });
+
+        setErrors({});
+
+        onHide();
+    };
+
     return (
         <Modal
             show={show}
-            onHide={onHide}
+            onHide={handleClose}
             id="__BVID__22"
             role="dialog"
             aria-describedby="__BVID__22___BV_modal_body_"
@@ -95,7 +127,7 @@ const ChangePasswordModal = ({ show, onHide }) => {
         >
             <Modal.Header id="__BVID__22___BV_modal_header_" className="bg-default">
                 <Modal.Title as="h5" className="text-uppercase">Change Password</Modal.Title>
-                <button type="button" data-dismiss="modal" className="close" onClick={onHide}>
+                <button type="button" data-dismiss="modal" className="close" onClick={handleClose}>
                     ×
                 </button>
             </Modal.Header>

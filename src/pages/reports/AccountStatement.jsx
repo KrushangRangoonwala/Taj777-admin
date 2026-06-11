@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { getAccountStatement } from '../../api/API';
-
-import { DatePicker } from "antd";
+import { getAccountStatement,getBetDetails } from '../../api/API';
+import { apiGetSports, apiGetGameType } from "../../api/API_games";
+import { casino_list } from "../../utilies/casino_list";
+import { Modal, Spinner } from "react-bootstrap";
+import { DatePicker, message } from "antd";
 import "antd/dist/reset.css"; // AntD 5+ reset styles
 import dayjs from "dayjs";
 const { RangePicker } = DatePicker;
@@ -13,10 +15,15 @@ import { Table } from 'react-bootstrap';
 import { getNoRecordText } from '../../utilies/helpers';
 import SelectBootStrap from '../../components/SelectBootStrap';
 import { Link } from 'react-router-dom';
+import { errorToast } from '../../utils/toast';
+import BetStatementModal from '../../components/BetStatementModal';
+import Result_parent from '../casino/games/components/Result_parent';
+import { setIsLoading } from '../../store/slices/actionSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 
 const AccountStatement = () => {
-
+  const dispatch = useDispatch();
   const [data, setData] = useState([]);
   const [filteredData, setFilteredData] = useState([]);
 
@@ -29,12 +36,23 @@ const AccountStatement = () => {
   const [type, setType] = useState("2");        // default selected
   const [statement, setStatement] = useState("all");
 
-  const [fromDate, setFromDate] = useState(
-    new Date(Date.now() - 7 * 86400000).toISOString().split("T")[0]
-  );
-  const [toDate, setToDate] = useState(
-    new Date().toISOString().split("T")[0]
-  );
+  const defaultFromDate = dayjs().subtract(7, "day").toDate();
+  const defaultToDate = dayjs().toDate();
+
+  const [sportsList, setSportsList] = useState([]);
+  const [sportsListType, setSportsListType] = useState("");
+
+  const [gameTypeList, setGameTypeList] = useState([]);
+  const [gameType, setGameType] = useState("");
+
+  const [casinoList, setCasinoList] = useState("");
+
+  const [fromDate, setFromDate] = useState(defaultFromDate);
+
+  const [toDate, setToDate] = useState(defaultToDate);
+  const [mid, setMid] = useState(false);
+  const [casinoType, setCasinoType] = useState("");
+  const [userId, setUserId] = useState("");
 
   const [search, setSearch] = useState('');
 
@@ -43,24 +61,56 @@ const AccountStatement = () => {
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('none');
 
+  const [showBetModal, setShowBetModal] = useState(false);
+  const [selectedRow, setSelectedRow] = useState(null);
+  
+
+  const getUsernames = (fromTo = "") => {
+    const parts = fromTo.split("/").map(s => s.trim());
+    return {
+        fromUser: parts[0] || "",
+        toUser: parts[1] || ""
+    };
+  };
+
+  const { fromUser, toUser } = getUsernames(selectedRow?.from_to);
+
+
   const isDataAvailable = data && data.length > 0;
-
-
+  const isClickableReport = type === "4" || type === "5" || type === "6";
 
   // 🔹 Fetch statement
   const fetchStatement = async (page = currentPage) => {
+    // Validate max 10 days
+    if (fromDate && toDate) {
+      const diffDays = dayjs(toDate).diff(dayjs(fromDate), "day");
+
+      /* if (diffDays > 10) {
+        errorToast("Sorry for inconvenience! You will see statement of 10 days date range in 3 months timeslot.");
+        return;
+      } */
+    }
     try {
       setLoading(true);
+      dispatch(setIsLoading(true));
 
       const payload = {
         client_name: selectedClient?.value,
-        from_date: fromDate ? new Date(fromDate).toISOString().split("T")[0] : "",
-        to_date: toDate ? new Date(toDate).toISOString().split("T")[0] : "",
+        from_date: fromDate ? dayjs(fromDate).format("YYYY-MM-DD") : "",
+        to_date: toDate ? dayjs(toDate).format("YYYY-MM-DD") : "",
         report_type: type,
         game_name: statement,
         search: search,
         page: page,
-        per_page: perPage
+        per_page: perPage,
+        event_type:
+          type === "4"
+            ? sportsListType
+            : type === "5"
+            ? casinoList   // or casinoList (depending on what backend expects)
+            : "",
+
+        market_type: type === "4" ? gameType : "",
       };
 
       const res = await getAccountStatement(payload);
@@ -80,6 +130,7 @@ const AccountStatement = () => {
       console.log(err);
     } finally {
       setLoading(false);
+      dispatch(setIsLoading(false));
     }
   };
 
@@ -101,6 +152,39 @@ const AccountStatement = () => {
     setCurrentPage(1);
 
   }, [search, data]); */
+
+  useEffect(() => {
+    async function getSports() {
+      const res = await apiGetSports();
+      const arr = [{ id: "", label: "Select Sports List" }];
+
+      res?.data?.forEach(item => {
+        arr.push({
+          id: item.sport_id,
+          label: item.sport_name === "Soccer" ? "Football" : item.sport_name
+        });
+      });
+
+      setSportsList(arr);
+    }
+
+    async function getGameType() {
+      const res = await apiGetGameType();
+      const arr = [{ id: "", label: "Select Game Type" }];
+
+      res?.data?.forEach(item => {
+        arr.push({
+          id: item.market_type,
+          label: item.market_type
+        });
+      });
+
+      setGameTypeList(arr);
+    }
+
+    getSports();
+    getGameType();
+  }, []);
 
   // 🔹 Pagination
   const indexOfLast = currentPage * perPage;
@@ -157,9 +241,38 @@ const AccountStatement = () => {
     return 'ascending';
   };
 
+  const handleTableRowClick = (row, index) => {
+
+    if (type === "5") {
+      console.log("Row data for Casino Report:", row);
+      setMid(row.event_id);
+      setCasinoType(row.event_type.toLowerCase());
+      setUserId(row.userid);
+      return;
+    }
+
+    if (type === "4" || type === "6") {
+      handleRowClick(row, index);
+      return;
+    }
+
+  };
+
+  const handleRowClick = (row, index) => {
+
+    if (index === 0) return;
+
+    if (!(type === "4" || type === "5" || type === "6")) {
+      return;
+    }
+    console.log("Clicked Row:", row);
+    setSelectedRow(row);
+    setShowBetModal(true);
+  };
+
   const exportToExcel = () => {
     const formattedData = data.map((row, index) => ({
-      Date: new Date(row.created_at * 1000).toLocaleString(),
+      Date: new Date(row.created_at * 1000).toLocaleString("en-GB"),
       "Sr No": index + 1,
       Credit: row.account_entryType == 1 ? row.account_amount : '',
       Debit: row.account_entryType == 2 ? row.account_amount : '',
@@ -182,7 +295,7 @@ const AccountStatement = () => {
     const doc = new jsPDF();
 
     const tableData = data.map((row, index) => ([
-      new Date(row.created_at * 1000).toLocaleString(),
+      new Date(row.created_at * 1000).toLocaleString("en-GB"),
       index + 1,
       row.account_entryType == 1 ? row.account_amount : '',
       row.account_entryType == 2 ? row.account_amount : '',
@@ -199,7 +312,86 @@ const AccountStatement = () => {
     doc.save("Account_Statement.pdf");
   };
 
+  const downloadRowExcel = (row) => {
+     const { fromUser, toUser } = getUsernames(row.from_to);
+    const formattedData = [{
+      userName: toUser || fromUser, // Show toUser if available, otherwise fromUser
+      nation: extractNation(row.remark),
+      userrate: "",
+      bettype: extractBetType(row.remark),
+      amount: row.account_amount,
+      winloss: row.account_entryType === 1 ? row.account_amount : -row.account_amount,
+      IsMatched: "",
+      PlaceDate: new Date(row.created_at * 1000).toLocaleString("en-GB"),
+      IpAddress: "",
+      bhav: "",
+      GameType: type
+    }];
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Bet_Row");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array"
+    });
+
+    const file = new Blob([excelBuffer], {
+      type: "application/octet-stream"
+    });
+
+    saveAs(file, `Bet_${row.created_at}.xlsx`);
+  };
+
+  const extractNation = (remark = "") => {
+    const parts = remark.split("/");
+    return parts[1]?.trim() || "";
+  };
+
+  const extractBetType = (remark = "") => {
+    const parts = remark.split("/");
+    return parts[2]?.trim() || "";
+  };
+
+  const disabledDate = (current) => {
+    return current && current > dayjs().endOf("day");
+  };
+
   return (
+    <>
+   <style>{`
+@media (max-width: 768px) {
+
+  /* Make the picker input responsive */
+  .custom-range-picker {
+    width: 100% !important;
+  }
+
+  /* Stack the two calendars vertically */
+  .ant-picker-panels {
+    flex-direction: column !important;
+  }
+
+  /* Make each panel fit mobile width */
+  .ant-picker-panel {
+    width: 100% !important;
+  }
+
+  /* Slightly reduce font size */
+  .ant-picker-content th,
+  .ant-picker-content td {
+    font-size: 12px !important;
+  }
+
+  /* Prevent horizontal overflow */
+  .ant-picker-panel-container {
+    max-width: calc(100vw - 20px) !important;
+    overflow-x: hidden !important;
+  }
+}
+`}</style>
     <div>
       <div>
         <div className="row">
@@ -253,10 +445,25 @@ const AccountStatement = () => {
                                 ? [dayjs(fromDate), dayjs(toDate)]
                                 : []
                             }
+                            disabledDate={disabledDate}
                             onChange={(dates) => {
                               if (dates) {
-                                setFromDate(dates[0].toDate());
-                                setToDate(dates[1].toDate());
+                                const start = dates[0];
+                                const end = dates[1];
+
+                                // Check difference
+                                const diffDays = end.diff(start, "day");
+
+                                /* if (diffDays > 10) {
+                                  message.error("You can see statement of maximum 10 days only");
+
+                                  setFromDate(null);
+                                  setToDate(null);
+                                  return;
+                                } */
+
+                                setFromDate(start.toDate());
+                                setToDate(end.toDate());
                               } else {
                                 setFromDate(null);
                                 setToDate(null);
@@ -294,21 +501,75 @@ const AccountStatement = () => {
                           </select>
                         </div>
                       </div>
+                      
+                      {type === "2" && (
+                        <div className="col-lg-2">
+                          <div className="form-group">
+                            <label>Statement</label>
+                            <select className="form-control" value={statement} onChange={(e) => setStatement(e.target.value)}>
+                              <option value="all">All</option>
+                              <option value="credit_all">Credit - All</option>
+                              <option value="credit_upper">Credit - Upper</option>
+                              <option value="credit_down">Credit - Down</option>
+                              <option value="pts_all">pts - All</option>
+                              <option value="pts_upper">pts - Upper</option>
+                              <option value="pts_down">pts - Down</option>
+                            </select>
+                          </div>
+                        </div>
+                      )}
 
-                      <div className="col-lg-2">
-                        <div className="form-group">
-                          <label>Statement</label>
-                          <select className="form-control" value={statement} onChange={(e) => setStatement(e.target.value)}>
-                            <option value="all">All</option>
-                            <option value="credit_all">Credit - All</option>
-                            <option value="credit_upper">Credit - Upper</option>
-                            <option value="credit_down">Credit - Down</option>
-                            <option value="pts_all">pts - All</option>
-                            <option value="pts_upper">pts - Upper</option>
-                            <option value="pts_down">pts - Down</option>
+                      {type === "4" && (
+                        <>
+                          <div className="col-lg-2">
+                            <label>Sports List</label>
+                            <select
+                              className="form-control"
+                              value={sportsListType}
+                              onChange={(e) => setSportsListType(e.target.value)}
+                            >
+                              {sportsList.map((t) => (
+                                <option key={t.id} value={t.id}>
+                                  {t.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+
+                          <div className="col-lg-2">
+                            <label>Game Type</label>
+                            <select
+                              className="form-control"
+                              value={gameType}
+                              onChange={(e) => setGameType(e.target.value)}
+                            >
+                              {gameTypeList.map((t) => (
+                                <option key={t.id} value={t.id}>
+                                  {t.label}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                        </>
+                      )}
+
+                      {type === "5" && (
+                        <div className="col-lg-2">
+                          <label>Casino List</label>
+                          <select
+                            className="form-control"
+                            value={casinoList}
+                            onChange={(e) => setCasinoList(e.target.value)}
+                          >
+                            <option value="">Select Casino</option>
+                            {casino_list.map((c) => (
+                              <option key={c.game_code} value={c.game_code}>
+                                {c.game_name}
+                              </option>
+                            ))}
                           </select>
                         </div>
-                      </div>
+                      )}
 
                     </div>
 
@@ -318,13 +579,17 @@ const AccountStatement = () => {
                         <button type="button" className="btn btn-light"
                           onClick={() => {
                             setSelectedClient([]);
-                            setFromDate(null);
-                            setToDate(null);
+                            setFromDate(defaultFromDate);
+                            setToDate(defaultToDate);
                             setSearch('');
                             setData([]);
                             setFilteredData([]);
                             setTotalRecords(0);
                             setCurrentPage(1);
+                            setSportsListType("");
+                            setGameType("");
+                            setCasinoList("");
+                            setStatement("all");
                           }}
                         >
                           Reset
@@ -431,9 +696,19 @@ const AccountStatement = () => {
                       <tbody role="rowgroup">
                         {data.length > 0 ? (
                           data.map((row, index) => (
-                            <tr key={index} role="row" tabIndex="0" aria-rowindex={indexOfFirst + index + 1} className="nocursor">
+                            <tr
+                              key={index}
+                              onClick={() => handleTableRowClick(row, index)}
+                              style={{
+                                cursor:
+                                  (type === "4" || type === "5" || type === "6") &&
+                                  index !== 0
+                                    ? "pointer"
+                                    : "default"
+                              }}
+                            >
                               <td aria-colindex="1" role="cell">
-                                {new Date(row.created_at * 1000).toLocaleString()}
+                                {new Date(row.created_at * 1000).toLocaleString("en-GB")}
                               </td>
                               <td aria-colindex="2" role="cell">
                                 <div className="text-right">{indexOfFirst + index + 1}</div>
@@ -450,11 +725,22 @@ const AccountStatement = () => {
                               </td>
                               <td aria-colindex="5" role="cell">
                                 <div className="text-right text-success">
-                                  <span>{Number(row.balance).toLocaleString('en-IN')}</span>
+                                  <span>{row.balance}</span>
                                 </div>
                               </td>
                               <td aria-colindex="6" role="cell">
-                                <div>{row.remark}</div>
+                                <div>
+                                  {row.remark}
+
+                                  <a
+                                    href="javascript:void(0)"
+                                    title="Download Excel"
+                                    className="ml-2 text-success"
+                                    onClick={() => downloadRowExcel(row)}
+                                  >
+                                    <i className="fas fa-file-excel"></i>
+                                  </a>
+                                </div>
                               </td>
                               <td aria-colindex="7" role="cell">
                                 {row.from_to}
@@ -523,7 +809,21 @@ const AccountStatement = () => {
         </div>
 
       </div>
+      <Result_parent mid={mid} setMid={setMid} game_type={casinoType} userId={userId} />
     </div>
+
+    {showBetModal && (
+      <BetStatementModal
+        show={showBetModal}
+        rowData={selectedRow}
+        onClose={() => {
+          setShowBetModal(false);
+          setSelectedRow(null);
+        }}
+      />
+    )}
+
+    </>
   );
 };
 

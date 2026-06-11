@@ -8073,7 +8073,8 @@ body.login .login-bg {
     display: flex;
     justify-content: center;
     align-items: center;
-    background-color: var(--bg-sidebar);
+    background-color: var(--bg-body);
+    color: var(--text-body);
 }
 
 .login-auth .log-logo img {
@@ -8089,7 +8090,7 @@ body.login .login-bg {
     border-radius: 4px;
     border: 0;
     text-align: center;
-    background-color: var(--bg-table);
+    background-color: var(--bg-sidebar);
     color: var(--text-table);
 }
 
@@ -15558,4 +15559,8 @@ market-analysis .page-title-box h4 a {
 
 :root[data-theme="blue"] .detail-page-container .market-18 .bet-table-row .market-18-item {
     border-bottom: 1px solid #d6dedb;
+}
+
+.login-auth .featured-box-login h3 {
+    color: var(--text-body);
 }

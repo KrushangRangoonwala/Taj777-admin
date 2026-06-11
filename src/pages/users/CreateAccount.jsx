@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
-import { checkUsername, createAccountApi, getPrivilegesApi } from "../../api/API";
-import { errorToast } from '../../utils/toast';
+import { checkUsername, createAccountApi, updateAccountApi, getPrivilegesApi, getMultiLoginUsersApi } from "../../api/API";
+import { errorToast, successToast } from '../../utils/toast';
 import { Link } from 'react-router-dom';
+import ChangePasswordModal from '../../components/ChangePasswordModal';
+import ChangeUserStatusModal from '../../components/ChangeUserStatusModal';
 
 const CreateAccount = () => {
   const [formData, setFormData] = useState({
@@ -22,14 +24,31 @@ const CreateAccount = () => {
   const [touched, setTouched] = useState({});
   const [submitted, setSubmitted] = useState(false);
 
+  const [users, setUsers] = useState([]);
+  const [isEdit, setIsEdit] = useState(false);
+  const [editUserId, setEditUserId] = useState(null);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
+  const [selectedPasswordUser, setSelectedPasswordUser] = useState(null);
+  const [showStatusModal, setShowStatusModal] = useState(false);
+  const [selectedStatusUser, setSelectedStatusUser] = useState(null);
+
   // ✅ label mapping
   const privilegeLabelMap = {
-    "Multi Login Account": "Login User creation",
+    "dashboard": "DashBoard",
+    "account list": "User List",
+    "create account": "Insert User",
+    "our casino result": "Casino Result",
+    "account list for active users": "active user",
+    "multi login account": "Login User creation",
+    "user register detail": "User Register Report",
+    "total profit loss": "Total Profitloss",
+    "user win loss": "User Winloss",
   };
 
   // ✅ fetch privileges
   useEffect(() => {
     fetchPrivileges();
+    fetchUsers();
   }, []);
 
   const fetchPrivileges = async () => {
@@ -46,6 +65,28 @@ const CreateAccount = () => {
       }
     } catch (err) {
       console.error("Privileges fetch error", err);
+    }
+  };
+
+  const fetchUsers = async () => {
+    try {
+
+      const res = await getMultiLoginUsersApi();
+
+      if (res?.status === "ok") {
+
+        const formattedUsers = res.data.map((u) => ({
+          ...u,
+          privileges: u.privileges.map((p) =>
+            privilegeLabelMap[p?.toLowerCase()] || p
+          )
+        }));
+
+        setUsers(formattedUsers);
+      }
+
+    } catch (err) {
+      console.error("Users fetch error", err);
     }
   };
 
@@ -66,16 +107,35 @@ const CreateAccount = () => {
         break;
 
       case "password":
-        if (value.length > 20) error = "The Password field may not be greater than 20 characters";
-        else if (!value.trim()) error = "The password field is required";
-        else if (value.length < 8) error = "The Password field must be at least 8 characters";
-        else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value))
-          error = "The password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 number";
+
+        if (!isEdit) {
+
+          if (value.length > 20)
+            error = "The Password field may not be greater than 20 characters";
+
+          else if (!value.trim())
+            error = "The password field is required";
+
+          else if (value.length < 8)
+            error = "The Password field must be at least 8 characters";
+
+          else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(value))
+            error = "The password must contain at least: 1 uppercase letter, 1 lowercase letter, 1 number";
+        }
+
         break;
 
       case "cpass":
-        if (!value.trim()) error = "The Confirm Password field is required";
-        else if (value !== currentFormData.password) error = "The Confirm Password confirmation does not match";
+
+        if (!isEdit) {
+
+          if (!value.trim())
+            error = "The Confirm Password field is required";
+
+          else if (value !== currentFormData.password)
+            error = "The Confirm Password confirmation does not match";
+        }
+
         break;
 
       case "mpass":
@@ -190,18 +250,24 @@ const CreateAccount = () => {
 
     try {
       const payload = {
+        user_id: editUserId,
         user_full_name: formData.fullname,
         user_username: formData.uname,
         user_password: formData.password,
         master_password: formData.mpass,
         user_account_type: 8,
-        privileges: selectedPrivileges.join(",") // ✅ important
+        privileges: selectedPrivileges.join(","),
       };
 
-      const result = await createAccountApi(payload);
+      const result = isEdit
+        ? await updateAccountApi(payload)
+        : await createAccountApi(payload);
 
       if (result.status === "ok") {
-        alert(result.message);
+        successToast(result.message);
+
+        resetForm();
+        fetchUsers();
 
         setFormData({
           uname: '',
@@ -217,16 +283,63 @@ const CreateAccount = () => {
 
       } else {
         setErrors({ api: result.message });
+        errorToast(result.message);
       }
 
     } catch (err) {
       console.error(err);
       setErrors({ api: "API Error" });
+      errorToast("API Error");
     }
   };
 
+  const handleEditUser = (user) => {
+
+    setIsEdit(true);
+
+    setEditUserId(user.id);
+
+    setFormData({
+      uname: user.username,
+      fullname: user.name,
+      password: '',
+      cpass: '',
+      mpass: ''
+    });
+
+    // convert privilege names back to ids
+    const selectedIds = privileges
+      .filter((p) => user.privileges.includes(p.name))
+      .map((p) => p.id);
+
+    setSelectedPrivileges(selectedIds);
+
+    setErrors({});
+    setTouched({});
+  };
+
+  const resetForm = () => {
+
+    setIsEdit(false);
+
+    setEditUserId(null);
+
+    setFormData({
+      uname: '',
+      fullname: '',
+      password: '',
+      cpass: '',
+      mpass: '',
+    });
+
+    setSelectedPrivileges([]);
+    setErrors({});
+    setTouched({});
+    setSubmitted(false);
+  };
+
   return (
-    
+    <>
 
     <div data-v-5a10e370="">
       <div data-v-5a10e370="">
@@ -272,6 +385,7 @@ const CreateAccount = () => {
                             value={formData.uname}
                             onChange={handleInputChange}
                             onBlur={handleBlur}
+                            disabled={isEdit}
                           />
                           {touched.uname && errors.uname && <small className="error">{errors.uname}</small>}
                         </div>
@@ -287,30 +401,44 @@ const CreateAccount = () => {
                           />
                           {touched.fullname && errors.fullname && <small className="error">{errors.fullname}</small>}
                         </div>
-                        <div className="col-md-3 form-group">
-                          <label>Password</label>
-                          <input
-                            type="password"
-                            name="password"
-                            className={`form-control ${touched.password && errors.password ? 'is-invalid' : ''}`}
-                            value={formData.password}
-                            onChange={handleInputChange}
-                            onBlur={handleBlur}
-                          />
-                          {touched.password && errors.password && <small className="error">{errors.password}</small>}
-                        </div>
-                        <div className="col-md-3 form-group">
-                          <label>Confirm Password</label>
-                          <input
-                            type="password"
-                            name="cpass"
-                            className={`form-control ${touched.cpass && errors.cpass ? 'is-invalid' : ''}`}
-                            value={formData.cpass}
-                            onChange={handleInputChange}
-                            onBlur={handleBlur}
-                          />
-                          {touched.cpass && errors.cpass && <small className="error">{errors.cpass}</small>}
-                        </div>
+                        {!isEdit && (
+                          <div className="col-md-3 form-group">
+                            <label>Password</label>
+
+                            <input
+                              type="password"
+                              name="password"
+                              className={`form-control ${touched.password && errors.password ? 'is-invalid' : ''}`}
+                              value={formData.password}
+                              onChange={handleInputChange}
+                              onBlur={handleBlur}
+                            />
+
+                            {touched.password && errors.password && (
+                              <small className="error">{errors.password}</small>
+                            )}
+                          </div>
+                        )}
+                        {!isEdit && (
+                          <div className="col-md-3 form-group">
+
+                            <label>Confirm Password</label>
+
+                            <input
+                              type="password"
+                              name="cpass"
+                              className={`form-control ${touched.cpass && errors.cpass ? 'is-invalid' : ''}`}
+                              value={formData.cpass}
+                              onChange={handleInputChange}
+                              onBlur={handleBlur}
+                            />
+
+                            {touched.cpass && errors.cpass && (
+                              <small className="error">{errors.cpass}</small>
+                            )}
+
+                          </div>
+                        )}
 
                       </div>
                     </div>
@@ -368,14 +496,7 @@ const CreateAccount = () => {
                           <button
                             type="button"
                             className="btn btn-light ml-3px-child"
-                            onClick={() => {
-                              setFormData({ uname: '', fullname: '', password: '', cpass: '', mpass: '' });
-                              setSelectedPrivileges([]);
-                              setErrors({});
-                              setTouched({});
-                              setSubmitted(false);
-
-                            }}
+                            onClick={resetForm}
                           >
                             Reset
                           </button>
@@ -394,15 +515,116 @@ const CreateAccount = () => {
                           <th className="fixed-col-1">Action</th>
                           <th className="fixed-col-2">Username</th>
                           <th className="fixed-col-3">IsAuth</th>
-                          <th style={{ alignContent: "center" }}>Full Name</th>
+                          <th className="fixed-col-4">Full Name</th>
+
                           {privileges.map((p) => (
-                            <th key={p.id} style={{ alignContent: "center" }}>{p.name}</th>
+                            <th key={p.id} style={{ alignContent: "center" }}>
+                              {p.name}
+                            </th>
                           ))}
                         </tr>
                       </thead>
-                      {/* <tbody>
-                           Table rows would go here 
-                        </tbody> */}
+
+                      <tbody>
+
+                        {users.length > 0 ? (
+                          users.map((user) => (
+
+                            <tr key={user.id}>
+
+                              <td className="fixed-col-1">
+
+                                <a
+                                  href="javascript:void(0)"
+                                  className="text-white btn btn-primary"
+                                  onClick={() => handleEditUser(user)}
+                                >
+                                  U
+                                </a>{" "}
+
+                                <a
+                                  href="javascript:void(0)"
+                                  className="text-white btn btn-info"
+                                  onClick={() => {
+                                    setSelectedStatusUser(user);
+                                    setShowStatusModal(true);
+                                  }}
+                                >
+                                  S
+                                </a>{" "}
+
+                                <a
+                                  href="javascript:void(0)"
+                                  className="text-white btn btn-success"
+                                  onClick={() => {
+
+                                      setSelectedPasswordUser(user);
+
+                                      setShowPasswordModal(true);
+                                  }}
+                              >
+                                  P
+                              </a>
+
+                              </td>
+
+                              <td className="fixed-col-2">
+
+                                {user.username}
+
+                                <i className="text-success fas fa-check pl-2"></i>
+
+                              </td>
+
+                              <td className="fixed-col-3">
+
+                                {user.status == 1 ? "Active" : "Inactive"}
+
+                              </td>
+
+                              <td className="fixed-col-4">
+
+                                {user.name}
+
+                              </td>
+
+                              {privileges.map((p) => {
+
+                                const hasPrivilege = user.privileges.includes(p.name);
+
+                                return (
+                                  <td
+                                    key={p.id}
+                                    className="text-center"
+                                  >
+                                    <i
+                                      className={
+                                        hasPrivilege
+                                          ? "fas fa-check-circle"
+                                          : "far fa-circle"
+                                      }
+                                    ></i>
+                                  </td>
+                                );
+                              })}
+
+                            </tr>
+
+                          ))
+                        ) : (
+
+                          <tr>
+                            <td
+                              colSpan={4 + privileges.length}
+                              className="text-center"
+                            >
+                              No Data Found
+                            </td>
+                          </tr>
+
+                        )}
+
+                      </tbody>
                     </table>
                     {/* </div> */}
                   </div>
@@ -413,6 +635,32 @@ const CreateAccount = () => {
         </div>
       </div>
     </div>
+
+      <ChangePasswordModal
+          show={showPasswordModal}
+          onHide={() => {
+
+              setShowPasswordModal(false);
+
+              setSelectedPasswordUser(null);
+          }}
+          selectedUserId={selectedPasswordUser?.id}
+          isMultiUser={true}
+      />
+
+      {showStatusModal && (
+        <ChangeUserStatusModal
+          user={selectedStatusUser}
+          onClose={() => {
+            setShowStatusModal(false);
+            setSelectedStatusUser(null);
+          }}
+          onSuccess={() => {
+            fetchUsers();
+          }}
+        />
+      )}
+    </>
   );
 };
 

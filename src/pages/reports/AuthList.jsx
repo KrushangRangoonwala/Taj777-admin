@@ -136,7 +136,7 @@ const AuthList = () => {
     const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
 
     const file = new Blob([excelBuffer], { type: "application/octet-stream" });
-    saveAs(file, "AuthList.xlsx");
+    saveAs(file, "Casino_List.xlsx");
   };
 
   // 🔹 EXPORT PDF
@@ -155,7 +155,7 @@ const AuthList = () => {
       body: tableRows,
     });
 
-    doc.save(`AuthList_${dayjs().format("YYYYMMDD_HHmmss")}.pdf`);
+    doc.save(`Casino_List_${dayjs().format("YYYYMMDD_HHmmss")}.pdf`);
   };
 
   return (

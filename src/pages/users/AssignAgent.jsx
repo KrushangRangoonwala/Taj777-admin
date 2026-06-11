@@ -154,7 +154,8 @@ const AssignAgent = () => {
                                                         className="mx-input"
                                                         value={fromDate}
                                                         onChange={(date) => setFromDate(date)}
-                                                        format="YYYY-MM-DD"
+                                                        // format="YYYY-MM-DD"
+                                                        format="DD/MM/YYYY"
                                                         placeholder=""
                                                         suffixIcon={
                                                             <i className="mx-icon-calendar">
@@ -170,13 +171,16 @@ const AssignAgent = () => {
                                         <div className="col-md-2">
                                             <label>To Date:</label>
                                             <div className="mx-datepicker">
-                                                <div className="mx-input-wrapper">
+                                                <div className="mx-input-wrapper custome-kk">
                                                     <DatePicker
                                                         className="mx-input"
                                                         value={toDate}
                                                         onChange={(date) => setToDate(date)}
-                                                        format="YYYY-MM-DD"
+                                                        // format="YYYY-MM-DD"
+                                                        format="DD/MM/YYYY"
                                                         placeholder=""
+                                                        disabled={true}
+                                                        style={{ cursor: "no-drop" }}
                                                         suffixIcon={
                                                             <i className="mx-icon-calendar">
                                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1em" height="1em">

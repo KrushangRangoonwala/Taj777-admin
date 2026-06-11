@@ -1,7 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import { accountTransaction } from "../api/API";
+import { accountTransaction, apiBalance } from "../api/API";
+import { useDispatch, useSelector } from 'react-redux';
+import { errorToast, successToast } from '../utils/toast';
 
 const DepositModal = ({ user, onClose }) => {
+  console.log("DepositModal user:", user); // debug
+  const dispatch = useDispatch();
+  const username = useSelector(store => store.user.name);
+  const useramount = useSelector(store => store.bet.balance.point);
+
   const [formData, setFormData] = useState({
     amount: '',
     remark: '',
@@ -9,7 +16,6 @@ const DepositModal = ({ user, onClose }) => {
   });
 
   const [errors, setErrors] = useState({});
-
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -21,14 +27,72 @@ const DepositModal = ({ user, onClose }) => {
 
   if (!user) return null;
 
+  // =========================
+  // INPUT AMOUNT
+  // =========================
+  const enteredAmount = Number(formData.amount || 0);
+
+  // =========================
+  // PARENT BALANCE
+  // =========================
+  const parentCurrent = Number(useramount || 0);
+
+  const parentAvailable = parentCurrent;
+
+  const parentAfterDeposit = formData.amount
+    ? (parentCurrent - enteredAmount)
+    : parentAvailable;
+
+  // =========================
+  // CHILD BALANCE
+  // =========================
+  const childCurrent = Number(
+    user.balance ||
+    user.point ||
+    user.amount ||
+    user.availablePts ||
+    0
+  );
+
+  const childAfterDeposit = formData.amount
+    ? (childCurrent + enteredAmount)
+    : 0;
+
+  // =========================
+  // PROFIT / LOSS
+  // =========================
+  const clientPL = Number(user.clientPL || 0);
+
+  const plSecondBox = formData.amount
+    ? (clientPL + enteredAmount)
+    : 0;
+
+  // =========================
+  // INPUT HANDLER
+  // =========================
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value });
+
+    if (name === "amount") {
+      if (!/^\d*\.?\d*$/.test(value)) return;
+    }
+
+    setFormData({
+      ...formData,
+      [name]: value
+    });
+
     if (errors[name]) {
-      setErrors({ ...errors, [name]: null });
+      setErrors({
+        ...errors,
+        [name]: null
+      });
     }
   };
 
+  // =========================
+  // SUBMIT
+  // =========================
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -46,8 +110,8 @@ const DepositModal = ({ user, onClose }) => {
       setLoading(true);
 
       const payload = {
-        user_name: user.id, // ✅ correct
-        transaction_type: 1, // ✅ deposit
+        user_name: user.id,
+        transaction_type: 1,
         transaction_points: Number(formData.amount),
         remark: formData.remark,
         master_password: formData.mpassword
@@ -56,23 +120,24 @@ const DepositModal = ({ user, onClose }) => {
       const res = await accountTransaction(payload);
 
       if (res.status === "ok") {
-        alert(res.message || "Deposit successful");
+        successToast(res.message || "Deposit successful");
 
-        // reset form
         setFormData({
           amount: '',
           remark: '',
           mpassword: '',
         });
 
+        await apiBalance(dispatch);
         onClose();
+
       } else {
-        alert(res.message || "Something went wrong");
+        errorToast(res.message || "Something went wrong");
       }
 
     } catch (err) {
       console.log(err);
-      alert("API error");
+      errorToast("API error");
     } finally {
       setLoading(false);
     }
@@ -80,115 +145,219 @@ const DepositModal = ({ user, onClose }) => {
 
   return (
     <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050, overflowY: 'auto' }} tabIndex="-1" role="dialog">
-      <div className="modal-dialog" role="document" style={{ width: '500px', maxWidth: '500px' }}>
-        <div id="__BVID__3055___BV_modal_content_" tabIndex="-1" className="modal-content">
-          <header id="__BVID__3055___BV_modal_header_" className="modal-header bg-success">
+      <div className="modal-dialog" role="document">
+        <div className="modal-content">
+
+          <header className="modal-header bg-success">
             <h5 className="modal-title text-uppercase text-white">Deposit</h5>
-            <button type="button" aria-label="Close" className="close text-white" onClick={onClose} style={{ background: 'none', border: 'none', fontSize: '1.2rem', fontWeight: '700', lineHeight: '1', color: '#000', textShadow: '0 1px 0 #fff', opacity: '.5' }}>
-              <span aria-hidden="true">×</span>
-            </button>
+            <button onClick={onClose} className="close text-white">×</button>
           </header>
-          <div id="__BVID__3055___BV_modal_body_" className="modal-body">
-            <div className="tabs" id="__BVID__3083">
-              <div className="">
-                <ul role="tablist" className="nav nav-tabs" id="__BVID__3083__BV_tab_controls_">
-                  <li role="presentation" className="nav-item">
-                    <a role="tab" aria-selected="true" href="#" target="_self" className="nav-link active tab-bg-success" id="__BVID__3084___BV_tab_button__">Deposit</a>
+
+          <div className="modal-body">
+
+            <div>
+
+                <ul
+                  role="tablist"
+                  className="nav nav-tabs"
+                  id="__BVID__3203__BV_tab_controls_"
+                >
+
+                  <li
+                    role="presentation"
+                    className="nav-item"
+                  >
+
+                    <a
+                      role="tab"
+                      aria-selected="true"
+                      href="#"
+                      target="_self"
+                      className="nav-link active"
+                      id="__BVID__3204___BV_tab_button__"
+                    >
+                      Deposit
+                    </a>
+
                   </li>
+
                 </ul>
-              </div>
-              <div className="tab-content text-muted" id="__BVID__3083__BV_tab_container_">
-                <div role="tabpanel" aria-hidden="false" className="tab-pane active" id="__BVID__3084">
-                  <form data-vv-scope="userdepositeMDL" method="post" onSubmit={handleSubmit}>
+
+            </div>
+
+            <div
+                className="tab-content text-muted"
+                id="__BVID__3203__BV_tab_container_"
+              >
+
+                <div
+                  role="tabpanel"
+                  aria-hidden="false"
+                  className="tab-pane active"
+                  id="__BVID__3204"
+                >
+
+                  <form
+                    data-vv-scope="userWithdrawFrm"
+                    method="post"
+                    onSubmit={handleSubmit}
+                  >
+
+                    {/* ================= PARENT ================= */}
                     <div className="form-group row">
-                      <label className="col-form-label col-4">Arpit526</label>
+                      <label className="col-4">{username}</label>
+                      <div className="col-8">
+                        <div className="row">
+
+                          <div className="col-6">
+                            <input
+                              readOnly
+                              className="form-control txt-right"
+                              value={parentAvailable.toLocaleString()}
+                            />
+                          </div>
+
+                          <div className="col-6">
+                            <input
+                              readOnly
+                              className="form-control txt-right"
+                              value={parentAfterDeposit === 0 ? "0" : parentAfterDeposit.toLocaleString()}
+                            />
+                          </div>
+
+                        </div>
+
+                      </div>
+                    </div>
+
+                    {/* ================= CHILD ================= */}
+                    <div className="form-group row">
+                      <label className="col-4">
+                        {user.username || user.name}
+                      </label>
+
                       <div className="col-8">
                         <div className="row">
                           <div className="col-6">
-                            <input placeholder="Amount" type="text" readOnly name="userDipositeloginusramount" className="form-control txt-right" defaultValue="2,000" />
+                            <input
+                              readOnly
+                              className="form-control txt-right"
+                              value={childCurrent.toLocaleString()}
+                            />
                           </div>
+
                           <div className="col-6">
-                            <input placeholder="Amount" type="text" readOnly name="userDipositeloginusrNamount" className="form-control txt-right" defaultValue="2,000" />
+                            <input
+                              readOnly
+                              className="form-control txt-right"
+                              value={childAfterDeposit.toLocaleString()}
+                            />
                           </div>
                         </div>
+
                       </div>
                     </div>
+
+                    {/* ================= P/L ================= */}
                     <div className="form-group row">
-                      <label className="col-form-label col-4">{user.username}</label>
+                      <label className="col-4">Profit/Loss</label>
+
                       <div className="col-8">
                         <div className="row">
-                          <div className="col-6">
-                            <input placeholder="Amount" type="text" readOnly name="userDipositeusrnameamount" className="form-control txt-right" defaultValue={user.cr} />
-                          </div>
-                          <div className="col-6">
-                            <input placeholder="Amount" type="text" readOnly name="userDipositeusrnameNamount" className="form-control txt-right" defaultValue={user.cr} />
-                          </div>
+                            <div className="col-6">
+                              <input
+                                readOnly
+                                className="form-control txt-right"
+                                value={clientPL.toLocaleString()}
+                              />
+                            </div>
+
+                            <div className="col-6">
+                              <input
+                                readOnly
+                                className="form-control txt-right"
+                                value={plSecondBox.toLocaleString()}
+                              />
+                            </div>
+
                         </div>
+
                       </div>
                     </div>
+
+                    {/* ================= AMOUNT ================= */}
                     <div className="form-group row">
-                      <label className="col-form-label col-4">Profit/Loss</label>
+                      <label className="col-4">Amount</label>
                       <div className="col-8">
-                        <div className="row">
-                          <div className="col-6">
-                            <input placeholder="P/L" type="text" readOnly name="userDipositepl" className="form-control txt-right" defaultValue="0" />
-                          </div>
-                          <div className="col-6">
-                            <input placeholder="P/L" type="text" readOnly name="userDipositeplnew" className="form-control txt-right" defaultValue="0" />
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="form-group row">
-                      <label className="col-form-label col-4">Amount</label>
-                      <div className="col-8 form-group-feedback form-group-feedback-right">
                         <input
-                          placeholder="Amount"
-                          type="text"
                           name="amount"
-                          className={`form-control txt-right ${errors.amount ? 'is-invalid' : ''}`}
+                          placeholder="Amount"
                           value={formData.amount}
                           onChange={handleInputChange}
+                          className={`form-control txt-right ${errors.amount ? 'is-invalid' : ''}`}
                         />
                       </div>
                     </div>
+
+                    {/* ================= REMARK ================= */}
                     <div className="form-group row">
-                      <label className="col-form-label col-4">Remark</label>
-                      <div className="col-8 form-group-feedback form-group-feedback-right">
+                      <label className="col-4">Remark</label>
+                      <div className="col-8">
                         <textarea
-                          placeholder="Remark"
                           name="remark"
-                          className={`form-control ${errors.remark ? 'is-invalid' : ''}`}
+                          placeholder="Remark"
                           value={formData.remark}
                           onChange={handleInputChange}
-                        ></textarea>
-                      </div>
-                    </div>
-                    <div className="form-group row">
-                      <label className="col-form-label col-4">Transaction Code</label>
-                      <div className="col-8 form-group-feedback form-group-feedback-right">
-                        <input
-                          placeholder="Transaction Code"
-                          name="mpassword"
-                          type="password"
-                          className={`form-control ${errors.mpassword ? 'is-invalid' : ''}`}
-                          value={formData.mpassword}
-                          onChange={handleInputChange}
+                          className={`form-control ${errors.remark ? 'is-invalid' : ''}`}
                         />
                       </div>
                     </div>
+
+                    {/* ================= PASSWORD ================= */}
                     <div className="form-group row">
-                      <div className="col-12 text-right">
-                        <button type="submit" className="btn btn-success" disabled={loading}>
-                          {loading ? "Processing..." : "submit"}
-                          <i className="fas fa-sign-in-alt ml-1"></i>
-                        </button>
+                      <label className="col-4">Transaction Code</label>
+                      <div className="col-8">
+                        <input
+                          type="password"
+                          placeholder="Transaction Code"
+                          name="mpassword"
+                          value={formData.mpassword}
+                          onChange={handleInputChange}
+                          className={`form-control ${errors.mpassword ? 'is-invalid' : ''}`}
+                        />
                       </div>
                     </div>
+
+                    {/* ================= SUBMIT ================= */}
+                    
+                    <div className="form-group row">
+
+                      <div className="col-12 text-right">
+
+                        <button
+                          onClick={handleSubmit}
+                          className="btn btn-success"
+                          disabled={loading}
+                        >
+
+                          {loading
+                            ? "Processing..."
+                            : "submit"}
+
+                          <i className="fas fa-sign-in-alt ml-1"></i>
+
+                        </button>
+
+                      </div>
+
+                    </div>
+
                   </form>
+
                 </div>
+
               </div>
-            </div>
+
           </div>
         </div>
       </div>

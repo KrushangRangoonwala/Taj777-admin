@@ -100,7 +100,7 @@ const Result_BetData = ({ betData, selectedFilter, setSelectedFilter }) => {
                         {filteredBets.length > 0 ? (
                             filteredBets.map((bet, index) => (
                                 <tr key={index} className={bet.bet_type?.toLowerCase() === 'back' ? 'back-border' : 'lay-border'}>
-                                    <td className="user-name"><span>{bet.user_name}</span></td>
+                                    <td className="user-name"><span>{bet.username}</span></td>
                                     <td className="event-name">
                                         <div>{bet.market_name}</div>
                                     </td>

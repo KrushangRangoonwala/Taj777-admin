@@ -161,8 +161,8 @@ const Dashboard = () => {
 
         setState(legendData)
     }
-
-
+    
+    const hasDashboardPermission = userData?.privileges?.includes("Dashboard");
 
     useEffect(() => {
         const loadDashboardData = async () => {
@@ -237,6 +237,10 @@ const Dashboard = () => {
         loadDashboardData();
         getCasinoGames();
     }, []);
+
+    if (user_type === '8' && !hasDashboardPermission) {
+        return <div></div>;
+    }
 
     return (
         <div className="p-1">

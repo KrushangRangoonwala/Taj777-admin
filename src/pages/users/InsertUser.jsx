@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { insertUser, getRemainingPercentage, checkUsername } from "../../api/API";
+import { errorToast, successToast } from '../../utils/toast';
 
 const InsertUser = () => {
 
@@ -47,10 +48,22 @@ const InsertUser = () => {
         const res = await getRemainingPercentage();
 
         if (res?.status === "ok") {
+          const remainingPercentage = Number(
+            res.data.remaining_percentage
+          );
+
           setPercentageData({
-            remaining: Number(res.data.remaining_percentage),
+            remaining: remainingPercentage,
             totalUsed: Number(res.data.total_used_percentage),
           });
+
+          // set default partnership value
+          setFormData((prev) => ({
+            ...prev,
+            spart1: remainingPercentage
+          }));
+        }else {
+          errorToast(res?.msg || res?.message || "Failed to fetch percentage data");
         }
       } catch (err) {
         console.error("Percentage API error", err);
@@ -60,11 +73,20 @@ const InsertUser = () => {
     fetchPercentage();
   }, []);
 
-  const enteredPartnership = Number(formData.spart1) || 0;
+  const maxPartnership = Number(
+    percentageData.remaining || 0
+  );
 
-  const remaining = percentageData.remaining;
+  const enteredPartnership = Number(
+    formData.spart1 || 0
+  );
 
-  const downline = remaining - enteredPartnership;
+  // OUR %
+  const remaining = enteredPartnership;
+
+  // DOWNLINE %
+  const downline =
+    maxPartnership - enteredPartnership;
 
   const renderAccountTypeOptions = () => {
     if (!loginUser) return null;
@@ -317,12 +339,13 @@ const InsertUser = () => {
         partnership: formData.spart1 || 0,
         master_password: formData.mpassword,
         changePasswordLock: formData.changePasswordLock ? 1 : 0,
+        remark: formData.remark || '',
       };
 
       const res = await insertUser(payload);
 
       if (res?.status === 'ok') {
-        alert(res?.message || 'User created successfully');
+        successToast(res?.message || 'User created successfully');
 
         setFormData({
           username: '',
@@ -341,11 +364,11 @@ const InsertUser = () => {
 
         setErrors({});
       } else {
-        alert(res?.message || 'Failed to create user');
+        errorToast(res?.message || 'Failed to create user');
       }
     } catch (error) {
       console.error(error);
-      alert('Something went wrong');
+      errorToast('Something went wrong');
     } finally {
       setLoading(false);
     }

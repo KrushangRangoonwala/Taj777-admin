@@ -35,7 +35,7 @@ export const menuItems = [
         linkClasses: "side-nav-link-ref router-link-exact-active router-link-active ", // active    
         ariaCurrent: "page",
         Component: Dashboard,
-        backend_key: "",
+        backend_key: "Dashboard",
     },
     {
         label: "Market Analysis",
@@ -43,7 +43,7 @@ export const menuItems = [
         icon: "bx bxs-bar-chart-alt-2",
         linkClasses: "side-nav-link-ref",
         Component: MarketAnalysis,
-        backend_key: "",
+        backend_key: "Market Analysis",
     },
     {
         label: "Multi Login Account",
@@ -51,15 +51,16 @@ export const menuItems = [
         icon: "bx bx-user-plus",
         linkClasses: "side-nav-link-ref",
         Component: CreateAccount,
-        backend_key: "",
+        backend_key: "Multi Login Account",
     },
     {
         label: "Account",
         icon: "bx bx-user-circle",
+        /* backend_key: "Account", */
         subItems: [
-            { label: "Account List For Active Users", href: "/admin/activeusers", Component: ActiveUsers, backend_key: "" },
-            { label: "Account List", href: "/admin/users", Component: AccountList, backend_key: "" },
-            { label: "Create Account", href: "/admin/users/insertuser", Component: InsertUser, backend_key: "" },
+            { label: "Account List For Active Users", href: "/admin/activeusers", Component: ActiveUsers, backend_key: "Account List For Active Users" },
+            { label: "Account List", href: "/admin/users", Component: AccountList, backend_key: "Account List" },
+            { label: "Create Account", href: "/admin/users/insertuser", Component: InsertUser, backend_key: "Create Account" },
         ],
     },
     {
@@ -68,7 +69,7 @@ export const menuItems = [
         icon: "bx bx-user",
         linkClasses: "side-nav-link-ref",
         Component: AssignAgent,
-        backend_key: "",
+        backend_key: "Assign Agent",
     },
     {
         label: "Bank",
@@ -76,25 +77,26 @@ export const menuItems = [
         icon: "bx bxs-bank",
         linkClasses: "side-nav-link-ref",
         Component: Bank,
-        backend_key: "",
+        backend_key: "Bank",
     },
     {
         label: "Reports",
         icon: "bx bx-file",
+        // backend_key: "Reports",
         subItems: [
-            { label: "Account Statement", href: "/admin/reports/accountstatement", Component: AccountStatement, backend_key: "" },
-            { label: "Party Win Loss", href: "/admin/reports/profitloss", Component: ProfitLoss, backend_key: "" },
-            { label: "Current Bets", href: "/admin/reports/currentbets", Component: CurrentBets, backend_key: "" },
-            { label: "User History", href: "/admin/reports/userhistory", Component: UserHistory, backend_key: "" },
-            { label: "General Lock", href: "/admin/reports/userlock", Component: GeneralLock, backend_key: "" },
-            { label: "Our Casino Result", href: "/admin/reports/casinoresult", Component: CasinoResult, backend_key: "" },
-            { label: "Live Casino Result", href: "/admin/reports/livecasinoreport", Component: LiveCasinoResult, backend_key: "" },
-            { label: "Sportbook Report", href: "/admin/reports/sportbookreport", Component: SportBookReport, backend_key: "" },
-            { label: "Turn Over", href: "/admin/reports/turnover", Component: Turnover, backend_key: "" },
-            { label: "User Authentication", href: "/admin/reports/authlist", Component: AuthList, backend_key: "" },
-            { label: "User Register Detail", href: "/admin/reports/userregisterdetail", Component: UserRegisterDetail, backend_key: "" },
-            { label: "Total Profit Loss", href: "/admin/reports/totalprofitloss", Component: TotalProfitLoss, backend_key: "" },
-            { label: "User Win Loss", href: "/admin/reports/userwinloss", Component: UserWinLoss, backend_key: "" },
+            { label: "Account Statement", href: "/admin/reports/accountstatement", Component: AccountStatement, backend_key: "Account Statement" },
+            { label: "Party Win Loss", href: "/admin/reports/profitloss", Component: ProfitLoss, backend_key: "Party Win Loss" },
+            { label: "Current Bets", href: "/admin/reports/currentbets", Component: CurrentBets, backend_key: "Current Bets" },
+            { label: "User History", href: "/admin/reports/userhistory", Component: UserHistory, backend_key: "User History" },
+            { label: "General Lock", href: "/admin/reports/userlock", Component: GeneralLock, backend_key: "General Lock" },
+            { label: "Our Casino Result", href: "/admin/reports/casinoresult", Component: CasinoResult, backend_key: "Our Casino Result" },
+            { label: "Live Casino Result", href: "/admin/reports/livecasinoreport", Component: LiveCasinoResult, backend_key: "Live Casino Result" },
+            { label: "Sportbook Report", href: "/admin/reports/sportbookreport", Component: SportBookReport },
+            { label: "Turn Over", href: "/admin/reports/turnover", Component: Turnover, backend_key: "Turn Over" },
+            { label: "User Authentication", href: "/admin/reports/authlist", Component: AuthList },
+            { label: "User Register Detail", href: "/admin/reports/userregisterdetail", Component: UserRegisterDetail, backend_key: "User Register Detail" },
+            { label: "Total Profit Loss", href: "/admin/reports/totalprofitloss", Component: TotalProfitLoss, backend_key: "Total Profit Loss" },
+            { label: "User Win Loss", href: "/admin/reports/userwinloss", Component: UserWinLoss, backend_key: "User Win Loss" },
         ],
     },
     {
@@ -103,7 +105,7 @@ export const menuItems = [
         icon: "mdi mdi-cards-playing-outline",
         linkClasses: "side-nav-link-ref",
         Component: CasinoList,
-        backend_key: "",
+        backend_key: "Our Casino",
     },
     {
         label: "Vip Casino",
@@ -142,3 +144,19 @@ export const menuItems = [
         backend_key: "",
     },
 ];
+
+
+export function getFilteredMenuItems(menuItems, privileges) {
+    const userData = JSON.parse(sessionStorage.getItem("userdata")) || {}
+    if (userData?.user_type != 8) return menuItems
+    return menuItems.filter(
+        (item) =>
+            item.backend_key
+                ? (privileges || []).includes(item.backend_key)
+                : item.subItems
+                    ? item.subItems.some(sub =>
+                        !sub.backend_key || (privileges || []).includes(sub.backend_key)
+                    )
+                    : true
+    );
+}

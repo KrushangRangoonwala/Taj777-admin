@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { Modal } from 'react-bootstrap';
 import { getUserBlock, updateUserBlock } from '../../../api/API';
+import { errorToast, successToast } from '../../../utils/toast';
 
-const BetLockModal = ({ show, onHide, event_id }) => {
+const BetLockModal = ({ show, onHide, event_id, bet_market_type, market_odd_name }) => {
 
     const [accounts, setAccounts] = useState([]);
     const [loading, setLoading] = useState(false);
@@ -14,13 +15,12 @@ const BetLockModal = ({ show, onHide, event_id }) => {
 
             const payload = {
                 event_id: event_id,
+                market_type: bet_market_type,
             };
 
-            console.log("event_id:", event_id);
+            const res = await getUserBlock(payload); // FIXED
 
-            const res = await getUserBlock(payload); // ✅ FIXED
-
-            console.log("API response:", res); // 👈 debug
+            /* console.log("API response:", res); // debug */
 
             const result =
                 res?.data?.results ||
@@ -29,8 +29,9 @@ const BetLockModal = ({ show, onHide, event_id }) => {
 
             const formatted = result.map((item, index) => ({
                 id: index,
+                uid: item.userid,
                 name: item.username,
-                checked: item.fstatus === 1
+                checked: item.status === 1
             }));
 
             setAccounts(formatted);
@@ -53,7 +54,7 @@ const BetLockModal = ({ show, onHide, event_id }) => {
 
         // Do not allow if no transaction code
         if (!tCode) {
-            alert("Please enter transaction code");
+            errorToast("Please enter transaction code");
             return;
         }
 
@@ -64,21 +65,26 @@ const BetLockModal = ({ show, onHide, event_id }) => {
             setLoading(true);
 
             const payload = {
+                usersid: selectedUser.uid, // user ID
                 users: selectedUser.name, // username
                 event_id: event_id,
                 status: newStatus,
-                tpassword: tCode
+                tpassword: tCode,
+                market_type: bet_market_type,
             };
 
             const res = await updateUserBlock(payload);
 
-            if (res?.fstatus === 1 || res?.data?.fstatus === 1) {
+            console.log("Update API response:--------", res); // debug
+
+            if (res?.status === 1 || res?.data?.status === 1) {
                 // update UI only if success
                 const updated = [...accounts];
                 updated[index].checked = !updated[index].checked;
                 setAccounts(updated);
+                successToast(res?.message || res?.data?.message || "Status updated");
             } else {
-                alert(res?.message || res?.data?.message || "Something went wrong");
+                errorToast(res?.message || res?.data?.message || "Something went wrong");
                 onHide(); // close modal on failure
             }
 

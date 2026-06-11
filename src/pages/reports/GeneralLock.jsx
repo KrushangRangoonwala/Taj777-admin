@@ -324,6 +324,7 @@ const GeneralLock = () => {
                         fetchType="client"
                         placeholder="Search By Client Name"
                         isFocusOnLoad={true}
+                        notFoundQuery_Txt="No elements found"
                       />
                     </div>
                     <div className="col-md-2">

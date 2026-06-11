@@ -3,10 +3,10 @@ import React from 'react'
 
 const Rules = ({ title, rules = [] }) => {
     return (
-        <table class="table table-bordered rules-table">
+        <table className="table table-bordered rules-table">
             <tbody>
-                <tr class="text-center">
-                    <th colspan="2">{title}</th>
+                <tr className="text-center">
+                    <th colSpan="2">{title}</th>
                 </tr>
 
                 {rules?.map((rule, index) => (

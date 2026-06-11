@@ -6,7 +6,12 @@ import { getUserList } from "../../api/API";
 import { Link, useLocation, useParams } from 'react-router-dom';
 import { Table } from 'react-bootstrap';
 import { setIsLoading } from '../../store/slices/actionSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import CRModal from '../../components/CRModal';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const AccountList = () => {
   const dispatch = useDispatch();
@@ -14,6 +19,7 @@ const AccountList = () => {
   const isChild = pathName.includes("child");
   const { id } = useParams();
   const [showModal, setShowModal] = useState(false);
+  const [showCRModal, setShowCRModal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -26,6 +32,17 @@ const AccountList = () => {
   const [total, setTotal] = useState(0);
   const [sortColumn, setSortColumn] = useState(null);
   const [sortDirection, setSortDirection] = useState('none');
+
+  const userdata = useSelector(store => store.user.userData);
+  
+
+  const canDeposit =
+    userdata?.user_type != 8 ||
+    userdata?.privileges?.includes("Deposit");
+
+  const canWithdraw =
+    userdata?.user_type != 8 ||
+    userdata?.privileges?.includes("Withdraw");
 
   const totalPages = Math.ceil(total / limit) || 1;
 
@@ -50,6 +67,10 @@ const AccountList = () => {
       }
     }
   }, []);
+
+  useEffect(() => {
+    fetchUserList(searchKey, 1);
+  }, [limit]);
 
   function openWithSession(url) {
     const sessionData = {};
@@ -86,6 +107,11 @@ const AccountList = () => {
     return pages?.length > 0 ? pages : [1];
   };
 
+  const handleCRClick = (user) => {
+    setSelectedUser(user);
+    setShowCRModal(true);
+  };
+
   const handleMoreClick = (user) => {
     setSelectedUser(user);
     setShowModal(true);
@@ -101,7 +127,7 @@ const AccountList = () => {
     setShowWithdrawModal(true);
   };
 
-  const fetchUserList = async (search = "", pageNo = page) => {
+  const fetchUserList = async (search = "", pageNo = page, sortBy = sortColumn, sortOrder = sortDirection) => {
     dispatch(setIsLoading(true));
     try {
       const payload = {
@@ -110,7 +136,9 @@ const AccountList = () => {
         page: pageNo,
         limit: limit,
         isChild: isChild,
-        childId: id
+        childId: id,
+        sortBy,
+        sortOrder
       };
 
       const res = await getUserList(payload);
@@ -133,18 +161,19 @@ const AccountList = () => {
   };
 
   const handleSort = (colIndex) => {
+    let direction = "ascending";
+
     if (sortColumn === colIndex) {
-      if (sortDirection === 'none') {
-        setSortDirection('ascending');
-      } else if (sortDirection === 'ascending') {
-        setSortDirection('descending');
-      } else {
-        setSortDirection('ascending');
-      }
-    } else {
-      setSortColumn(colIndex);
-      setSortDirection('ascending');
+      direction =
+        sortDirection === "ascending"
+          ? "descending"
+          : "ascending";
     }
+
+    setSortColumn(colIndex);
+    setSortDirection(direction);
+
+    fetchUserList(searchKey, 1, colIndex, direction);
   };
 
   const getSortValueText = (colIndex) => {
@@ -167,6 +196,67 @@ const AccountList = () => {
   const handleReset = () => {
     setSearchKey("");
     fetchUserList("");
+  };
+
+  const exportToExcel = () => {
+    const formattedData = users.map((user, index) => ({
+      "Sr No": index + 1,
+      "User Name": user.username,
+      "CR": user.cr,
+      "Bet Status": user.bst ? "ON" : "OFF",
+      "User Status": user.ust ? "ON" : "OFF",
+      "Partnership": user.partnership,
+      "Account Type": user.accountType,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(
+      workbook,
+      worksheet,
+      "Account List"
+    );
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const file = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+
+    saveAs(file, "Account_List.xlsx");
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF();
+
+    const tableData = users.map((user, index) => [
+      index + 1,
+      user.username,
+      user.cr,
+      user.bst ? "ON" : "OFF",
+      user.ust ? "ON" : "OFF",
+      user.partnership,
+      user.accountType,
+    ]);
+
+    autoTable(doc, {
+      head: [[
+        "Sr No",
+        "User Name",
+        "CR",
+        "Bet Status",
+        "User Status",
+        "Partnership",
+        "Account Type"
+      ]],
+      body: tableData,
+    });
+
+    doc.save("Account_List.pdf");
   };
 
   return (
@@ -245,12 +335,22 @@ const AccountList = () => {
                         className="d-inline-block"
                         style={{ marginRight: '0.2rem' }}
                       >
-                        <button type="button" className="btn mr-1 btn-success">
+                        <button
+                          type="button"
+                          className="btn mr-1 btn-success"
+                          disabled={!users.length}
+                          onClick={exportToExcel}
+                        >
                           <i className="fas fa-file-excel"></i>
                         </button>
                       </div>
 
-                      <button type="button" className="btn btn-danger">
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        disabled={!users.length}
+                        onClick={exportToPDF}
+                      >
                         <i className="fas fa-file-pdf"></i>
                       </button>{' '}
                     </div>{' '}
@@ -327,8 +427,7 @@ const AccountList = () => {
                               <td aria-colindex="1" role="cell">
                                 {user.accountType.toLowerCase() !== "user" ? (
                                   <Link
-                                    onClick={() => openWithSession(`/admin/child/${user.id}`)}
-                                    // onClick={() => openWithSession(`/admin_new/admin/child/${user.id}`)}
+                                    onClick={() => openWithSession(`/${import.meta.env.VITE_IMAGE_PATH}/admin/child/${user.id}`)}
                                     className="wrape-text"
                                     title={user.fullName}
                                     target="_blank"
@@ -344,7 +443,11 @@ const AccountList = () => {
                               </td>
 
                               <td aria-colindex="2" role="cell">
-                                <p className="text-right mb-0 cp text-warning">
+                                <p className="text-right mb-0 cp text-warning" onClick={
+                                    Number(user.parent_id) === Number(userdata?.user_id)
+                                      ? () => handleCRClick(user)
+                                      : undefined
+                                  }>
                                   {user.cr}
                                 </p>
                               </td>
@@ -382,7 +485,7 @@ const AccountList = () => {
                               </td>
 
                               <td aria-colindex="5" role="cell">
-                                <p className="text-left mb-0">{user.pname}</p>
+                                <p className="text-left mb-0">{user.partnership}</p>
                               </td>
 
                               <td aria-colindex="6" role="cell">
@@ -391,28 +494,32 @@ const AccountList = () => {
 
                               <td aria-colindex="7" role="cell">
                                 <div role="group" className="btn-group">
-                                  <button
-                                    type="button"
-                                    className="btn btn-success"
-                                    onClick={() => handleDepositClick(user)}
-                                  >
-                                    D
-                                  </button>
+                                  {Number(user.parent_id) === Number(userdata?.user_id) && canDeposit && (
+                                    <button
+                                      type="button"
+                                      className="btn btn-success"
+                                      onClick={() => handleDepositClick(user)}
+                                    >
+                                      D
+                                    </button>
+                                  )}
 
-                                  <button
-                                    type="button"
-                                    className="btn btn-danger"
-                                    onClick={() => handleWithdrawClick(user)}
-                                  >
-                                    W
-                                  </button>
+                                  {Number(user.parent_id) === Number(userdata?.user_id) && canWithdraw && (
+                                    <button
+                                      type="button"
+                                      className="btn btn-danger"
+                                      onClick={() => handleWithdrawClick(user)}
+                                    >
+                                      W
+                                    </button>
+                                  )}
 
                                   <button
                                     type="button"
                                     className="btn btn-info"
                                     onClick={() => handleMoreClick(user)}
                                   >
-                                    More
+                                    {Number(user.parent_id) === Number(userdata?.user_id) ? 'More' : 'P'}
                                   </button>
                                 </div>
                               </td>
@@ -481,6 +588,20 @@ const AccountList = () => {
         <UserMoreModal
           user={selectedUser}
           onClose={() => setShowModal(false)}
+          userdata={userdata}
+          onSuccess={() => {
+            fetchUserList();
+          }}
+        />
+      )}
+
+      {showCRModal && (
+        <CRModal
+          user={selectedUser}
+          onClose={() => setShowCRModal(false)}
+          onSuccess={() => {
+            fetchUserList();
+          }}
         />
       )}
 

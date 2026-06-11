@@ -86,11 +86,12 @@ export async function fetchDashboardData() {
     }
 }
 
-export async function fetchResultById(eventId, gameType) {
+export async function fetchResultById(eventId, gameType, userId="") {
     try {
         const requestBody = {
             event_id: eventId || "",
             game_type: gameType || "teen",
+            userid: userId || "",
             ...getDefaultParams(),
         };
 

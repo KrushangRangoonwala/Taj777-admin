@@ -475,19 +475,24 @@ const Turnover = () => {
                     {data.length > 0 ? (
                       data.map((row, i) => (
                         <tr key={i}>
-                          <td className="text-right">{row.loss_turnover}</td>
-                          <td className="text-right">{row.loss}</td>
-                          <td className="text-right">{row.win_turnover}</td>
-                          <td className="text-right">{row.win}</td>
-                          <td className="text-right">{row.total_turnover}</td>
-                          <td className="text-right">{row.total_pl}</td>
+                          <td className="text-right">{row.loss_turnover || 0}</td>
+                          <td className="text-right">{row.loss || 0}</td>
+                          <td className="text-right">{row.win_turnover || 0}</td>
+                          <td className="text-right">{row.win || 0}</td>
+                          <td className="text-right">{row.total_turnover || 0}</td>
+                          <td className="text-right">{row.total_pl || 0}</td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="6" className="text-center">
+                        {/* <td colSpan="6" className="text-center">
                           {loading ? "Loading..." : "There are no records to show"}
-                        </td>
+                        </td> */}
+                        <td className="text-right">0</td>
+                        <td className="text-right">0</td>
+                        <td className="text-right">0</td>
+                        <td className="text-right">0</td>
+                        <td className="text-right">0</td>
                       </tr>
                     )}
                   </tbody>

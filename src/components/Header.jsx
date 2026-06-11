@@ -381,7 +381,11 @@ export default function Header() {
                 </div>
             </div>
             {showChangePasswordModal && <ChangePasswordModal show={showChangePasswordModal} onHide={() => setShowChangePasswordModal(false)} />}
-            {showMarketAnalysisModal && <MarketAnalysisModal show={showMarketAnalysisModal} onHide={() => setShowMarketAnalysisModal(false)} />}
+            {showMarketAnalysisModal && <MarketAnalysisModal 
+                show={showMarketAnalysisModal} 
+                onHide={() => setShowMarketAnalysisModal(false)} 
+                selectedUser={selectedOption}
+            />}
 
             <RulesModal show={showRulesModal} onHide={() => setShowRulesModal(false)} />
         </header>

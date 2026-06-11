@@ -67,7 +67,7 @@ export const MarketTable = ({
     }
 
     if (!dataLen) return null;
-    console.log("event_id--------", event_id);
+    /* console.log("event_id--------", event_id); */
 
     return (
         <>
@@ -158,6 +158,8 @@ export const MarketTable = ({
                 show={isBetLockModalOpen}
                 onHide={() => setIsBetLockModalOpen(false)}
                 event_id={event_id}
+                bet_market_type={bet_market_type}
+                market_odd_name={market_odd_name}
             />
 
             <UserBookModal

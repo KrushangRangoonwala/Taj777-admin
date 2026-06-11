@@ -13,8 +13,8 @@ export function getDefaultParams() {
   const aa = JSON.parse(sessionStorage.getItem("userdata") || null);
   return {
     is_app: 1,
-    auth_key: aa?.login_auth_key,
-    login_user_id: aa?.user_id,
+    auth_key: aa?.user_type != 8 ? aa?.login_auth_key : aa?.parent_login_auth_key,
+    login_user_id: aa?.user_type != 8 ? aa?.user_id : aa?.parent_user_id,
   };
 }
 
@@ -26,12 +26,8 @@ export const loginAdmin = async (email, password) => {
   try {
     const response = await ajax_adm.post('login.php', params);
 
-    if (response.data.status === "ok") {
-      successToast("success");
-      return {
-        status: "ok",
-        data: response.data
-      };
+    if (response.data.status !== "error") {
+      return response.data;
     } else {
       const errorMessage = response.data?.message || response.data?.error || "Login failed";
       throw new Error(errorMessage);
@@ -42,7 +38,6 @@ export const loginAdmin = async (email, password) => {
     console.error('Error status:', error.response?.status);
     throw error;
   }
-
 };
 
 export async function fetchDashboard(search = "") {
@@ -69,16 +64,31 @@ export async function getAccountStatement(extraPayload = {}) {
     );
     return data;
   } catch (error) {
-    console.error("Error fetching accontstatements:", error);
+    console.error("Error fetching account statements:", error);
     throw error;
   }
 }
 
-export async function getClients(search = "") {
+export async function getBetDetails(extraPayload = {}) {
+  try {
+    const payload = { ...getDefaultParams(), ...extraPayload };
+    const { data } = await ajax_adm.post(
+      "get_account_bet_statement",
+      payload
+    );
+    return data;
+  } catch (error) {
+    console.error("Error fetching bet details:", error);
+    throw error;
+  }
+}
+
+export async function getClients(search = "",extraPayload = {}) {
   try {
     const payload = {
       search,
       ...getDefaultParams(),
+      ...extraPayload
     };
     const { data } = await ajax_adm.post("get_clients.php", payload);
 
@@ -188,7 +198,20 @@ export async function getCasinoResult(payload) {
     const { data } = await ajax_adm.post("casino_result", fullPayload);
     return data;
   } catch (error) {
-    console.error("Error fetching history:", error);
+    console.error("Error fetching casino result:", error);
+    throw error;
+  }
+}
+export async function getBankDetail(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("bank", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching bank detail:", error);
     throw error;
   }
 }
@@ -283,6 +306,19 @@ export async function getUserList(payload) {
     throw error;
   }
 }
+export async function apiGetMarketAnalysis(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("get_analysis", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+}
 export async function accountTransaction(payload) {
   try {
     const fullPayload = {
@@ -290,6 +326,32 @@ export async function accountTransaction(payload) {
       ...getDefaultParams(),
     };
     const { data } = await ajax_adm.post("account_transaction", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+}
+export async function creditReferenceTransaction(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("credit_reference_transaction", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching data:", error);
+    throw error;
+  }
+}
+export async function creditReferenceHistory(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("credit_reference_history", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);
@@ -369,7 +431,7 @@ export async function createAccountApi(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await ajax_adm.post("create_account", fullPayload);
+    const { data } = await ajax_adm.post("add_user", fullPayload);
     return data;
   } catch (error) {
     console.error("Error creating account:", error);
@@ -386,6 +448,32 @@ export async function getPrivilegesApi(payload) {
     return data;
   } catch (error) {
     console.error("Error fetching privileges:", error);
+    throw error;
+  }
+}
+export async function getMultiLoginUsersApi(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("get_multi_login_users", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error fetching multi-login users:", error);
+    throw error;
+  }
+}
+export async function updateAccountApi(payload) {
+  try {
+    const fullPayload = {
+      ...payload,
+      ...getDefaultParams(),
+    };
+    const { data } = await ajax_adm.post("update_multi_login_users", fullPayload);
+    return data;
+  } catch (error) {
+    console.error("Error updating multi-login users:", error);
     throw error;
   }
 }
@@ -568,15 +656,36 @@ export const sendUserInfoAPI = async (payload) => {
 };
 
 export async function apiBalance(dispatch, pageName) {
+  /* const aa = JSON.parse(sessionStorage.getItem("userdata") || null);
   const payload = {
-    ...getDefaultParams(),
+    is_app: 1,  // DON'T USE getDefaultParams() HERE
+    auth_key: aa?.login_auth_key,
+    login_user_id: aa?.user_id,
     ...(!!pageName ? pageName : {}),
-  };
+  }; */
+  const payload = {
+      ...getDefaultParams(),
+      ...(!!pageName ? pageName : {}),
+    };
   try {
     const { data } = await ajax_files.post("refresh_balance", payload);
     console.log('data', data);
     dispatch(setBalance({ point: data.balance, exposure: data.exposure }));
   } catch (error) {
     console.log("error", error);
+  }
+}
+
+export async function getViewMoreMatch(extraPayload = {}) {
+  try {
+    const payload = { ...getDefaultParams(), ...extraPayload };
+    const { data } = await ajax_adm.post(
+      "view_more_match.php",
+      payload
+    );
+    return data;
+  } catch (error) {
+    console.error("Error fetching view more matches:", error);
+    throw error;
   }
 }

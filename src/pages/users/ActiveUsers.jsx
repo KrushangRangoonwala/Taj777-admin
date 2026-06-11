@@ -5,10 +5,16 @@ import WithdrawModal from '../../components/WithdrawModal';
 import { getUserList } from "../../api/API";
 import { Link } from 'react-router-dom';
 import { setIsLoading } from '../../store/slices/actionSlice';
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
+import CRModal from '../../components/CRModal';
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const ActiveUsers = () => {
   const dispatch = useDispatch();
+  const [showCRModal, setShowCRModal] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [showDepositModal, setShowDepositModal] = useState(false);
   const [showWithdrawModal, setShowWithdrawModal] = useState(false);
@@ -19,8 +25,20 @@ const ActiveUsers = () => {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(25);
   const [total, setTotal] = useState(0);
+  const [sortColumn, setSortColumn] = useState("");
+  const [sortDirection, setSortDirection] = useState("ASC");
 
   const totalPages = Math.ceil(total / limit);
+
+  const userdata = useSelector(store => store.user.userData);
+  
+  const canDeposit =
+    userdata?.user_type != 8 ||
+    userdata?.privileges?.includes("Deposit");
+
+  const canWithdraw =
+    userdata?.user_type != 8 ||
+    userdata?.privileges?.includes("Withdraw");
 
   const changePage = (pageNo) => {
     if (pageNo >= 1 && pageNo <= totalPages) {
@@ -46,6 +64,11 @@ const ActiveUsers = () => {
     return pages;
   };
 
+  const handleCRClick = (user) => {
+    setSelectedUser(user);
+    setShowCRModal(true);
+  };
+  
   const handleMoreClick = (user) => {
     setSelectedUser(user);
     setShowModal(true);
@@ -61,14 +84,35 @@ const ActiveUsers = () => {
     setShowWithdrawModal(true);
   };
 
-  const fetchUserList = async (search = "", pageNo = page) => {
+  const handleSort = (column) => {
+    let direction = "ASC";
+
+    if (sortColumn === column) {
+      direction = sortDirection === "ASC" ? "DESC" : "ASC";
+    }
+
+    setSortColumn(column);
+    setSortDirection(direction);
+
+    fetchUserList(searchKey, 1, column, direction);
+  };
+
+  const fetchUserList = async (
+    search = "",
+    pageNo = page,
+    sortCol = sortColumn,
+    sortDir = sortDirection
+  ) => {
     dispatch(setIsLoading(true));
+
     try {
       const payload = {
         user_status: "0",
         searchKey: search,
         page: pageNo,
-        limit: limit
+        limit: limit,
+        sortColumn: sortCol,
+        sortDirection: sortDir
       };
 
       const res = await getUserList(payload);
@@ -83,8 +127,6 @@ const ActiveUsers = () => {
         setTotal(res.total);
         setPage(pageNo);
       }
-    } catch (err) {
-      console.error(err);
     } finally {
       dispatch(setIsLoading(false));
     }
@@ -93,84 +135,86 @@ const ActiveUsers = () => {
   useEffect(() => {
     fetchUserList();
   }, []);
-  const dummyData = [
-    {
-      id: '1',
-      username: 'Ras44',
-      fullName: 'Apapap',
-      cr: '5,000',
-      pts: '1,573',
-      clientPL: '-3,427',
-      clientPLPercent: '-',
-      exposure: '0',
-      availablePts: '1,573',
-      bst: true,
-      ust: true,
-      pname: '0 PNR',
-      accountType: 'User',
-    },
-    {
-      id: '2',
-      username: 'Ras46',
-      fullName: 'Ras46',
-      cr: '5,000',
-      pts: '2,128.75',
-      clientPL: '-2,871.25',
-      clientPLPercent: '-',
-      exposure: '0',
-      availablePts: '2,128.75',
-      bst: true,
-      ust: true,
-      pname: '0 PNR',
-      accountType: 'User',
-    },
-    {
-      id: '3',
-      username: 'Ras48',
-      fullName: 'Apapap',
-      cr: '5,000',
-      pts: '1,936',
-      clientPL: '-3,064',
-      clientPLPercent: '-',
-      exposure: '0',
-      availablePts: '1,936',
-      bst: true,
-      ust: true,
-      pname: '0 PNR',
-      accountType: 'User',
-    },
-    {
-      id: '4',
-      username: 'Ras49',
-      fullName: 'Rasg',
-      cr: '5,100',
-      pts: '1,444',
-      clientPL: '-3,656',
-      clientPLPercent: '-',
-      exposure: '0',
-      availablePts: '1,444',
-      bst: true,
-      ust: true,
-      pname: '0 PNR',
-      accountType: 'User',
-    },
-    {
-      id: '5',
-      username: 'Ras52',
-      fullName: 'Apapapap',
-      cr: '1,000',
-      pts: '9,295',
-      clientPL: '8,295',
-      clientPLPercent: '-',
-      exposure: '0',
-      availablePts: '9,295',
-      bst: true,
-      ust: true,
-      pname: '0 PNR',
-      accountType: 'User',
-    },
-  ];
 
+  useEffect(() => {
+      fetchUserList(searchKey, 1);
+  }, [limit]);
+
+  const exportToExcel = () => {
+    const formattedData = users.map((user, index) => ({
+      "Sr No": index + 1,
+      "User Name": user.username,
+      CR: user.cr,
+      PTS: user.pts,
+      "Client P/L": user.clientPL,
+      "Client P/L %": user.clientPLPercent,
+      Exposure: user.exposure,
+      "Available PTS": user.availablePts,
+      "B Status": user.bst ? "ON" : "OFF",
+      "U Status": user.ust ? "ON" : "OFF",
+      PName: user.partnership,
+      "Account Type": user.accountType,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(formattedData);
+    const workbook = XLSX.utils.book_new();
+
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Active Users");
+
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+
+    const file = new Blob([excelBuffer], {
+      type: "application/octet-stream",
+    });
+
+    saveAs(file, "Active_Users.xlsx");
+  };
+
+  const exportToPDF = () => {
+    const doc = new jsPDF("landscape");
+
+    const tableData = users.map((user, index) => [
+      index + 1,
+      user.username,
+      user.cr,
+      user.pts,
+      user.clientPL,
+      user.clientPLPercent,
+      user.exposure,
+      user.availablePts,
+      user.bst ? "ON" : "OFF",
+      user.ust ? "ON" : "OFF",
+      user.partnership,
+      user.accountType,
+    ]);
+
+    autoTable(doc, {
+      head: [[
+        "Sr No",
+        "User Name",
+        "CR",
+        "PTS",
+        "Client P/L",
+        "Client P/L %",
+        "Exposure",
+        "Available PTS",
+        "B Status",
+        "U Status",
+        "PName",
+        "Account Type",
+      ]],
+      body: tableData,
+      styles: {
+        fontSize: 8,
+      },
+    });
+
+    doc.save("Active_Users.pdf");
+  };
+  
   return (
     <div data-v-5a10e370="">
       <div data-v-5a10e370="">
@@ -236,11 +280,22 @@ const ActiveUsers = () => {
                   <div className="col-md-6 text-right mb-2">
                     <div className="d-inline-block mr-2">
                       <div id="export_1774244719287" className="d-inline-block" style={{ marginRight: '0.2rem' }}>
-                        <button type="button" className="btn mr-1 btn-success" style={{ marginRight: 'calc(1rem)' }}>
+                        <button
+                          type="button"
+                          className="btn mr-1 btn-success"
+                          style={{ marginRight: 'calc(1rem)' }}
+                          disabled={!users.length}
+                          onClick={exportToExcel}
+                        >
                           <i className="fas fa-file-excel"></i>
                         </button>
                       </div>
-                      <button type="button" className="btn btn-danger">
+                      <button
+                        type="button"
+                        className="btn btn-danger"
+                        disabled={!users.length}
+                        onClick={exportToPDF}
+                      >
                         <i className="fas fa-file-pdf"></i>
                       </button>
                     </div>{' '}
@@ -257,7 +312,11 @@ const ActiveUsers = () => {
                     <div id="tickets-table_length" className="dataTables_length">
                       <label className="d-inline-flex align-items-center">
                         Show&nbsp;
-                        <select className="custom-select custom-select-sm" id="__BVID__2629">
+                        <select
+                          className="custom-select custom-select-sm"
+                          value={limit}
+                          onChange={(e) => setLimit(Number(e.target.value))}
+                        >
                           <option value="25">25</option>
                           <option value="50">50</option>
                           <option value="100">100</option>
@@ -277,10 +336,10 @@ const ActiveUsers = () => {
                     <table id="eventsListTbl" role="table" aria-busy="false" aria-colcount="12" className="table b-table">
                       <thead>
                         <tr role="row">
-                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="1" aria-sort="none" className="position-relative">
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="1" aria-sort="none" className="position-relative" onClick={() => handleSort("username")} style={{ cursor: "pointer" }}>
                             <div>User Name</div>
                           </th>
-                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="2" aria-sort="none" className="position-relative text-right">
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="2" aria-sort="none" className="position-relative text-right" onClick={() => handleSort("cr")} style={{ cursor: "pointer" }}>
                             <div>CR</div>
                           </th>
                           <th role="columnheader" scope="col" tabIndex="0" aria-colindex="3" aria-sort="none" className="position-relative text-right">
@@ -307,7 +366,7 @@ const ActiveUsers = () => {
                           <th role="columnheader" scope="col" aria-colindex="10" className="">
                             <div>PName</div>
                           </th>
-                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="11" aria-sort="none" className="position-relative">
+                          <th role="columnheader" scope="col" tabIndex="0" aria-colindex="11" aria-sort="none" className="position-relative" onClick={() => handleSort("accountType")} style={{ cursor: "pointer" }}>
                             <div>Account Type</div>
                           </th>
                           <th role="columnheader" scope="col" aria-colindex="12" className="">
@@ -327,7 +386,13 @@ const ActiveUsers = () => {
                               <span title={user.fullName}>{user.username}</span>
                             </td>
                             <td aria-colindex="2" role="cell">
-                              <p className="text-right mb-0 cp text-warning">{user.cr}</p>
+                              <p className="text-right mb-0 cp text-warning" onClick={
+                                  Number(user.parent_id) === Number(userdata?.user_id)
+                                    ? () => handleCRClick(user)
+                                    : undefined
+                                }>
+                                {user.cr}
+                              </p>
                             </td>
                             <td aria-colindex="3" role="cell">
                               <p className="text-right mb-0">{user.pts}</p>
@@ -357,15 +422,15 @@ const ActiveUsers = () => {
                               </div>
                             </td>
                             <td aria-colindex="10" role="cell">
-                              <p className="text-left mb-0">{user.pname}</p>
+                              <p className="text-left mb-0">{user.partnership}</p>
                             </td>
                             <td aria-colindex="11" role="cell">
                               {user.accountType}
                             </td>
                             <td aria-colindex="12" role="cell">
                               <div role="group" className="btn-group">
-                                <button type="button" className="btn btn-success" onClick={() => handleDepositClick(user)}>D</button>
-                                <button type="button" className="btn btn-danger" onClick={() => handleWithdrawClick(user)}>W</button>
+                                {canDeposit && (<button type="button" className="btn btn-success" onClick={() => handleDepositClick(user)}>D</button>)}
+                                {canWithdraw && (<button type="button" className="btn btn-danger" onClick={() => handleWithdrawClick(user)}>W</button>)}
                                 <button type="button" className="btn btn-info" onClick={() => handleMoreClick(user)}>More</button>
                               </div>
                             </td>
@@ -423,6 +488,19 @@ const ActiveUsers = () => {
         <UserMoreModal
           user={selectedUser}
           onClose={() => setShowModal(false)}
+          userdata={userdata}
+          onSuccess={() => {
+            fetchUserList();
+          }}
+        />
+      )}
+      {showCRModal && (
+        <CRModal
+          user={selectedUser}
+          onClose={() => setShowCRModal(false)}
+          onSuccess={() => {
+            fetchUserList();
+          }}
         />
       )}
       {showDepositModal && (

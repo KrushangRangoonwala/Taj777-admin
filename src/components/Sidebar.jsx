@@ -5,16 +5,19 @@ import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import useIsMobile from "../hooks/useIsMobile";
 import { toggleSidebar } from "./Header";
-import { menuItems } from "./SidebarPages";
+import { getFilteredMenuItems, menuItems } from "./SidebarPages";
 
 const EVENT_IDX = 20; // JUST RANDOM NUMBER 
 
-const privileges = ["dashboard", "account-list", "market-analysis"]  //  backend key array 
+// const privileges = ["dashboard", "account-list", "market-analysis"]  //  backend key array 
 
 export default function Sidebar() {
     const isMobile = useIsMobile(992)
     const dispatch = useDispatch();
     const isCollapsed = useSelector((state) => state.action.isSidebarCollapse);
+    const userData = useSelector((state) => state.user.userData);
+    const user_type = userData?.user_type;
+    const privileges = userData?.privileges;
     const toggleSidebar2 = () => setTimeout(() => isMobile && toggleSidebar(dispatch, isMobile, isCollapsed), 100)
 
     const [openMenuIndex, setOpenMenuIndex] = useState(null);
@@ -24,8 +27,6 @@ export default function Sidebar() {
     const toggleMenu = (index) => {
         setOpenMenuIndex(openMenuIndex === index ? null : index);
     };
-
-    const filterdMenuItems = menuItems.filter((item) => (privileges || []).includes(item.backend_key));
 
     const isEventopen = openMenuIndex === EVENT_IDX;
     return (
@@ -60,7 +61,10 @@ export default function Sidebar() {
 
 
                                                 {/* {filterdMenuItems.map((item, index) => {  */}
-                                                {menuItems.map((item, index) => {  // 📌 USE ABOVE LINE WHEN BACKEND SENDS PRIVILEGES ARRAY
+                                                {(user_type == 8
+                                                    ? getFilteredMenuItems(menuItems, privileges)
+                                                    : menuItems
+                                                ).map((item, index) => {  // 📌 USE ABOVE LINE WHEN BACKEND SENDS PRIVILEGES ARRAY
                                                     const isOpen = openMenuIndex === index;
                                                     return (
                                                         <li key={index} className={`${item.liClassName || ""} ${isOpen ? "mm-active" : ""}`.trim()}>
@@ -79,7 +83,10 @@ export default function Sidebar() {
                                                                         <span style={{ marginLeft: "4px" }}>{item.label}</span>
                                                                     </Link>
                                                                     <SmoothMenu isOpen={isOpen} className="sub-menu">
-                                                                        {item.subItems.map((subItem, subIndex) => (
+                                                                        {(user_type == 8
+                                                                            ? getFilteredMenuItems(item.subItems, privileges)
+                                                                            : item.subItems
+                                                                        ).map((subItem, subIndex) => (
                                                                             <li key={subIndex}>
                                                                                 <Link
                                                                                     to={subItem.href || "#"}
@@ -111,17 +118,21 @@ export default function Sidebar() {
                                                         </li>
                                                     )
                                                 })}
-
+                                                
                                                 {/* EVENT GAMES */}
-                                                <SidebarEventsTree
-                                                    isEventopen={isEventopen}
-                                                    toggleMenu={toggleMenu}
-                                                    eventIdx={EVENT_IDX}
-                                                    openSport={openSport}
-                                                    setOpenSport={setOpenSport}
-                                                    openLeague={openLeague}
-                                                    setOpenLeague={setOpenLeague}
-                                                />
+                                                {
+                                                    (user_type !== '8' || privileges?.includes("Events")) && (
+                                                        <SidebarEventsTree
+                                                        isEventopen={isEventopen}
+                                                        toggleMenu={toggleMenu}
+                                                        eventIdx={EVENT_IDX}
+                                                        openSport={openSport}
+                                                        setOpenSport={setOpenSport}
+                                                        openLeague={openLeague}
+                                                        setOpenLeague={setOpenLeague}
+                                                        />
+                                                    )
+                                                }
                                             </ul>
                                         </div>
                                     </div>
@@ -160,3 +171,5 @@ export default function Sidebar() {
         </>
     );
 }
+
+

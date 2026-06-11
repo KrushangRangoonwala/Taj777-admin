@@ -52,7 +52,8 @@ import PremiumCasino from './pages/casino/PremiumCasino'
 import TemboCasino from './pages/casino/TemboCasino'
 import AssignAgent from './pages/users/AssignAgent'
 import SetButton from './pages/SetButton'
-import { menuItems } from './components/SidebarPages'
+import { getFilteredMenuItems, menuItems } from './components/SidebarPages'
+import LoginAuth from './pages/LoginAuth'
 
 function putLiveFirst(arr) {
   if (arr && Array.isArray(arr)) {
@@ -184,11 +185,16 @@ function AppContent() {
 
   return (
     <Routes>
+      <Route path="/admin/loginauth" element={<LoginAuth />} />
+      <Route path="/admin" element={<AdminPage />} />
+      <Route path="/admin/change-password-success/:id" element={<FirstTimeLogin />} />
+
       <Route element={<AuthGuard />}>
         <Route path="/" element={<Layout />}>
           <Route index element={<Navigate to="/admin/home" replace />} />
 
-          {menuItems.map((item) => {
+          {/* {menuItems.map((item) => { */}
+          {getFilteredMenuItems(menuItems, userdata?.privileges).map((item) => {
             if (item.subItems && item.subItems.length > 0) {
               return (
                 item.subItems.map((item) => (
@@ -202,7 +208,7 @@ function AppContent() {
             )
           })}
 
-          {/* <Route path="admin/home" element={<Dashboard />} /> */}
+          <Route path="admin/home" element={<Dashboard />} />
           <Route path="admin/secureauth" element={<SecureAuth />} />
           {userdata?.user_type == 2 && <Route path="admin/setbutton" element={<SetButton />} />}
           {/* <Route path="admin/users" element={<AccountList />} /> */}
@@ -259,16 +265,17 @@ function AppContent() {
           {/* <Route path="admin/market-analysis" element={<MarketAnalysis />} /> */}
         </Route>
       </Route>
-      <Route path="/admin" element={<AdminPage />} />
-      <Route path="/admin/change-password-success/:id" element={<FirstTimeLogin />} />
+
+      <Route path="*" element={<Navigate to="/admin/home" replace />} />
     </Routes>
   );
 }
 
+const isAdminNew = import.meta.env.VITE_IMAGE_PATH === "admin_new";
+{/* <BrowserRouter basename={isAdminNew ? "/admin_new" : ""}> */}
 function App() {
   return (
-    // <BrowserRouter basename="/admin_new/">
-    <BrowserRouter>
+    <BrowserRouter basename="/admin">
       <AppContent />
     </BrowserRouter>
   )

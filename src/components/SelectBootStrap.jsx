@@ -19,7 +19,7 @@ const CustomOption = (props) => {
     );
 };
 
-function SelectBootStrap({ selectedOption, setSelectedOption, placeholder = "Select option", fetchType: fetchType_, isFocusOnLoad = false }) {
+function SelectBootStrap({ selectedOption, setSelectedOption, placeholder = "Select option", fetchType: fetchType_, isFocusOnLoad = false, notFoundQuery_Txt, emptyList_Txt, isOnlyUser = false }) {
     const fetchType = fetchType_.toLowerCase();
     const selectRef = useRef(null);
     const [search, setSearch] = useState("");
@@ -75,7 +75,7 @@ function SelectBootStrap({ selectedOption, setSelectedOption, placeholder = "Sel
         }
 
         try {
-            const res = await getClients(value);
+            const res = await getClients(value, { is_only_user: isOnlyUser });
             if (res.status === "ok") {
                 const formatData = res.results?.map(item => {
                     return {
@@ -98,6 +98,9 @@ function SelectBootStrap({ selectedOption, setSelectedOption, placeholder = "Sel
         search?.length > 2 && fetchApi(search);
     }, [search]);
 
+    const emptyListTxt = emptyList_Txt ?? emptyList[0].text;
+    const notFoundQueryTxt = notFoundQuery_Txt ?? notFoundQuery[0].text;
+
     return (
         <Select
             ref={selectRef}
@@ -110,7 +113,7 @@ function SelectBootStrap({ selectedOption, setSelectedOption, placeholder = "Sel
                 IndicatorSeparator: () => null,
                 Option: CustomOption
             }}
-            noOptionsMessage={() => search.length ? notFoundQuery[0].text : emptyList[0].text}
+            noOptionsMessage={() => search.length ? notFoundQueryTxt : emptyListTxt}
             styles={customSelectStylesWithOption}
             onInputChange={(value) => setSearch(value)}
             onKeyDown={(e) => {
@@ -129,6 +132,7 @@ function SelectBootStrap({ selectedOption, setSelectedOption, placeholder = "Sel
                 setIsFocused(false);
             }}
             value={isFocused ? [] : selectedOption}
+            isOnlyUser={isOnlyUser}
             selectedOption={selectedOption}
             onFocus={() => {
                 setIsFocused(true);

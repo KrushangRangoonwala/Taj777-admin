@@ -10,15 +10,47 @@ import {
     checkAuthStatusApi,
     telegramOtpGenerationApi
 } from "../../api/API";
+import { Link, useNavigate } from 'react-router-dom';
+import { logout } from '../../store/slices/userSlice';
+import { useDispatch } from 'react-redux';
+import OtpInput from '../../components/OtpInput';
+import { setIsLoading } from '../../store/slices/actionSlice';
+
+function MobileAppDownload() {
+    return (
+        <>
+            <div className="mt-3">
+                <b>
+                    If you haven't downloaded,<br />
+                    please download 'Secure Auth Verification App' from below link.
+                </b>
+            </div>
+
+            <div className="mt-3">
+                Using this app you will receive auth code during login authentication
+            </div>
+
+            <div className="mt-3">
+                <Link to="https://worlds777.app/apk/auth_v1.apk" rel="noopener noreferrer">
+                    <button className="btn btn-primary">
+                        <i className="fab fa-android"></i>{" "}
+                        <span>Download on the Android</span>
+                    </button>
+                </Link>
+            </div>
+        </>
+    )
+}
 
 const SecureAuth = () => {
-
+    const chkAuthRef = useRef("");
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
     const [tab, setTab] = useState(0);
     const [authStatus, setAuthStatus] = useState(false);
     const [verificationType, setVerificationType] = useState("");
     const [otpBoxHtml, setOtpBoxHtml] = useState(null);
     const [telegramPassword, setTelegramPassword] = useState("");
-    const inputsRef = useRef([]);
 
     /* ================= LOAD STATUS ================= */
 
@@ -38,10 +70,20 @@ const SecureAuth = () => {
 
     /* ================= AUTO CHECK ================= */
 
+    /* ================= AUTO STATUS CHECK ================= */
     useEffect(() => {
         const interval = setInterval(async () => {
             try {
-                await checkAuthStatusApi({ auth_status: authStatus });
+                const res = await checkAuthStatusApi({
+                    auth_status: authStatus
+                });
+
+                console.log('chkAuthRef', chkAuthRef.current, chkAuthRef.current === "DISABLED");
+                if (chkAuthRef.current === "DISABLED" && res?.user_verification_status === "ENABLED") {
+                    dispatch(logout());
+                    setTimeout(() => navigate("/", { replace: true }), 500);
+                }
+                chkAuthRef.current = res?.user_verification_status;
             } catch (err) {
                 console.error(err);
             }
@@ -51,32 +93,52 @@ const SecureAuth = () => {
     }, [authStatus]);
 
     /* ================= OTP INPUT ================= */
+    // const handleOtpChange = async (e, index) => {
+    //     const value = e.target.value;
 
-    const handleOtpChange = async (e, index) => {
-        const value = e.target.value;
+    //     if (!/^[0-9]?$/.test(value)) {
+    //         e.target.value = "";
+    //         return;
+    //     }
 
-        if (!/^[0-9]?$/.test(value)) {
-            e.target.value = "";
-            return;
-        }
+    //     const nextInput = inputsRef.current[index + 1];
+    //     const prevInput = inputsRef.current[index - 1];
 
-        const nextInput = inputsRef.current[index + 1];
-        const prevInput = inputsRef.current[index - 1];
+    //     if (value && nextInput) nextInput.focus();
+    //     if (!value && prevInput) prevInput.focus();
 
-        if (value && nextInput) nextInput.focus();
-        if (!value && prevInput) prevInput.focus();
+    //     const otpArr = inputsRef.current.map(i => i?.value).filter(Boolean);
 
-        const otpArr = inputsRef.current.map(i => i?.value).filter(Boolean);
+    //     if (otpArr.length !== 6) return;
 
-        if (otpArr.length !== 6) return;
+    //     const otp = otpArr.join("");
 
-        const otp = otpArr.join("");
+    //     try {
+    //         const res = await disableAuthApi({ code: otp });
+    //         successToast(res?.message || "Success")
+    //     } catch (err) {
+    //         errorToast(err?.response?.data?.message || "Sorry for inconvenience! You will see statement of 10 days date range in 3 months timeslot.");
+    //     }
+    // };
+
+    /* ================= OTP INPUT ================= */
+    const checkOtp = async (otp) => {
+        if (otp.length !== 6) return;
 
         try {
-            const res = await disableAuthApi({ code: otp });
-            successToast(res?.message || "Success")
+            const res = await disableAuthApi({
+                code: otp
+            });
+            if (res?.status === "ok") {
+                // showToast({ message: "2-Step Verification is disabled for your account.", isSuccess: true });
+                successToast("Token Valid.")
+                dispatch(logout());
+                setTimeout(() => navigate("/"), 500);
+            } else {
+                // showToast({ message: res?.message || "Invalid Code", isSuccess: false });
+            }
         } catch (err) {
-            errorToast(err?.response?.data?.message || "Sorry for inconvenience! You will see statement of 10 days date range in 3 months timeslot.");
+            // showToast({ message: err?.response?.data?.message || "Invalid Code", isSuccess: false });
         }
     };
 
@@ -99,25 +161,7 @@ const SecureAuth = () => {
                             <div className="verify-code">{code}</div>
                         </div>
 
-                        <div className="mt-3">
-                            <b>
-                                If you haven't downloaded,<br />
-                                please download 'Secure Auth Verification App' from below link.
-                            </b>
-                        </div>
-
-                        <div className="mt-3">
-                            Using this app you will receive auth code during login authentication
-                        </div>
-
-                        <div className="mt-3">
-                            <a href="https://sitethemedata.com/auth_apk/SecureAuthApp-2.0.apk" target="_blank" rel="noopener noreferrer">
-                                <button className="btn btn-primary">
-                                    <i className="fab fa-android"></i>{" "}
-                                    <span>Download on the Android</span>
-                                </button>
-                            </a>
-                        </div>
+                        <MobileAppDownload />
 
                     </div>
                 </div>
@@ -139,11 +183,24 @@ const SecureAuth = () => {
             const code = res?.verification_code || res?.data?.verification_code;
 
             setOtpBoxHtml(
-                <div className="mt-3 follow-instruction text-center">
-                    <b>Please follow instructions</b>
-
-                    <p>Open your Telegram bot and send:</p>
-                    <p><kbd>/connect {code}</kbd></p>
+                <div className="mt-3">
+                    <b>Please follow below instructions for the telegram 2-step verification</b>
+                    <p>
+                        Find{' '}
+                        <Link target="_blank" to="https://t.me/Worlds777_bot?start" className="text-primary">@Worlds777_bot</Link>
+                        in your telegram and type
+                        <kbd>/start</kbd>
+                        command. Bot will respond you.
+                    </p>
+                    <p className="text-dark">
+                        After this type
+                        <kbd>/connect {code}</kbd> and send it
+                        to BOT.
+                    </p>
+                    <p>
+                        Now your telegram account will be linked with your
+                        website account and 2-Step veriication will be enabled.
+                    </p> <hr />
                 </div>
             );
 
@@ -155,35 +212,31 @@ const SecureAuth = () => {
     /* ================= DISABLE ================= */
 
     const showDisableOtp = async () => {
+        dispatch(setIsLoading(true));
         try {
-
-            if (verificationType === "Telegram") {
-                await telegramOtpGenerationApi();
-            }
-
-            setOtpBoxHtml(
-                <div className="text-center mt-3">
-
-                    <div className="mt-3">Enter 6-digit code</div>
-
-                    <div className="inputs mt-3" style={{ display: "flex", justifyContent: "center" }}>
-                        {[...Array(6)].map((_, index) => (
-                            <input
-                                key={index}
-                                ref={(el) => (inputsRef.current[index] = el)}
-                                type="tel"
-                                maxLength="1"
-                                className="otp-input"
-                                onChange={(e) => handleOtpChange(e, index)}
-                            />
-                        ))}
+            // if (verificationType === "Telegram") {
+            const res = await telegramOtpGenerationApi();
+            if (res?.status === "ok") {
+                successToast("Successfully Code Generate.");
+                setOtpBoxHtml(
+                    <div className="tab-pane active">
+                        <div className='mt-2 mb-3 login-auth'>
+                            <h3 className="text-center">Security Code Verification</h3>
+                            <div className="mt-3 text-center">
+                                Enter 6-digit code from your security auth verification App
+                            </div>
+                            <div className="mt-2 mb-3 login-auth">
+                                <OtpInput onComplete={checkOtp} />
+                            </div>
+                        </div>
                     </div>
-
-                </div>
-            );
-
-        } catch {
-            errorToast("OTP failed");
+                );
+            }
+            // }
+        } catch (err) {
+            errorToast("Failed to generate OTP");
+        } finally {
+            dispatch(setIsLoading(false));
         }
     };
 
@@ -212,9 +265,15 @@ const SecureAuth = () => {
                             Enabled
                         </span>
                     ) : (
-                        <span className="badge badge-danger">Disabled</span>
+                        <span className="badge badge-danger p-2">Disabled</span>
                     )}
                 </div>
+
+                {verificationType === "Mobile" && authStatus &&
+                    <div className='text-center'>
+                        <MobileAppDownload />
+                    </div>
+                }
 
                 {!authStatus && (
                     <>
@@ -226,7 +285,8 @@ const SecureAuth = () => {
                             <ul className="nav nav-tabs">
 
                                 <li className="nav-item pointer">
-                                    <a
+                                    <Link
+                                        to="#"
                                         className={`nav-link ${tab === 1 ? "active" : ""}`}
                                         onClick={() => {
                                             setTab(1);
@@ -235,11 +295,12 @@ const SecureAuth = () => {
                                         }}
                                     >
                                         Enable Using Mobile App
-                                    </a>
+                                    </Link>
                                 </li>
 
                                 <li className="nav-item pointer">
-                                    <a
+                                    <Link
+                                        to="#"
                                         className={`nav-link ${tab === 2 ? "active" : ""}`}
                                         onClick={() => {
                                             setTab(2);
@@ -247,7 +308,21 @@ const SecureAuth = () => {
                                         }}
                                     >
                                         Enable Using Telegram
-                                    </a>
+                                    </Link>
+                                </li>
+
+                                <li className="nav-item pointer">
+                                    <Link
+                                        to="#"
+                                        // disabled
+                                        className={`nav-link ${tab === 3 ? "active" : ""}`}
+                                        onClick={() => {
+                                            setTab(3);
+                                            setOtpBoxHtml(null);
+                                        }}
+                                    >
+                                        Enable Using Google Auth
+                                    </Link>
                                 </li>
 
                             </ul>
@@ -277,6 +352,32 @@ const SecureAuth = () => {
                                             onClick={enableTelegram}
                                         >
                                             Get Connection ID
+                                        </button>
+                                    </div>
+
+                                    {otpBoxHtml}
+                                </div>
+                            }
+                            {tab === 3 &&
+                                <div className="tab-pane telegram active text-center">
+
+                                    <b>Please enter your login password to continue</b>
+
+                                    <div className="form-group mt-3 secure-password">
+                                        <input
+                                            type="password"
+                                            placeholder="Enter your login password"
+                                            className="form-control"
+                                            value={telegramPassword}
+                                            onChange={(e) => setTelegramPassword(e.target.value)}
+                                        />
+
+                                        <button
+                                            className="btn btn-primary ml-2 vt"
+                                            disabled={!telegramPassword}
+                                            onClick={enableTelegram}
+                                        >
+                                            Submit
                                         </button>
                                     </div>
 

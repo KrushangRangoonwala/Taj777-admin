@@ -1,12 +1,27 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import { getBankDetail, accountTransaction, apiBalance } from '../../api/API';
+import { useDispatch } from 'react-redux';
 
 const Bank = () => {
+  const dispatch = useDispatch();
   const [formData, setFormData] = useState({
     masterPassword: '',
   });
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+
+  const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [searchKey, setSearchKey] = useState('');
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(25);
+  const [total, setTotal] = useState(0);
+  const totalPages = Math.ceil(total / limit);
+
+  const [amounts, setAmounts] = useState({});
+  const [rowStatus, setRowStatus] = useState({});
+  const [rowLoading, setRowLoading] = useState({});
 
   const validateField = (name, value) => {
     let error = "";
@@ -37,90 +52,161 @@ const Bank = () => {
     setErrors((prev) => ({ ...prev, [name]: error }));
   };
 
-  const dummyData = [
-    {
-      username: 'Arpit528',
-      fullName: 'Arpit',
-      cr: '10,000',
-      pts: '20,000',
-      clientPL: '10,000',
-      exposure: '0',
-      availablePts: '20,000',
-      accountType: 'Master',
-      status: '',
-    },
-    {
-      username: 'Ras44',
-      fullName: 'Apapap',
-      cr: '5,000',
-      pts: '1,573',
-      clientPL: '-3,427',
-      exposure: '0',
-      availablePts: '1,573',
-      accountType: 'User',
-      status: '',
-    },
-    {
-      username: 'Ras45',
-      fullName: 'Apapapp',
-      cr: '5,000',
-      pts: '5,000',
-      clientPL: '0',
-      exposure: '0',
-      availablePts: '5,000',
-      accountType: 'Agent',
-      status: '',
-    },
-    {
-      username: 'Ras46',
-      fullName: 'Ras46',
-      cr: '5,000',
-      pts: '2,128.75',
-      clientPL: '-2,871.25',
-      exposure: '0',
-      availablePts: '2,128.75',
-      accountType: 'User',
-      status: '',
-    },
-    {
-      username: 'Ras48',
-      fullName: 'Apapap',
-      cr: '5,000',
-      pts: '1,936',
-      clientPL: '-3,064',
-      exposure: '0',
-      availablePts: '1,936',
-      accountType: 'User',
-      status: '',
-    },
-    {
-      username: 'Ras49',
-      fullName: 'Rasg',
-      cr: '5,100',
-      pts: '1,518',
-      clientPL: '-3,582',
-      exposure: '0',
-      availablePts: '1,518',
-      accountType: 'User',
-      status: '',
-    },
-    {
-      username: 'Ras52',
-      fullName: 'Apapapap',
-      cr: '1,000',
-      pts: '9,295',
-      clientPL: '8,295',
-      exposure: '0',
-      availablePts: '9,295',
-      accountType: 'User',
-      status: '',
-    },
-  ];
+  const handleAmountChange = (id, value) => {
+    setAmounts((prev) => ({
+      ...prev,
+      [id]: value,
+    }));
+  };
 
-  const emptyData = []
+  const fetchBankData = async (
+    currentPage = page,
+    currentLimit = limit,
+    currentSearch = searchKey
+  ) => {
+    try {
+      setLoading(true);
 
-  const data = emptyData;
-  // const data = dummyData;
+      const payload = {
+        page: currentPage,
+        limit: currentLimit,
+        searchKey: currentSearch,
+        user_status: "1",
+      };
+
+      const response = await getBankDetail(payload);
+
+      if (response?.status === "ok") {
+        setData(response.data || []);
+        setTotal(response.total || 0);
+      } else {
+        setData([]);
+      }
+    } catch (error) {
+      console.log("Bank API Error:", error);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchBankData();
+  }, [page, limit]);
+
+  const handleTransfer = async (user) => {
+
+    const amount = Number(amounts[user.id]);
+
+    // Master password validation
+    if (!formData.masterPassword.trim()) {
+      setRowStatus((prev) => ({
+        ...prev,
+        [user.id]: "Please enter master password",
+      }));
+      return;
+    }
+
+    // Amount validation
+    if (!amount || amount === 0) {
+      setRowStatus((prev) => ({
+        ...prev,
+        [user.id]: "Please enter valid amount",
+      }));
+      return;
+    }
+
+    try {
+
+      setRowLoading((prev) => ({
+        ...prev,
+        [user.id]: true,
+      }));
+
+      setRowStatus((prev) => ({
+        ...prev,
+        [user.id]: "Processing...",
+      }));
+
+      // (+) deposit
+      // (-) withdraw
+      const transactionType = amount > 0 ? 1 : 2;
+
+      const payload = {
+        user_name: user.id,
+        transaction_type: transactionType,
+        transaction_points: Math.abs(amount),
+        remark: "Bank Transfer",
+        master_password: formData.masterPassword,
+      };
+
+      const response = await accountTransaction(payload);
+
+      setRowStatus((prev) => ({
+        ...prev,
+        [user.id]: response.message,
+      }));
+
+      // Refresh data after success
+      if (response.status === "ok") {
+        fetchBankData();
+        handleAmountChange(user.id, 0); // reset amount input
+        const Totbal = await apiBalance(dispatch);
+      }
+
+    } catch (error) {
+
+      setRowStatus((prev) => ({
+        ...prev,
+        [user.id]: "Something went wrong",
+      }));
+
+    } finally {
+
+      setRowLoading((prev) => ({
+        ...prev,
+        [user.id]: false,
+      }));
+    }
+  };
+
+  const handleTransferAll = async (e) => {
+
+    e.preventDefault();
+
+    // Master password validation
+    if (!formData.masterPassword.trim()) {
+      setTouched((prev) => ({
+        ...prev,
+        masterPassword: true,
+      }));
+
+      setErrors((prev) => ({
+        ...prev,
+        masterPassword: "true",
+      }));
+
+      return;
+    }
+
+    for (const user of data) {
+
+      const amount = Number(amounts[user.id]);
+
+      // Skip invalid amount rows
+      if (!amount || amount === 0) {
+
+        /* setRowStatus((prev) => ({
+          ...prev,
+          [user.id]: "Amount should not be 0",
+        })); */
+
+        continue;
+      }
+
+      await handleTransfer(user);
+    }
+  };
 
   return (
     <div data-v-5a10e370="">
@@ -149,15 +235,47 @@ const Bank = () => {
                 <div className="report-form mb-1">
                   <div className="row row5">
                     <div className="col-md-6 mb-2 search-form">
-                      <form method="post" className="ajaxFormSubmit">
+                      <form
+                        method="post"
+                        className="ajaxFormSubmit"
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                          setPage(1);
+                          fetchBankData(1, limit, searchKey);
+                        }}
+                      >
                         <div className="d-inline-block form-group form-group-feedback form-group-feedback-right" style={{ marginRight: '0.2rem' }}>
-                          <input type="text" name="searchKey" placeholder="Search User" className="form-control" />
+                          <input
+                            type="text"
+                            name="searchKey"
+                            placeholder="Search User"
+                            className="form-control"
+                            value={searchKey}
+                            onChange={(e) => setSearchKey(e.target.value)}
+                          />
                         </div>
                         <div className="d-inline-block">
                           <button type="submit" id="submit" className="btn btn-primary">
                             Load
                           </button>
-                          <button type="button" id="reset" className="btn btn-light ml-1">
+                          <button
+                            type="button"
+                            id="reset"
+                            className="btn btn-light ml-1"
+                            onClick={() => {
+                              setSearchKey('');
+                              setPage(1);
+
+                              // Reset all amount fields to 0
+                              const resetAmounts = {};
+                              data.forEach((user) => {
+                                resetAmounts[user.id] = 0;
+                              });
+                              setAmounts(resetAmounts);
+
+                              fetchBankData(1, limit, '');
+                            }}
+                          >
                             Reset
                           </button>
                         </div>
@@ -174,7 +292,12 @@ const Bank = () => {
                           <i className="fas fa-file-pdf"></i>
                         </button>
                       </div>
-                      <form data-vv-scope="transferAll" method="post" className="d-inline-block ml-1">{' '}
+                      <form
+                        data-vv-scope="transferAll"
+                        method="post"
+                        className="d-inline-block ml-1"
+                        onSubmit={handleTransferAll}
+                      >
                         <div className="d-inline-block form-group form-group-feedback form-group-feedback-right" style={{ marginRight: '0.2rem' }}>
                           <input
                             type="password"
@@ -201,14 +324,21 @@ const Bank = () => {
                     <div id="tickets-table_length" className="dataTables_length">
                       <label className="d-inline-flex align-items-center">
                         Show&nbsp;
-                        <select className="custom-select custom-select-sm" id="__BVID__2355">
-                          <option value="25">25</option>
-                          <option value="50">50</option>
-                          <option value="100">100</option>
-                          <option value="250">250</option>
-                          <option value="500">500</option>
-                          <option value="750">750</option>
-                          <option value="1000">1000</option>
+                        <select
+                          className="custom-select custom-select-sm"
+                          id="__BVID__2355"
+                          value={limit}
+                          onChange={(e) => {
+                            setLimit(Number(e.target.value));
+                            setPage(1);
+                          }}
+                        >
+                          <option>25</option>
+                          <option>50</option>
+                          <option>75</option>
+                          <option>100</option>
+                          <option>125</option>
+                          <option>150</option>
                         </select>
                         &nbsp;entries
                       </label>
@@ -268,13 +398,51 @@ const Bank = () => {
                               </td>
                               <td aria-colindex="7" role="cell">{user.accountType}</td>
                               <td aria-colindex="8" role="cell">
-                                <a href="javascript:void(0)" className="text-success">All <i className="fas fa-arrow-right"></i></a>
-                                <input type="number" name="amount" placeholder="0" className="form-control form-control-sm transfer-amt d-inline-block mx-1" style={{ width: '122px' }} />
-                                <button className="btn btn-info btn-sm">
-                                  Submit
+                                <a
+                                  href="javascript:void(0)"
+                                  className="text-success"
+                                  onClick={() =>
+                                    handleAmountChange(
+                                      user.id,
+                                      Number(user.clientPL) > 0
+                                        ? -Math.abs(Number(user.clientPL))
+                                        : Math.abs(Number(user.clientPL))
+                                    )
+                                  }
+                                >
+                                  All <i className="fas fa-arrow-right"></i>
+                                </a>
+                                <input
+                                  type="number"
+                                  name="amount"
+                                  placeholder="0"
+                                  value={amounts[user.id] ?? 0}
+                                  onChange={(e) =>
+                                    handleAmountChange(user.id, e.target.value)
+                                  }
+                                  className="form-control form-control-sm transfer-amt d-inline-block mx-1"
+                                  style={{ width: '122px' }}
+                                />
+                                <button
+                                  className="btn btn-info btn-sm"
+                                  type="button"
+                                  onClick={() => handleTransfer(user)}
+                                  disabled={rowLoading[user.id]}
+                                >
+                                  {rowLoading[user.id] ? "Loading..." : "Submit"}
                                 </button>
                               </td>
-                              <td aria-colindex="9" role="cell">{user.status}</td>
+                              <td aria-colindex="9" role="cell">
+                                <span
+                                  className={
+                                    rowStatus[user.id]?.toLowerCase().includes("success")
+                                      ? "text-success"
+                                      : "text-danger"
+                                  }
+                                >
+                                  {rowStatus[user.id]}
+                                </span>
+                              </td>
                             </tr>
                           ))
                         ) : (
@@ -282,13 +450,11 @@ const Bank = () => {
                             <td colSpan="9" role="cell">
                               <div role="alert" aria-live="polite">
                                 <div className="text-center my-2">
-                                  {/* {loading
-                                      ? "Loading..."
-                                      // ? "There are no records to show"
-                                      : search?.length
-                                        ? "There are no records matching your request"
-                                        : "There are no records to show"} */}
-                                  There are no records to show
+                                  {loading
+                                    ? "Loading..."
+                                    : searchKey
+                                      ? "There are no records matching your request"
+                                      : "There are no records to show"}
                                 </div>
                               </div>
                             </td>
@@ -301,26 +467,81 @@ const Bank = () => {
                 <div className="row pt-3">
                   <div className="col">
                     <div className="dataTables_paginate paging_simple_numbers float-right">
-                      <ul className="pagination pagination-rounded mb-0">
-                        <ul role="menubar" aria-disabled="false" aria-label="Pagination" className="pagination dataTables_paginate paging_simple_numbers my-0 b-pagination justify-content-end">
-                          <li role="presentation" aria-hidden="true" className="page-item disabled">
-                            <span role="menuitem" aria-label="Go to first page" aria-disabled="true" className="page-link">«</span>
-                          </li>
-                          <li role="presentation" aria-hidden="true" className="page-item disabled">
-                            <span role="menuitem" aria-label="Go to previous page" aria-disabled="true" className="page-link">‹</span>
-                          </li>
-                          <li role="presentation" className="page-item active">
-                            <button role="menuitemradio" type="button" aria-label="Go to page 1" aria-checked="true" aria-posinset="1" aria-setsize="1" tabIndex="0" className="page-link">1</button>
-                          </li>
-                          <li role="presentation" aria-hidden="true" className="page-item disabled">
-                            <span role="menuitem" aria-label="Go to next page" aria-disabled="true" className="page-link">›</span>
-                          </li>
-                          <li role="presentation" aria-hidden="true" className="page-item disabled">
-                            <span role="menuitem" aria-label="Go to last page" aria-disabled="true" className="page-link">»</span>
-                          </li>
-                        </ul>
+                      <ul className="pagination pagination-rounded mb-0 float-right">
+
+                        {/* First */}
+                        <li
+                          className={`page-item ${page === 1 ? "disabled" : ""}`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => setPage(1)}
+                            disabled={page === 1}
+                          >
+                            «
+                          </button>
+                        </li>
+
+                        {/* Previous */}
+                        <li
+                          className={`page-item ${page === 1 ? "disabled" : ""}`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => setPage(page - 1)}
+                            disabled={page === 1}
+                          >
+                            ‹
+                          </button>
+                        </li>
+
+                        {/* Page Numbers */}
+                        {[...Array(totalPages)].map((_, index) => {
+                          const pageNumber = index + 1;
+
+                          return (
+                            <li
+                              key={pageNumber}
+                              className={`page-item ${page === pageNumber ? "active" : ""}`}
+                            >
+                              <button
+                                className="page-link"
+                                onClick={() => setPage(pageNumber)}
+                              >
+                                {pageNumber}
+                              </button>
+                            </li>
+                          );
+                        })}
+
+                        {/* Next */}
+                        <li
+                          className={`page-item ${page === totalPages ? "disabled" : ""}`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => setPage(page + 1)}
+                            disabled={page === totalPages}
+                          >
+                            ›
+                          </button>
+                        </li>
+
+                        {/* Last */}
+                        <li
+                          className={`page-item ${page === totalPages ? "disabled" : ""}`}
+                        >
+                          <button
+                            className="page-link"
+                            onClick={() => setPage(totalPages)}
+                            disabled={page === totalPages}
+                          >
+                            »
+                          </button>
+                        </li>
                       </ul>
                     </div>
+
                   </div>
                 </div>
               </div>
@@ -333,7 +554,3 @@ const Bank = () => {
 };
 
 export default Bank;
-
-
-//aaaaaaaaaabbbbbbbbbbbccccccccccc
-//10000000000000000000000000000

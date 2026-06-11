@@ -527,6 +527,7 @@ function CricketMarkets({
     openedBetPoint,
     livePoints,
     prevSocketData,
+    selectedMatch,
 }) {
     const aa = isTied ? cricketMarkets.filter((market) => market.marketName === "Tied Match") : cricketMarkets.filter((market) => market.marketName !== "Tied Match");
 
@@ -561,6 +562,7 @@ function CricketMarkets({
                     openedBetPoint={openedBetPoint}
                     livePoints={livePoints}
                     prevSocketData={prevSocketData}
+                    event_id={selectedMatch?.event_id || selectedMatch?.matchid}
                     showUserBook={true}
                 />
 
@@ -578,6 +580,7 @@ function CricketMarkets({
                     openedBetPoint={openedBetPoint}
                     livePoints={livePoints}
                     prevSocketData={prevSocketData}
+                    event_id={selectedMatch?.event_id || selectedMatch?.matchid}
                     showUserBook={true}
                 />
 
@@ -601,6 +604,7 @@ function CricketMarkets({
                     livePoints={livePoints}
                     prevSocketData={prevSocketData}
                     showUserBook={true}
+                    event_id={selectedMatch?.event_id || selectedMatch?.matchid}
                 />
             </React.Fragment>
         );
@@ -1012,15 +1016,24 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
                             </>
                         ) : socketData && !isCricket ? (
                             <>
-                                <CricketMarkets isTied={false} {...eventProps} cricketMarkets={cricketMarkets} marketBookmakers={marketBookmakers} />
-                                <CricketMarkets isTied={true} {...eventProps} cricketMarkets={cricketMarkets} marketBookmakers={marketBookmakers} />
+                                <CricketMarkets isTied={false} {...eventProps} cricketMarkets={cricketMarkets} marketBookmakers={marketBookmakers} selectedMatch={selectedMatch} />
+                                <CricketMarkets isTied={true} {...eventProps} cricketMarkets={cricketMarkets} marketBookmakers={marketBookmakers} selectedMatch={selectedMatch} />
                             </>
                         ) : (
                             <div style={{ color: 'white', textAlign: 'center', padding: '20px' }}>Loading live data...</div>
                         )}
                     </div>
                 </div>
-                <EventRightSidebar tvUrl={tvUrl} liveScoreData={liveScoreData} isLive={selectedMatch?.inPlay && !isLeague} activeBets={activeBets} />
+                <EventRightSidebar
+                    tvUrl={tvUrl}
+                    liveScoreData={liveScoreData}
+                    isLive={selectedMatch?.inPlay && !isLeague}
+                    activeBets={activeBets}
+                    event_id={
+                        selectedMatch?.event_id ||
+                        selectedMatch?.matchid
+                    }
+                />
 
                 <MoreMarketModal
                     show={isMoreMarketModalOpen}
