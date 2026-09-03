@@ -127,9 +127,10 @@ const BetStatementModal = ({
       }}
       tabIndex="-1"
       role="dialog"
+      onClick={onClose}
     >
 
-      <div className="modal-dialog modal-xl">
+      <div className="modal-dialog modal-xl" onClick={(e) => e.stopPropagation()}>
 
         <div className="modal-content">
 

@@ -3,7 +3,7 @@ import { accountTransaction, apiBalance } from "../api/API";
 import { useDispatch, useSelector } from 'react-redux';
 import { errorToast, successToast } from '../utils/toast';
 
-const WithdrawModal = ({ user, onClose }) => {
+const WithdrawModal = ({ user, onClose, onSuccess }) => {
 
   const dispatch = useDispatch();
 
@@ -148,6 +148,8 @@ const WithdrawModal = ({ user, onClose }) => {
           res.message || "Withdraw successful"
         );
 
+        onSuccess();
+
         setFormData({
           amount: '',
           remark: '',
@@ -188,11 +190,13 @@ const WithdrawModal = ({ user, onClose }) => {
       }}
       tabIndex="-1"
       role="dialog"
+      onClick={onClose}
     >
 
       <div
         className="modal-dialog"
         role="document"
+        onClick={(e) => e.stopPropagation()}
       >
 
         <div

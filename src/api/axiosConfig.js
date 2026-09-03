@@ -9,6 +9,7 @@ function handleUnauthorized() {
     store.dispatch(logout());
     store.dispatch(setIsSessionExpired(true));
     sessionStorage.removeItem('userdata');
+    console.log("function handleUnauthorized() {");
     window.location.href = "/admin";
     /* window.location.href = "/admin_new"; */
 }
@@ -25,7 +26,7 @@ const createApiInstance = (baseURL) => {
     instance.interceptors.response.use(
         (response) => {
             const data = response?.data || {};
-
+            console.log('ddddddddddddata', data);
             const message = (
                 data?.message ||
                 data?.msg ||
@@ -40,6 +41,7 @@ const createApiInstance = (baseURL) => {
                 code === "ACCOUNT_BLOCKED" ||
                 code === "SESSION_EXPIRED" ||
 
+                message.includes("Invalid Key") ||
                 message.includes("unauthorized") ||
                 message.includes("unauthorised") ||
                 message.includes("account blocked") ||
@@ -72,6 +74,7 @@ const createApiInstance = (baseURL) => {
                 code === "ACCOUNT_BLOCKED" ||
                 code === "SESSION_EXPIRED" ||
 
+                message.includes("Invalid Key") ||
                 message.includes("unauthorised") ||
                 message.includes("unauthorized") ||
                 message.includes("account blocked") ||
@@ -94,14 +97,7 @@ const createApiInstance = (baseURL) => {
     return instance;
 };
 
-// export const ajax_adm = createApiInstance("http://159.65.143.49/~sevennew/ajax_adm/");
-// export const ajax_files = createApiInstance("http://159.65.143.49/~sevennew/ajaxfiles/");
-
-// export const ajax_adm = createApiInstance("http://159.65.143.49/~worlds7/ajax_adm/");
-// export const ajax_files = createApiInstance("http://159.65.143.49/~worlds7/ajaxfiles/");
-
-// const base_url = import.meta.env.VITE_IMAGE_PATH === "admin_new" ? "https://worlds777.app/" : "http://159.65.143.49/~sevennew/";
-const base_url = "https://worlds777.app/";
+const base_url = import.meta.env.VITE_BACKEND_BASE_URL;
 
 export const ajax_adm = createApiInstance(base_url + "ajax_adm/");
 export const ajax_files = createApiInstance(base_url + "ajaxfiles/");

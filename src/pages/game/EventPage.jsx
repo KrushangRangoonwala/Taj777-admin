@@ -664,7 +664,7 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
 
     const [liveScoreData, setLiveScoreData] = useState(null);
 
-    const socket = useSocket("casino");
+    const socket = useSocket("sports");
 
     function dummyFunction() {
         (async () => {
@@ -803,8 +803,11 @@ const EventPage = ({ socketData, setSocketData, initialSocketData, requestOdds }
 
 
     const oldgameId = initialSocketData?.[0]?.oldGameId;
-    const scoreCardUrl = `https://e765432.diamondcricketid.com/anm.php?type=scorecard&eventid=${oldgameId}&sportid=${selectedMatch?.SportId}`
-    const tvUrl = `https://e765432.diamondcricketid.com/tvd247.php?1=1&sportid=${selectedMatch?.SportId}&gmid=${oldgameId}`
+    const nn = getSportName(Number(selectedMatch?.SportId)).toLowerCase();
+    const tvUrl = `https://play.trubets365.com/relay-tv/${oldgameId}`
+    const scoreCardUrl = `https://api.trubets365.com/api/scoreboard/${nn}/${oldgameId}`
+    // const scoreCardUrl = `https://e765432.diamondcricketid.com/anm.php?type=scorecard&eventid=${oldgameId}&sportid=${selectedMatch?.SportId}`
+    // const tvUrl = `https://e765432.diamondcricketid.com/tvd247.php?1=1&sportid=${selectedMatch?.SportId}&gmid=${oldgameId}`
 
     return (
         <div className="detail-page-container">

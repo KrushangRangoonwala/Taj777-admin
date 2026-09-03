@@ -69,7 +69,7 @@ function AppContent() {
   const location = useLocation();
   const { isLoggedIn } = useSelector((state) => state.user);
   const dispatch = useDispatch();
-  const socket = useSocket("casino");
+  const socket = useSocket("sports");
   const activeTab = useSelector(state => state.match.activeTab);
   const userdata = useSelector(state => state.user.userData);
   const game_id = activeTab?.id;
@@ -135,7 +135,7 @@ function AppContent() {
     if (!game_name) return;
     const name = game_name.toLowerCase() === "football" ? "Soccer" : game_name;
     try {
-      const res = await axios.get(`https://trubet9.bet:2053/get${name}Matches`);
+      const res = await axios.get(`https://allpanelexch.fyi:8443/get${name}Matches`);
       handleLiveEventName(res?.data);
     } catch (error) {
       console.log("error fetching match data", error);
@@ -272,10 +272,10 @@ function AppContent() {
 }
 
 const isAdminNew = import.meta.env.VITE_IMAGE_PATH === "admin_new";
-{/* <BrowserRouter basename={isAdminNew ? "/admin_new" : ""}> */}
+{/* <BrowserRouter basename={isAdminNew ? "/admin_new" : ""}> */ }
 function App() {
   return (
-    <BrowserRouter basename="/admin">
+    <BrowserRouter basename=""> {/* basename="/admin" */}
       <AppContent />
     </BrowserRouter>
   )
@@ -288,3 +288,5 @@ export default App
 // "List is empty." -> WROKED PERFACTLY IN GENERAL LOCK
 
 // getUserList
+
+// dist,.md,Sidebar copy 2.jsx,sidebarEvents.json,Sidebar copy.jsx

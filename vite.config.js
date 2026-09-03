@@ -11,6 +11,7 @@ export default defineConfig({
   //   port: 5174,
   // },
 
+  // base: '/',
   base: '/admin', // '/admin/'
   /* base: '/admin_new', // '/admin_new/' */
 

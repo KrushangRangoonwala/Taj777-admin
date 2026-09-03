@@ -110,8 +110,9 @@ const ChangeUserStatusModal = ({ user, onClose, onSuccess }) => {
       }}
       tabIndex="-1"
       role="dialog"
+      onClick={onClose}
     >
-      <div className="modal-dialog modal-md" role="document">
+      <div className="modal-dialog modal-md" role="document" onClick={(e) => e.stopPropagation()}>
 
         <div className="modal-content">
 

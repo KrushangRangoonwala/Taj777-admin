@@ -3,7 +3,7 @@ import { accountTransaction, apiBalance } from "../api/API";
 import { useDispatch, useSelector } from 'react-redux';
 import { errorToast, successToast } from '../utils/toast';
 
-const DepositModal = ({ user, onClose }) => {
+const DepositModal = ({ user, onClose, onSuccess }) => {
   console.log("DepositModal user:", user); // debug
   const dispatch = useDispatch();
   const username = useSelector(store => store.user.name);
@@ -122,6 +122,8 @@ const DepositModal = ({ user, onClose }) => {
       if (res.status === "ok") {
         successToast(res.message || "Deposit successful");
 
+        onSuccess();
+
         setFormData({
           amount: '',
           remark: '',
@@ -144,8 +146,8 @@ const DepositModal = ({ user, onClose }) => {
   };
 
   return (
-    <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050, overflowY: 'auto' }} tabIndex="-1" role="dialog">
-      <div className="modal-dialog" role="document">
+    <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050, overflowY: 'auto' }} tabIndex="-1" role="dialog" onClick={onClose}>
+      <div className="modal-dialog" role="document" onClick={(e) => e.stopPropagation()}>
         <div className="modal-content">
 
           <header className="modal-header bg-success">

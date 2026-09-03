@@ -299,7 +299,7 @@ export async function getUserList(payload) {
       ...payload,
       ...getDefaultParams(),
     };
-    const { data } = await ajax_adm.post("get_user_list", fullPayload);
+    const { data } = await ajax_adm.post("get_user_list.php", fullPayload);
     return data;
   } catch (error) {
     console.error("Error fetching data:", error);

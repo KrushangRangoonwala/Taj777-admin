@@ -534,16 +534,16 @@ const CreateAccount = () => {
 
                               <td className="fixed-col-1">
 
-                                <a
-                                  href="javascript:void(0)"
+                                <button
+                                  type="button"
                                   className="text-white btn btn-primary"
                                   onClick={() => handleEditUser(user)}
                                 >
                                   U
-                                </a>{" "}
+                                </button>{" "}
 
-                                <a
-                                  href="javascript:void(0)"
+                                <button
+                                  type="button"
                                   className="text-white btn btn-info"
                                   onClick={() => {
                                     setSelectedStatusUser(user);
@@ -551,20 +551,18 @@ const CreateAccount = () => {
                                   }}
                                 >
                                   S
-                                </a>{" "}
+                                </button>{" "}
 
-                                <a
-                                  href="javascript:void(0)"
+                                <button
+                                  type="button"
                                   className="text-white btn btn-success"
                                   onClick={() => {
-
                                       setSelectedPasswordUser(user);
-
                                       setShowPasswordModal(true);
                                   }}
-                              >
+                                >
                                   P
-                              </a>
+                                </button>
 
                               </td>
 

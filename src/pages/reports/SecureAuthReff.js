@@ -16,10 +16,11 @@ import showToast from "../../utilies/toaster";
 import { useDispatch } from "react-redux";
 import { logout } from "../../store/slices/userSlice";
 import { useNavigate } from "react-router-dom";
+import { getSocketUrl } from "../../api/Socket/socketConfig";
 
-const SOCKET_URL = process.env.REACT_APP_GAME_IP;
-const TELEGRAM_BOT = process.env.REACT_APP_TELEGRAM_BOT;
-const TELEGRAM_LINK = process.env.REACT_APP_TELEGRAM_LINK;
+const SOCKET_URL = getSocketUrl("casino");
+const TELEGRAM_BOT = process.env.VITE_TELEGRAM_BOT;
+const TELEGRAM_LINK = process.env.VITE_TELEGRAM_LINK;
 
 console.log(SOCKET_URL, "SOCKET_URL");
 
@@ -189,7 +190,7 @@ const SecurityAuthVerification = () => {
               </div>
 
               <div className="mt-3">
-                <button type="button" className="btn btn-primary" onClick={() => window.location.href = "https://worlds777.app/apk/auth_v1.apk"}>
+                <button type="button" className="btn btn-primary" onClick={() => window.location.href = `${import.meta.env.VITE_BACKEND_BASE_URL}/apk/auth_v1.apk`}>
                   <i className="fab fa-android"></i>{" "}
                   <span>Download on the Android</span>
                 </button>
@@ -312,7 +313,7 @@ const SecurityAuthVerification = () => {
                                 </div>
 
                                 <div className="mt-3">
-                                    <button type="button" className="btn btn-primary" onClick={() => window.location.href = "https://worlds777.app/apk/auth_v1.apk"}>
+                                    <button type="button" className="btn btn-primary" onClick={() => window.location.href = `${import.meta.env.VITE_BACKEND_BASE_URL}/apk/auth_v1.apk`}>
                                         <i className="fab fa-android"></i>{" "}
                                         <span>Download on the Android</span>
                                     </button>

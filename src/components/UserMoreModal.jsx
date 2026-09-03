@@ -355,8 +355,8 @@ const UserMoreModal = ({ user, onClose, userdata, onSuccess }) => {
   console.log("Rendering UserMoreModal with user:", user);
 
   return (
-    <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050, overflowY: 'auto' }} tabIndex="-1" role="dialog">
-      <div className="modal-dialog modal-xl" role="document">
+    <div className="modal fade show" style={{ display: 'block', backgroundColor: 'rgba(0,0,0,0.5)', zIndex: 1050, overflowY: 'auto' }} tabIndex="-1" role="dialog" onClick={onClose}>
+      <div className="modal-dialog modal-xl" role="document" onClick={(e) => e.stopPropagation()}>
         <div id="__BVID__3181___BV_modal_content_" tabIndex="-1" className="modal-content">
           <header id="__BVID__3181___BV_modal_header_" className="modal-header bg-primary">
             <h5 className="modal-title text-uppercase text-white">

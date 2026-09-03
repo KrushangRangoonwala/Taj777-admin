@@ -1,18 +1,27 @@
 import React, { useEffect, useRef, useState } from "react";
 import { io } from "socket.io-client";
 import SocketContext from "./SocketContext";
-import { SOCKETS } from "./socketConfig";
+import { getSocketUrl } from "./socketConfig";
 
 const SocketProvider = ({ children }) => {
     const [ready, setReady] = useState(false);
     const socketsRef = useRef({
         casino: null,
+        sports: null,
         mining: null,
     });
 
     useEffect(() => {
         // 🎰 Casino Socket
-        socketsRef.current.casino = io(SOCKETS.CASINO, {
+        socketsRef.current.casino = io(getSocketUrl("casino"), {
+            transports: ["websocket", "polling"],
+            reconnection: true,
+            reconnectionAttempts: Infinity,
+            reconnectionDelay: 1000,
+        });
+
+        // ⚽ Sports Socket
+        socketsRef.current.sports = io(getSocketUrl("sports"), {
             transports: ["websocket", "polling"],
             reconnection: true,
             reconnectionAttempts: Infinity,

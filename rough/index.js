@@ -1560,13 +1560,3 @@ const SportsCenterContainer = ({
 };
 
 export default SportsCenterContainer;
-
-
-// https://worlds777.app/Images/newlaunched/1733733913274.jpg
-// https://worlds777.app/storage//home_mob.jpeg
-
-// https://e765432.diamondcricketid.com/tvd247.php?1=1&sportid=2&gmid=643604506 tv saffron
-// https://e765432.diamondcricketid.com/anm.php?type=scorecard&eventid=643604506&sportid=2 scorecard saffron
-
-
-// 5ea63a42

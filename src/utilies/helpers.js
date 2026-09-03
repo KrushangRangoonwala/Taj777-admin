@@ -106,8 +106,8 @@ export const getImage = (cardCode, folders, extension_) => {
     const bb = aa.split('/').filter(val => val !== '').join('/');
 
     if (!cardCode || cardCode === "1")
-        return `/${import.meta.env.VITE_IMAGE_PATH}/assets/${bb}/1.png`;
-    return `/${import.meta.env.VITE_IMAGE_PATH}/assets/${bb}/${cardCode}.${extension}`
+        return `/assets/${bb}/1.png`; //`/${import.meta.env.VITE_IMAGE_PATH}/assets/${bb}/1.png`;
+    return `/assets/${bb}/${cardCode}.${extension}` //`/${import.meta.env.VITE_IMAGE_PATH}/assets/${bb}/${cardCode}.${extension}`
 };
 
 export function getCardImage(cardCode, folders_) {

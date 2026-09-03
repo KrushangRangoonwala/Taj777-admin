@@ -507,12 +507,18 @@ const ActiveUsers = () => {
         <DepositModal
           user={selectedUser}
           onClose={() => setShowDepositModal(false)}
+          onSuccess={() => {
+            fetchUserList();
+          }}
         />
       )}
       {showWithdrawModal && (
         <WithdrawModal
           user={selectedUser}
           onClose={() => setShowWithdrawModal(false)}
+          onSuccess={() => {
+            fetchUserList();
+          }}
         />
       )}
     </div>

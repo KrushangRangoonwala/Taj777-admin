@@ -724,7 +724,7 @@ const AccountStatement = () => {
                                 </div>
                               </td>
                               <td aria-colindex="5" role="cell">
-                                <div className="text-right text-success">
+                                <div className={`text-right ${Number(row.balance) < 0 || String(row.balance).trim().startsWith('-') ? 'text-danger' : 'text-success'}`}>
                                   <span>{row.balance}</span>
                                 </div>
                               </td>

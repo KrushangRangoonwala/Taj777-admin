@@ -240,9 +240,10 @@ const CRModal = ({ user, onClose, onSuccess }) => {
       className="modal fade show"
       aria-modal="true"
       style={{ display: "block" }}
+      onClick={onClose}
     >
 
-      <div className="modal-dialog modal-lg">
+      <div className="modal-dialog modal-lg" onClick={(e) => e.stopPropagation()}>
 
         <span tabIndex="0"></span>
 

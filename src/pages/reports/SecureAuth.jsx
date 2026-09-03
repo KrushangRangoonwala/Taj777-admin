@@ -31,7 +31,7 @@ function MobileAppDownload() {
             </div>
 
             <div className="mt-3">
-                <Link to="https://worlds777.app/apk/auth_v1.apk" rel="noopener noreferrer">
+                <Link to={`${import.meta.env.VITE_BACKEND_BASE_URL}/apk/auth_v1.apk`} rel="noopener noreferrer">
                     <button className="btn btn-primary">
                         <i className="fab fa-android"></i>{" "}
                         <span>Download on the Android</span>
@@ -187,7 +187,13 @@ const SecureAuth = () => {
                     <b>Please follow below instructions for the telegram 2-step verification</b>
                     <p>
                         Find{' '}
-                        <Link target="_blank" to="https://t.me/Worlds777_bot?start" className="text-primary">@Worlds777_bot</Link>
+                        <Link
+                            target="_blank"
+                            to={`https://t.me/${import.meta.env.VITE_TELEGRAM_LINK}?start`}
+                            className="text-primary"
+                        >
+                            {import.meta.env.VITE_TELEGRAM_BOT}
+                        </Link>
                         in your telegram and type
                         <kbd>/start</kbd>
                         command. Bot will respond you.

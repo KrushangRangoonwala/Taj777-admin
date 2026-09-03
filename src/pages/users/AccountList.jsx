@@ -72,6 +72,17 @@ const AccountList = () => {
     fetchUserList(searchKey, 1);
   }, [limit]);
 
+  const getAdminBasePath = () => {
+    const pathname = window.location.pathname || "/";
+    const match = pathname.match(/^\/(admin|admin_new)(?=\/|$)/);
+    return match ? match[0] : "";
+  };
+
+  const buildChildAccountUrl = (userId) => {
+    const basePath = getAdminBasePath();
+    return `${basePath}/child/${userId}`;
+  };
+
   function openWithSession(url) {
     const sessionData = {};
 
@@ -426,15 +437,19 @@ const AccountList = () => {
 
                               <td aria-colindex="1" role="cell">
                                 {user.accountType.toLowerCase() !== "user" ? (
-                                  <Link
-                                    onClick={() => openWithSession(`/${import.meta.env.VITE_IMAGE_PATH}/admin/child/${user.id}`)}
+                                  <a
+                                    href={buildChildAccountUrl(user.id)}
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      openWithSession(buildChildAccountUrl(user.id));
+                                    }}
                                     className="wrape-text"
                                     title={user.fullName}
                                     target="_blank"
                                     rel="noopener noreferrer"
                                   >
                                     <span>{user.username}</span>
-                                  </Link>
+                                  </a>
                                 ) : (
                                   <span title={user.fullName}>
                                     {user.username}
@@ -609,6 +624,9 @@ const AccountList = () => {
         <DepositModal
           user={selectedUser}
           onClose={() => setShowDepositModal(false)}
+          onSuccess={() => {
+            fetchUserList();
+          }}
         />
       )}
 
@@ -616,6 +634,9 @@ const AccountList = () => {
         <WithdrawModal
           user={selectedUser}
           onClose={() => setShowWithdrawModal(false)}
+          onSuccess={() => {
+            fetchUserList();
+          }}
         />
       )}
     </div>

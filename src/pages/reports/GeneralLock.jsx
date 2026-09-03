@@ -6,6 +6,7 @@ import { casino_list } from "../../utilies/casino_list";
 import { errorToast, successToast } from '../../utils/toast';
 import PageNamePath from "../../components/PageNamePath";
 import SelectBootStrap from "../../components/SelectBootStrap";
+import { getSocketUrl } from "../../api/Socket/socketConfig";
 
 // Event tree node component
 const EventTreeNode = ({ node, onChange }) => {
@@ -89,7 +90,7 @@ const GeneralLock = () => {
 
   // SOCKET: fetch matches dynamically
   useEffect(() => {
-    const socket = io("https://trubet9.bet:2053", {
+    const socket = io(getSocketUrl("sports"), {
       transports: ["websocket", "polling"],
       reconnection: true,
       reconnectionAttempts: Infinity,
@@ -108,8 +109,8 @@ const GeneralLock = () => {
 
         Object.values(sport.body).forEach((match) => {
           const sportId = match.SportId;
-          const cid = match.cid;       // ✅ competition id
-          const cname = match.cname;   // ✅ competition name
+          const cid = match.cid;       // competition id
+          const cname = match.cname;   // competition name
 
           if (!updated[sportId]) updated[sportId] = {};
 
@@ -167,7 +168,7 @@ const GeneralLock = () => {
     const { casino_names = [], sport_type = [] } = data;
 
     /* const casinoTypes = [
-        { value: "", label: "Select Type" },   // ✅ static first option
+        { value: "", label: "Select Type" },   //  static first option
         ...(casino_list?.map(val => ({
             value: val.game_socket,
             label: val.game_name,
@@ -178,19 +179,19 @@ const GeneralLock = () => {
 
     const events = Object.keys(matchesBySport).map((sportId) => ({
       id: sportId,
-      sportId, // ✅ important
+      sportId, //  important
       name: sportsMap[sportId] || "Unknown",
       checked: sport_type.includes(sportId),
 
       children: Object.values(matchesBySport[sportId] || {}).map((comp) => ({
         id: comp.cid,
         name: comp.cname,
-        sportId, // ✅ pass down
+        sportId, //  pass down
 
         children: comp.matches.map((match) => ({
           id: match.marketId,
           name: match.matchName,
-          sportId, // ✅ pass down
+          sportId, //  pass down
           markets: [
             {
               type: "Match",
@@ -198,7 +199,7 @@ const GeneralLock = () => {
                 {
                   id: match.marketId,
                   name: match.matchName,
-                  sportId, // ✅ pass down
+                  sportId, //  pass down
                   checked: casino_names.includes(
                     match.marketId.toString()
                   ),
@@ -234,7 +235,7 @@ const GeneralLock = () => {
         username: selectedClient?.value || null,
       });
 
-      // ✅ CASINO
+      //  CASINO
       if (!item.sportId) {
         setCasinoData((prev) =>
           prev.map((c) =>
@@ -244,7 +245,7 @@ const GeneralLock = () => {
         return;
       }
 
-      // ✅ EVENTS
+      //  EVENTS
       setEventData((prev) =>
         prev.map((sport) => {
           const isSport = item.id === sport.id;
