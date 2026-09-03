@@ -10,7 +10,7 @@ import {
     disableAuthApi,
     checkAuthStatusApi,
     telegramOtpGenerationApi
-} from "../../api/api";
+} from "../../api/API";
 import Loader from "../Loader/Loader";
 import showToast from "../../utilies/toaster";
 import { useDispatch } from "react-redux";

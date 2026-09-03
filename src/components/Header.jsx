@@ -255,9 +255,9 @@ export default function Header() {
                     <div className="navbar-brand-box"><Link to="/admin/home" aria-current="page"
                         className="logo logo-light router-link-exact-active router-link-active"><span
                             className="logo-sm"><img
-                                src="https://wver.sprintstaticdata.com/v207/static/admin/img/icon.png" alt=""
+                                src={`/${import.meta.env.VITE_IMAGE_PATH}/img/icon.png`} alt=""
                                 height="22" /></span> <span className="logo-lg"><img
-                                    src="https://sitethemedata.com/sitethemes/world777.com/front/logo.png" alt=""
+                                    src={`/${import.meta.env.VITE_IMAGE_PATH}/logo.png`} alt=""
                                     className="site-logo" /></span></Link></div>
                     <button
                         id="vertical-menu-btn"

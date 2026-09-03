@@ -90,7 +90,7 @@ const LoginAuth = () => {
             {isLoading && <Loading />}
             <div class="loginInner1 authentication">
                 <div class="log-logo m-b-20 text-center">
-                    <img src="https://sitethemedata.com/sitethemes/world777.com/front/logo.png" class="logo-login" />
+                    <img src={`/${import.meta.env.VITE_IMAGE_PATH}/logo.png`} class="logo-login" />
                 </div>
                 <div class="featured-box-login featured-box-secundary default">
                     <h3 class="text-center">

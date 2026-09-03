@@ -323,7 +323,7 @@ export const isPageAtTop = () => {
     return window.scrollY === 0;
 };
 
-export const footerText = "This website is owned and operated by (WORLD777.COM) Seven Investments America N.V.. registration number: 152581, registered address: Zuikertuintjeweg Z/N (Zuikertuin Tower), Curaçao. Contact us info@world7.com. world7.com is licensed and regulated by the Government of the Autonomous Island of Anjouan, Union of Comoros and operates under License No. ALSI-122310018-F16. world7.com has passed all regulatory compliance and is legally authorized to conduct gaming operations for any and all games of chance and wagering.";
+export const footerText = `This website is owned and operated by (${import.meta.env.VITE_SITE_URL_UPPERCASE}) Seven Investments America N.V.. registration number: 152581, registered address: Zuikertuintjeweg Z/N (Zuikertuin Tower), Curaçao. Contact us info@world7.com. ${import.meta.env.VITE_SITE_URL} is licensed and regulated by the Government of the Autonomous Island of Anjouan, Union of Comoros and operates under License No. ALSI-122310018-F16. ${import.meta.env.VITE_SITE_URL} has passed all regulatory compliance and is legally authorized to conduct gaming operations for any and all games of chance and wagering.`;
 
 export const emptyList = [{ id: '1', text: 'List is empty.' }]
 

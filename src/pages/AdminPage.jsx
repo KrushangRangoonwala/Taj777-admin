@@ -300,7 +300,7 @@ const AdminPage = () => {
         <div data-v-019a5d71="" className="container">
           <div data-v-019a5d71="" className="home-new-header">
             <div data-v-019a5d71="" className="home-new-logo">
-              <img data-v-019a5d71="" data-src="https://sitethemedata.com/sitethemes/world777.com/front/logo.png" src="https://sitethemedata.com/sitethemes/world777.com/front/logo.png" lazy="loaded" />
+              <img data-v-019a5d71="" data-src={`/${import.meta.env.VITE_IMAGE_PATH}/logo.png`} src={`/${import.meta.env.VITE_IMAGE_PATH}/logo.png`} lazy="loaded" />
             </div>
             <div data-v-019a5d71="" className="home-new-header-bottom">
               <div data-v-019a5d71="" className="header-sport-list d-none-mobile">
