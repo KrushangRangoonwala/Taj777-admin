@@ -135,7 +135,7 @@ function AppContent() {
     if (!game_name) return;
     const name = game_name.toLowerCase() === "football" ? "Soccer" : game_name;
     try {
-      const res = await axios.get(`https://allpanelexch.fyi:8443/get${name}Matches`);
+      const res = await axios.get(`${import.meta.env.VITE_SPORTS_IP}/get${name}Matches`);
       handleLiveEventName(res?.data);
     } catch (error) {
       console.log("error fetching match data", error);
