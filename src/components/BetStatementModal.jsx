@@ -44,6 +44,20 @@ const BetStatementModal = ({
     return parts[1] || parts[0] || "-";
 };
 
+  const getBetType = (value) => String(value ?? "").trim().toLowerCase();
+
+  const normalizeBetType = (value) => {
+    const betType = getBetType(value);
+
+    if (betType === "yes") return "back";
+    if (betType === "no") return "lay";
+
+    return betType;
+  };
+
+  const isBackType = (item) => normalizeBetType(item?.bet_type) === "back";
+  const isLayType = (item) => normalizeBetType(item?.bet_type) === "lay";
+
   const fetchBetDetails = async () => {
 
     try {
@@ -100,11 +114,11 @@ const BetStatementModal = ({
     if (filterType === "all") return true;
 
     if (filterType === "back") {
-      return Number(item.win) >= 0;
+      return isBackType(item);
     }
 
     if (filterType === "lay") {
-      return Number(item.win) < 0;
+      return isLayType(item);
     }
 
     if (filterType === "deleted") {
@@ -351,16 +365,24 @@ const BetStatementModal = ({
 
                   ) : filteredData.length > 0 ? (
 
-                    filteredData.map((item, index) => (
+                    filteredData.map((item, index) => {
+                      const betType = normalizeBetType(item?.bet_type);
+                      const rowClassName = betType === "back"
+                        ? "back-border"
+                        : betType === "lay"
+                          ? "lay-border"
+                          : "";
 
-                      <tr
-                        key={index}
-                        className={
-                          Number(item.win) >= 0
-                            ? "back-border"
-                            : "lay-border"
-                        }
-                      >
+                      const winClassName =
+                           Number(item.win) >= 0
+                            ? "text-success"
+                            : "text-danger";
+
+                      return (
+                        <tr
+                          key={index}
+                          className={rowClassName}
+                        >
 
                         <td>
                             {getUserName(rowData?.from_to)}
@@ -383,11 +405,7 @@ const BetStatementModal = ({
                         </td>
 
                         <td
-                          className={`text-right ${
-                            Number(item.win) >= 0
-                              ? "text-success"
-                              : "text-danger"
-                          }`}
+                          className={`text-right ${winClassName}`}
                         >
                           {item.win}
                         </td>
@@ -414,9 +432,9 @@ const BetStatementModal = ({
 
                         </td>
 
-                      </tr>
-
-                    ))
+                        </tr>
+                      );
+                    })
 
                   ) : (
 

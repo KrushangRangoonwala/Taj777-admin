@@ -44,7 +44,7 @@ import TotalProfitLoss from './pages/reports/TotalProfitLoss'
 import SecureAuth from './pages/reports/SecureAuth'
 import { logout } from './store/slices/userSlice'
 import UserWinLoss from './pages/reports/UserWinLoss'
-import { apiBalance, sendUserInfoAPI } from './api/API'
+import { apiBalance, sendUserInfoAPI, updateUserStatus } from './api/API'
 import FirstTimeLogin from './pages/users/FirstTimeLogin'
 import VirtualCasino from './pages/casino/VirtualCasino'
 import VipCasino from './pages/casino/VipCasino'
@@ -82,6 +82,22 @@ function AppContent() {
   useEffect(() => {
     console.log('admi location.pathname', location.pathname)
   }, [location.pathname])
+
+
+  useEffect(() => {
+    let intervalId;
+    if (isLoggedIn) {
+      // Initial call
+      updateUserStatus();
+
+      intervalId = setInterval(() => {
+        updateUserStatus();
+      }, 5000);
+    }
+    return () => {
+      if (intervalId) clearInterval(intervalId);
+    };
+  }, [isLoggedIn]);
 
   useEffect(() => {
     if (userdata?.user_type == 1) { // IT SHOULD NOT BE USER (user_type = 1 for role : User)

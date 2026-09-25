@@ -52,10 +52,9 @@ const UserBookModal = ({
                                             <tr>
                                                 <td data-id={user.user_id}> {user.username} </td>
                                                 {markets.map((market, marketIndex) => {
-                                                    const plEntry = user.pl?.find(
-                                                        (p) => p.market_id === market.market_id
+                                                    const score = Number(
+                                                        user.pl?.[market.market_id]?.pl || 0
                                                     );
-                                                    const score = Number(plEntry?.pl ?? 0);
 
                                                     return (
                                                         <td

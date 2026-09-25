@@ -83,7 +83,7 @@ export async function getBetDetails(extraPayload = {}) {
   }
 }
 
-export async function getClients(search = "",extraPayload = {}) {
+export async function getClients(search = "", extraPayload = {}) {
   try {
     const payload = {
       search,
@@ -664,9 +664,9 @@ export async function apiBalance(dispatch, pageName) {
     ...(!!pageName ? pageName : {}),
   }; */
   const payload = {
-      ...getDefaultParams(),
-      ...(!!pageName ? pageName : {}),
-    };
+    ...getDefaultParams(),
+    ...(!!pageName ? pageName : {}),
+  };
   try {
     const { data } = await ajax_files.post("refresh_balance", payload);
     console.log('data', data);
@@ -686,6 +686,18 @@ export async function getViewMoreMatch(extraPayload = {}) {
     return data;
   } catch (error) {
     console.error("Error fetching view more matches:", error);
+    throw error;
+  }
+}
+
+
+export async function updateUserStatus(extraPayload = {}) {
+  try {
+    const payload = { ...getDefaultParams(), ...extraPayload };
+
+    const { data } = await ajax_files.post("/update_user_status", payload);
+    return data;
+  } catch (error) {
     throw error;
   }
 }
