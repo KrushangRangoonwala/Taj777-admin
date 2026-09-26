@@ -5,13 +5,19 @@ import { getImage, getValueAfterDot, getIsSuspended } from "../../../utilies/hel
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import { Exposure } from "../CasinoCenter";
 
-
-const RaceTo2nd = ({ onBetSelection }) => {
+const RaceTo2nd = ({ onBetSelection, lastBetTime, exposureData, lastResults: propsLastResults }) => {
     const { game_type, phpFile, game_name, iframe_url } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -215,7 +221,7 @@ const RaceTo2nd = ({ onBetSelection }) => {
                                                             <RenderBetBox nat={displayName} type="lay" />
                                                         </div>
                                                         <div className="casino-nation-name">
-                                                            <span className="casino-book book-black">0</span>
+                                                            <Exposure className="casino-book" data={exposureData} id={market?.sid} />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -232,7 +238,7 @@ const RaceTo2nd = ({ onBetSelection }) => {
                                             return (
                                                 <div className="casino-bl-box" key={num} style={{ position: 'relative' }}>
                                                     <div className="casino-bl-box-item casino-odds-name">
-                                                        <b>{displayName.toUpperCase()}</b> <span className="float-right book-black">0</span>
+                                                        <b>{displayName.toUpperCase()}</b> <Exposure className="float-right" data={exposureData} id={market?.sid} />
                                                     </div>
                                                     <RenderBetBox nat={displayName} type="back" showLock={true} />
                                                     <RenderBetBox nat={displayName} type="lay" showLock={true} />

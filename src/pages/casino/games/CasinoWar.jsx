@@ -5,13 +5,20 @@ import { getValueAfterDot, getIsSuspended, getImage } from "../../../utilies/hel
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import { Exposure } from "../CasinoCenter";
 
-const CasinoWar = ({ onBetSelection }) => {
+const CasinoWar = ({ onBetSelection, exposureData, lastResults: propsLastResults }) => {
     const { game_type, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     const [activeTab, setActiveTab] = useState(1);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
     // ... existing useEffect ...
@@ -111,7 +118,7 @@ const CasinoWar = ({ onBetSelection }) => {
                             style={{ width: "15px", height: "15px", filter: "brightness(0)", zIndex: 10, position: "absolute", left: "calc(50% - 7px)", top: "calc(50% - 7px)" }}
                         />
                     )} */}
-                    {children(odds)}
+                    {children(odds, market)}
                 </div>
             </div>
         );
@@ -178,10 +185,10 @@ const CasinoWar = ({ onBetSelection }) => {
             </div>
             {[1, 2, 3, 4, 5, 6].map((i) => (
                 <BetBox key={i} label={label} colIndex={i} className="back casino-bl-box-item">
-                    {(odds) => (
+                    {(odds, market) => (
                         <>
                             <span className="casino-box-odd">{odds || 0}</span>
-                            <span className="casino-book book-black">0</span>
+                            <Exposure className="casino-book" data={exposureData} id={market?.sid} />
                         </>
                     )}
                 </BetBox>
@@ -201,10 +208,10 @@ const CasinoWar = ({ onBetSelection }) => {
                 </div>
             </div>
             <BetBox label={label} colIndex={activeTab} className="back casino-bl-box-item">
-                {(odds) => (
+                {(odds, market) => (
                     <>
                         <span className="casino-box-odd">{odds || 0}</span>
-                        <span className="book-black">0</span>
+                        <Exposure data={exposureData} id={market?.sid} />
                     </>
                 )}
             </BetBox>

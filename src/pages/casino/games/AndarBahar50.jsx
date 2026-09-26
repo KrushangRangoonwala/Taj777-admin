@@ -7,14 +7,21 @@ import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
 import useIsMobile from "../../../hooks/useIsMobile";
+import { Exposure } from "../CasinoCenter";
 
-const AndarBahar50 = ({ onBetSelection, lastBetTime }) => {
+const AndarBahar50 = ({ onBetSelection, lastBetTime, exposureData, lastResults: propsLastResults }) => {
     const isMobile = useIsMobile();
     const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     // const [exposureData, setExposureData] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -290,7 +297,7 @@ const AndarBahar50 = ({ onBetSelection, lastBetTime }) => {
                         alt="card"
                     />
                 </div>
-                <div className="casino-book book-black">0</div>
+                <Exposure className="casino-book" data={exposureData} id={item.sid} />
             </div>
         );
     };

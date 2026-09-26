@@ -7,14 +7,21 @@ import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
 import BetLimitInfo from "./components/BetLimitInfo";
+import { Exposure } from "../CasinoCenter";
 
-const UnlimitedJoker2020 = ({ onBetSelection, lastBetTime }) => {
+const UnlimitedJoker2020 = ({ onBetSelection, exposureData, lastResults: propsLastResults }) => {
     const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     // const [exposureData, setExposureData] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     const [openRanges, setOpenRanges] = useState({});
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const toggleRange = (id) => {
         setOpenRanges((prev) => ({
@@ -216,7 +223,7 @@ const UnlimitedJoker2020 = ({ onBetSelection, lastBetTime }) => {
                                                             {m.icon && <img src={m.icon} alt="icon" />}
                                                             <b>{m.nameA}</b>
                                                             <div className="float-right">
-                                                                <span className="mr-2 book-black">0</span>
+                                                                <Exposure className="mr-2 book-black" data={exposureData} id={getMarketByName(m.nameA)?.sid} />
                                                                 <BetLimitInfo 
                                                                     id={m.idA} 
                                                                     openRanges={openRanges} 
@@ -240,7 +247,7 @@ const UnlimitedJoker2020 = ({ onBetSelection, lastBetTime }) => {
                                                         <div className="casino-nation-name">
                                                             <b>{m.nameB}</b>
                                                             <div className="float-right">
-                                                                <span className="mr-2 book-black">0</span>
+                                                                <Exposure className="mr-2 book-black" data={exposureData} id={getMarketByName(m.nameB)?.sid} />
                                                                 <BetLimitInfo 
                                                                     id={m.idB} 
                                                                     openRanges={openRanges} 

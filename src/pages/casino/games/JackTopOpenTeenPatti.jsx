@@ -7,14 +7,21 @@ import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
 import BetLimitInfo from "./components/BetLimitInfo";
+import { Exposure } from "../CasinoCenter";
 
-const JackTopOpenTeenPatti = ({ onBetSelection, lastBetTime }) => {
+const JackTopOpenTeenPatti = ({ onBetSelection, exposureData, lastResults: propsLastResults }) => {
     const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     // const [exposureData, setExposureData] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     const [openRanges, setOpenRanges] = useState({});
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const toggleRange = (id) => {
         setOpenRanges((prev) => ({
@@ -207,7 +214,7 @@ const JackTopOpenTeenPatti = ({ onBetSelection, lastBetTime }) => {
                                             <div className="casino-box-row">
                                                 <div className="casino-nation-name"><b>Main</b>
                                                     <div className="float-right">
-                                                        <span className="mr-2 casino-book book-black">0</span>
+                                                        <Exposure className="mr-2 casino-book" data={exposureData} id={getMarketByName("Player A")?.sid} />
                                                         <BetLimitInfo 
                                                             id="range1" 
                                                             openRanges={openRanges} 
@@ -242,7 +249,7 @@ const JackTopOpenTeenPatti = ({ onBetSelection, lastBetTime }) => {
                                             <div className="casino-box-row">
                                                 <div className="casino-nation-name"><b>Main</b>
                                                     <div className="float-right">
-                                                        <span className="mr-2 casino-book book-black">0</span>
+                                                        <Exposure className="mr-2 casino-book" data={exposureData} id={getMarketByName("Player B")?.sid} />
                                                         <BetLimitInfo 
                                                             id="range7" 
                                                             openRanges={openRanges} 
@@ -274,7 +281,7 @@ const JackTopOpenTeenPatti = ({ onBetSelection, lastBetTime }) => {
                                                 <div className="casino-nation-name">
                                                     <b>Player B Under 21</b>
                                                     <div className="float-right">
-                                                        <span className="book-black">0</span>
+                                                        <Exposure className="book-black" data={exposureData} id={getMarketByName("Player B Under 21")?.sid} />
                                                         <BetLimitInfo 
                                                             id="range5" 
                                                             openRanges={openRanges} 
@@ -293,7 +300,7 @@ const JackTopOpenTeenPatti = ({ onBetSelection, lastBetTime }) => {
                                                 <div className="casino-nation-name">
                                                     <b>Player B Over 21</b>
                                                     <div className="float-right">
-                                                        <span className="book-black">0</span>
+                                                        <Exposure className="book-black" data={exposureData} id={getMarketByName("Player B Over 21")?.sid} />
                                                         <BetLimitInfo 
                                                             id="range6" 
                                                             openRanges={openRanges} 
@@ -336,7 +343,7 @@ const JackTopOpenTeenPatti = ({ onBetSelection, lastBetTime }) => {
                                             <div className="casino-bl-box">
                                                 <div className="casino-bl-box-item casino-odds-name">
                                                     <span>Player A</span>
-                                                    <span className="float-right book-black">0</span>
+                                                    <Exposure className="float-right" data={exposureData} id={getMarketByName("Player A")?.sid} />
                                                 </div>
                                                 <BetBox marketName="Player A" className="back casino-bl-box-item" type="back">
                                                     {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
@@ -348,7 +355,7 @@ const JackTopOpenTeenPatti = ({ onBetSelection, lastBetTime }) => {
                                             <div className="casino-bl-box">
                                                 <div className="casino-bl-box-item casino-odds-name">
                                                     <span>Player B</span>
-                                                    <span className="float-right book-black">0</span>
+                                                    <Exposure className="float-right" data={exposureData} id={getMarketByName("Player B")?.sid} />
                                                 </div>
                                                 <BetBox marketName="Player B" className="back casino-bl-box-item" type="back">
                                                     {(odds) => <span className="casino-box-odd">{odds || 0}</span>}

@@ -5,14 +5,24 @@ import { getImage, getValueAfterDot, getIsSuspended } from "../../../utilies/hel
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import { Exposure } from "../CasinoCenter";
 // import { fetchCasinoExposureApi } from "../../../api/API";
 
-const Trio = ({ onBetSelection, lastBetTime }) => {
+const Trio = ({ onBetSelection, lastBetTime, exposureData, lastResults: propsLastResults }) => {
     const { game_type, phpFile, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     const [isLastResultOpen, setIsLastResultOpen] = useState(true);
     // const [exposureData, setExposureData] = useState([]);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setGameData(prev => ({
+                ...prev,
+                last_results: propsLastResults
+            }));
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -209,7 +219,7 @@ const Trio = ({ onBetSelection, lastBetTime }) => {
                                                     <b className="pointer">Session</b>
                                                     <div className="float-right">
                                                         {/* <span className="mr-2 book-black">{getExposure(1)}</span> */}
-                                                        <span className="mr-2 book-black">0</span>
+                                                        <Exposure className="mr-2" data={exposureData} id={1} />
                                                     </div>
                                                 </div>
                                                 <div className="casino-bl-box">
@@ -270,7 +280,7 @@ const Trio = ({ onBetSelection, lastBetTime }) => {
                                                         </div>
                                                     </div>
                                                     {/* {renderExposure(market.sid)} */}
-                                                    <div className="casino-nation-name book-black">0</div>
+                                                    <Exposure className="casino-nation-name" data={exposureData} id={market.sid} />
                                                 </div>
                                             </div>
                                         ))}
@@ -303,7 +313,7 @@ const Trio = ({ onBetSelection, lastBetTime }) => {
                                                         </div>
                                                     </div>
                                                     {/* {renderExposure(market.sid)} */}
-                                                    <div className="casino-nation-name book-black">0</div>
+                                                    <Exposure className="casino-nation-name" data={exposureData} id={market.sid} />
                                                 </div>
                                             </div>
                                         ))}
@@ -325,7 +335,7 @@ const Trio = ({ onBetSelection, lastBetTime }) => {
                                                     </div>
                                                 </div>
                                                 {/* {renderExposure(market.sid)} */}
-                                                <div className="casino-nation-name book-black">0</div>
+                                                <Exposure className="casino-nation-name" data={exposureData} id={market.sid} />
                                             </div>
                                         ))}
                                     </div>

@@ -6,13 +6,20 @@ import { getImage, getMarketByNation, getValueAfterDot, getIsSuspended, getCards
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import { Exposure } from "../CasinoCenter";
 
-const Mogambo = ({ onBetSelection, lastBetTime }) => {
+const Mogambo = ({ onBetSelection, lastBetTime, exposureData, lastResults: propsLastResults }) => {
     const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     // const [exposureData, setExposureData] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -182,7 +189,7 @@ const Mogambo = ({ onBetSelection, lastBetTime }) => {
                                                     <div className="casino-nation-name">
                                                         <b>Daaga / Teja</b>
                                                         <div className="float-right">
-                                                            <span className="mr-2 book-black">0</span>
+                                                            <Exposure className="mr-2" data={exposureData} id="2" />
                                                         </div>
                                                     </div>
                                                     <div className="casino-bl-box casino-bl-boxfull">
@@ -200,7 +207,7 @@ const Mogambo = ({ onBetSelection, lastBetTime }) => {
                                                     <div className="casino-nation-name">
                                                         <b>Mogambo</b>
                                                         <div className="float-right">
-                                                            <span className="mr-2 book-black">0</span>
+                                                            <Exposure className="mr-2" data={exposureData} id="1" />
                                                         </div>
                                                     </div>
                                                     <div className="casino-bl-box casino-bl-boxfull">
@@ -218,7 +225,7 @@ const Mogambo = ({ onBetSelection, lastBetTime }) => {
                                             <div className="casino-nation-name">
                                                 <b className="pointer">3 Card Total</b>
                                                 <div className="float-right">
-                                                    <span className="mr-2 book-black">0</span>
+                                                    <Exposure className="mr-2" data={exposureData} id="3" />
                                                 </div>
                                             </div>
                                             <div className="casino-bl-box">
@@ -255,7 +262,7 @@ const Mogambo = ({ onBetSelection, lastBetTime }) => {
                                             <div className="casino-nation-name">
                                                 <b>Daga / Teja</b>
                                                 <div className="float-right">
-                                                    <span className="mr-2 book-black">0</span>
+                                                    <Exposure className="mr-2" data={exposureData} id="2" />
                                                 </div>
                                             </div>
                                             <div className="casino-bl-box">
@@ -268,7 +275,7 @@ const Mogambo = ({ onBetSelection, lastBetTime }) => {
                                             <div className="casino-nation-name">
                                                 <b>Mogambo</b>
                                                 <div className="float-right">
-                                                    <span className="mr-2 book-black">0</span>
+                                                    <Exposure className="mr-2" data={exposureData} id="1" />
                                                 </div>
                                             </div>
                                             <div className="casino-bl-box">
@@ -281,7 +288,7 @@ const Mogambo = ({ onBetSelection, lastBetTime }) => {
                                             <div className="casino-nation-name">
                                                 <b className="pointer">3 Card Total</b>
                                                 <div className="float-right">
-                                                    <span className="mr-2 book-black">0</span>
+                                                    <Exposure className="mr-2" data={exposureData} id="3" />
                                                 </div>
                                             </div>
                                             <div className="casino-bl-box total-odds">

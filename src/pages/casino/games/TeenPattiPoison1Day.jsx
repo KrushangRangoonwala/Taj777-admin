@@ -7,14 +7,21 @@ import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
 import BetLimitInfo from "./components/BetLimitInfo";
+import { Exposure } from "../CasinoCenter";
 
-const TeenPattiPoison1Day = ({ onBetSelection, lastBetTime }) => {
+const TeenPattiPoison1Day = ({ onBetSelection, exposureData, lastResults: propsLastResults }) => {
     const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     // const [exposureData, setExposureData] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     const [openRanges, setOpenRanges] = useState({});
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const toggleRange = (id) => {
         setOpenRanges((prev) => ({
@@ -202,7 +209,7 @@ const TeenPattiPoison1Day = ({ onBetSelection, lastBetTime }) => {
                                                 <div className="casino-nation-name">
                                                     <b>Player A</b>
                                                     <div className="float-right">
-                                                        <span className="mr-2 book-black">0</span>
+                                                        <Exposure className="mr-2 book-black" data={exposureData} id={getMarketByName("Player A")?.sid} />
                                                         <BetLimitInfo
                                                             id="range1"
                                                             openRanges={openRanges}
@@ -226,7 +233,7 @@ const TeenPattiPoison1Day = ({ onBetSelection, lastBetTime }) => {
                                                 <div className="casino-nation-name">
                                                     <b>Player B</b>
                                                     <div className="float-right">
-                                                        <span className="mr-2 book-black">0</span>
+                                                        <Exposure className="mr-2 book-black" data={exposureData} id={getMarketByName("Player B")?.sid} />
                                                         <BetLimitInfo
                                                             id="range2"
                                                             openRanges={openRanges}
@@ -265,7 +272,7 @@ const TeenPattiPoison1Day = ({ onBetSelection, lastBetTime }) => {
                                                             {(odds) => (
                                                                 <>
                                                                     <span className="casino-box-odd">Even</span>
-                                                                    <span className="book-black">0</span>
+                                                                    <Exposure className="book-black" data={exposureData} id={getMarketByName("Poison Even")?.sid} />
                                                                 </>
                                                             )}
                                                         </BetBox>
@@ -286,7 +293,7 @@ const TeenPattiPoison1Day = ({ onBetSelection, lastBetTime }) => {
                                                             {(odds) => (
                                                                 <>
                                                                     <span className="casino-box-odd">Odd</span>
-                                                                    <span className="book-black">0</span>
+                                                                    <Exposure className="book-black" data={exposureData} id={getMarketByName("Poison Odd")?.sid} />
                                                                 </>
                                                             )}
                                                         </BetBox>
@@ -310,7 +317,7 @@ const TeenPattiPoison1Day = ({ onBetSelection, lastBetTime }) => {
                                                                         <img src="https://wver.sprintstaticdata.com/v209/static/front/img/cards/heart.png" />
                                                                         <img src="https://wver.sprintstaticdata.com/v209/static/front/img/cards/diamond.png" />
                                                                     </span>
-                                                                    <span className="book-black">0</span>
+                                                                    <Exposure className="book-black" data={exposureData} id={getMarketByName("Poison Red")?.sid} />
                                                                 </>
                                                             )}
                                                         </BetBox>
@@ -334,7 +341,7 @@ const TeenPattiPoison1Day = ({ onBetSelection, lastBetTime }) => {
                                                                         <img src="https://wver.sprintstaticdata.com/v209/static/front/img/cards/spade.png" />
                                                                         <img src="https://wver.sprintstaticdata.com/v209/static/front/img/cards/club.png" />
                                                                     </span>
-                                                                    <span className="book-black">0</span>
+                                                                    <Exposure className="book-black" data={exposureData} id={getMarketByName("Poison Black")?.sid} />
                                                                 </>
                                                             )}
                                                         </BetBox>
@@ -387,7 +394,7 @@ const TeenPattiPoison1Day = ({ onBetSelection, lastBetTime }) => {
                                                                 {(odds) => (
                                                                     <>
                                                                         <span className="casino-box-odd">{odds || 0}</span>
-                                                                        <span className="book-black">0</span>
+                                                                        <Exposure className="book-black" data={exposureData} id={getMarketByName(suit.name)?.sid} />
                                                                     </>
                                                                 )}
                                                             </BetBox>

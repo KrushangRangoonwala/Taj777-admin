@@ -6,8 +6,7 @@ import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import Collapse from "react-bootstrap/Collapse";
 import RemarkMarquee from "./components/RemarkMarquee";
-
-// import { fetchCasinoExposureApi } from "../../../api/api";
+import { Exposure } from "../CasinoCenter";
 
 const BallByBall = ({ exposureData, gameData, lastResults }) => {
     const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
@@ -139,13 +138,13 @@ const BallByBall = ({ exposureData, gameData, lastResults }) => {
                                                                         <div className="bet-table-mobile-row d-none-desktop">
                                                                             <div className="bet-table-mobile-team-name">
                                                                                 <span>{runner.nat}</span>
-                                                                                <span className="book-black">0</span>
+                                                                                <Exposure className="mb-0" data={exposureData} id={runner?.sid} isInlineColor={true} />
                                                                             </div>
                                                                         </div>
                                                                         <div className="bet-table-row">
                                                                             <div className="nation-name d-none-mobile">
                                                                                 <p>{runner.nat}</p>
-                                                                                <p className="mb-0 book-black">0</p>
+                                                                                <Exposure className="mb-0" data={exposureData} id={runner?.sid} isInlineColor={true} />
                                                                             </div>
                                                                             <div
                                                                                 className={`bl-box back ${odds == 0 || isSuspended ? "no-val" : ""} ${isSuspended ? "suspended" : ""}`}

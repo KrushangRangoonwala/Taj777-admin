@@ -362,7 +362,7 @@ const TeenPatti1Day = ({ onBetSelection, exposureData, lastResults: propsLastRes
                                                         <BetBox market={getMarketBySid(sid)} marketName={`Card ${index + 1} Odd`} nation="Odd" className="back casino-bl-box-item" type="back" handleOddsClick={handleOddsClick}>
                                                             {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
                                                         </BetBox>
-                                                        <Exposure className="casino-book" data={exposureData} id={getMarketBySid(sid)?.sid} />
+                                                        <Exposure className="casino-book" data={exposureData} id={sid + '_1'} />
                                                     </div>
                                                 ))}
                                             </div>
@@ -385,7 +385,7 @@ const TeenPatti1Day = ({ onBetSelection, exposureData, lastResults: propsLastRes
                                                         <BetBox market={getMarketBySid(sid)} marketName={`Card ${index + 1} Even`} nation="Even" className="back casino-bl-box-item" type="back" handleOddsClick={handleOddsClick}>
                                                             {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
                                                         </BetBox>
-                                                        <Exposure className="casino-book" data={exposureData} id={getMarketBySid(sid)?.sid} />
+                                                        <Exposure className="casino-book" data={exposureData} id={sid + '_2'} />
                                                     </div>
                                                 ))}
                                             </div>
@@ -495,7 +495,7 @@ const TeenPatti1Day = ({ onBetSelection, exposureData, lastResults: propsLastRes
                                                         {(odds) => (
                                                             <>
                                                                 <span className="casino-box-odd">{odds || 0}</span>
-                                                                <Exposure data={exposureData} id={getMarketBySid(sid)?.sid} />
+                                                                <Exposure data={exposureData} id={String(sid) + '_1'} />
                                                             </>
                                                         )}
                                                     </BetBox>
@@ -503,7 +503,7 @@ const TeenPatti1Day = ({ onBetSelection, exposureData, lastResults: propsLastRes
                                                         {(odds) => (
                                                             <>
                                                                 <span className="casino-box-odd">{odds || 0}</span>
-                                                                <Exposure data={exposureData} id={getMarketBySid(sid)?.sid} />
+                                                                <Exposure data={exposureData} id={(sid) + '_2'} />
                                                             </>
                                                         )}
                                                     </BetBox>

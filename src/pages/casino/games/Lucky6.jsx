@@ -6,13 +6,20 @@ import { getImage, getValueAfterDot, getIsSuspended } from "../../../utilies/hel
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import { Exposure } from "../CasinoCenter";
 
-const Lucky6 = ({ onBetSelection, lastBetTime }) => {
+const Lucky6 = ({ onBetSelection, lastBetTime, exposureData, lastResults: propsLastResults }) => {
     const { CODE, game_type, phpFile, game_name, iframe_url } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     // const [exposureData, setExposureData] = useState([]);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -119,7 +126,7 @@ const Lucky6 = ({ onBetSelection, lastBetTime }) => {
             >
                 <div className="casino-odds">{odds}</div>
                 <div className="text-center casino-buttons">{children || <span>{label || marketName}</span>}</div>
-                <div className="casino-book book-black">0</div>
+                <Exposure className="casino-book" data={exposureData} id={sid} />
                 {suspended && (
                     <img
                         src="/assets/images/lock.svg"
@@ -264,7 +271,7 @@ const Lucky6 = ({ onBetSelection, lastBetTime }) => {
                                                             <div className={`card-image ${suspended ? "suspended" : ""}`}>
                                                                 <img src={getImage(card, 'cards_new/lucky6')} alt={card} />
                                                             </div>
-                                                            <div className="casino-book book-black">0</div>
+                                                            <Exposure className="casino-book" data={exposureData} id={sid} />
                                                             {suspended && (
                                                                 <img
                                                                     src="/assets/images/lock.svg"

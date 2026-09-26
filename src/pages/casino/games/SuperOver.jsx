@@ -269,7 +269,7 @@ const SuperOver = ({ exposureData, lastResults }) => {
                                                                     <div className={`bet-table-row ${isSuspended ? 'suspendedtext' : ''}`} data-title={isSuspended ? runner.status : ""}>
                                                                         <div className="nation-name d-none-mobile">
                                                                             <p>{runner.nat}</p>
-                                                                            <Exposure className="mb-0 float-left" data={exposureData} id={runner?.mid} isInlineColor={true} />
+                                                                            <Exposure className="mb-0 float-left" data={exposureData} id={runner?.sid} isInlineColor={true} />
                                                                         </div>
                                                                         <div className="bl-box back back" >
                                                                             <span className="d-block odds">{runner.b1 || "—"}</span>

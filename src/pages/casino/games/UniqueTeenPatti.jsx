@@ -17,7 +17,7 @@ const UNIQUE_TEENPATTI_DATA = {
     result_image: "/cards_new/"
 };
 
-const UniqueTeenPatti = ({ onBetSelection, lastBetTime }) => {
+const UniqueTeenPatti = ({ onBetSelection, exposureData, lastResults: propsLastResults }) => {
     const {
         game_code: CODE,
         game_socket: game_type,
@@ -29,6 +29,12 @@ const UniqueTeenPatti = ({ onBetSelection, lastBetTime }) => {
     const [lastResults, setLastResults] = useState([]);
     // const [exposureData, setExposureData] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     // Selection State
     const [selectedCards, setSelectedCards] = useState([]);

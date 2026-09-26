@@ -6,12 +6,19 @@ import { getImage, getMarketByNation, getValueAfterDot, getIsSuspended } from ".
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import { Exposure } from "../CasinoCenter";
 
-const RaceTo17 = ({ onBetSelection, lastBetTime }) => {
+const RaceTo17 = ({ onBetSelection, lastBetTime, exposureData, lastResults: propsLastResults }) => {
     const { CODE, game_type, phpFile, matchName, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -218,7 +225,7 @@ const RaceTo17 = ({ onBetSelection, lastBetTime }) => {
                                                 <div key={index} className="casino-bl-box">
                                                     <div className="casino-bl-box-item casino-odds-name">
                                                         <b>{item.label}</b>
-                                                        <span className="float-right text-success book-black">0</span>
+                                                        <Exposure className="float-right" data={exposureData} id={market?.sid} />
                                                     </div>
                                                     <BetBox marketName={item.nat} subtype={item.subtype} className="back casino-bl-box-item" type="back">
                                                         {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
@@ -255,10 +262,7 @@ const RaceTo17 = ({ onBetSelection, lastBetTime }) => {
                                                                 {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
                                                             </BetBox>
                                                         </div>
-                                                        <div className="casino-nation-name book-black">
-                                                            {/* {renderExposureByNat(item.nat)} */}
-                                                            0
-                                                        </div>
+                                                        <Exposure className="casino-nation-name" data={exposureData} id={market?.sid} />
                                                     </div>
                                                 </div>
                                             );

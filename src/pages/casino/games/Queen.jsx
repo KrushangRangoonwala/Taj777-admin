@@ -5,13 +5,19 @@ import { getImage, getValueAfterDot, getIsSuspended } from "../../../utilies/hel
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import { Exposure } from "../CasinoCenter";
 
-
-const Queen = ({ onBetSelection }) => {
+const Queen = ({ onBetSelection, exposureData, lastResults: propsLastResults }) => {
     const { game_type, phpFile, game_name, iframe_url } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -254,7 +260,7 @@ const Queen = ({ onBetSelection }) => {
                                                             <RenderBetBox nat={nat} type="lay" />
                                                         </div>
                                                         <div className="casino-nation-name">
-                                                            <span className="casino-book book-black">0</span>
+                                                            <Exposure className="casino-book" data={exposureData} id={market?.sid} />
                                                         </div>
                                                     </div>
                                                 </div>
@@ -271,7 +277,7 @@ const Queen = ({ onBetSelection }) => {
                                             return (
                                                 <div className="casino-bl-box" key={num}>
                                                     <div className="casino-bl-box-item casino-odds-name">
-                                                        <b>{nat}</b> <span className="float-right book-black">0</span>
+                                                        <b>{nat}</b> <Exposure className="float-right" data={exposureData} id={market?.sid} />
                                                     </div>
                                                     <RenderBetBox nat={nat} type="back" showLock={true} />
                                                     <RenderBetBox nat={nat} type="lay" showLock={true} />

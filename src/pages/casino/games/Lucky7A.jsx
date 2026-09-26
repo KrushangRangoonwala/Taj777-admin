@@ -6,13 +6,20 @@ import { getImage, getValueAfterDot, getIsSuspended } from "../../../utilies/hel
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import { Exposure } from "../CasinoCenter";
 
-const Lucky7A = ({ onBetSelection, lastBetTime }) => {
+const Lucky7A = ({ onBetSelection, lastBetTime, exposureData, lastResults: propsLastResults }) => {
     const { CODE, game_type, phpFile, game_name, iframe_url } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     // const [exposureData, setExposureData] = useState([]);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -213,8 +220,7 @@ const Lucky7A = ({ onBetSelection, lastBetTime }) => {
                                         <div className={`low-odds ${getIsSuspended(getMarketBySid(1)) ? "suspended" : ""}`}>
                                             <div className="casino-odds">{getIsSuspended(getMarketBySid(1)) ? "0" : getOdds(getMarketBySid(1))}</div>
                                             <BetBox sid={1} marketName="Low Card" label="Low Card" />
-                                            {/* <div className="casino-book book-black">{getExposure(1)}</div> */}
-                                            <div className="casino-book book-black">0</div>
+                                            <Exposure className="casino-book" data={exposureData} id={1} />
                                         </div>
                                         <div className="text-center lucky7-card">
                                             <img
@@ -226,8 +232,7 @@ const Lucky7A = ({ onBetSelection, lastBetTime }) => {
                                         <div className={`high-odds ${getIsSuspended(getMarketBySid(2)) ? "suspended" : ""}`}>
                                             <div className="casino-odds">{getIsSuspended(getMarketBySid(2)) ? "0" : getOdds(getMarketBySid(2))}</div>
                                             <BetBox sid={2} marketName="High Card" label="High Card" />
-                                            {/* <div className="casino-book book-black">{getExposure(2)}</div> */}
-                                            <div className="casino-book book-black">0</div>
+                                            <Exposure className="casino-book" data={exposureData} id={2} />
                                         </div>
                                         <div className="casino-min-max text-right">
                                             R:<span>{getMarketBySid(1)?.min || 100}</span>-<span>{formatBetLimit(getMarketBySid(1)?.max) || "1L"}</span>
@@ -239,8 +244,7 @@ const Lucky7A = ({ onBetSelection, lastBetTime }) => {
                                                 <div className={`lucky7-extra-bets-item ${getIsSuspended(getMarketBySid(3)) ? "suspended" : ""}`}>
                                                     <div className="casino-odds">{getIsSuspended(getMarketBySid(3)) ? "0" : getOdds(getMarketBySid(3))}</div>
                                                     <BetBox sid={3} marketName="Even" label="Even" />
-                                                    {/* <div className="casino-book book-black">{getExposure(3)}</div> */}
-                                                    <div className="casino-book book-black">0</div>
+                                                    <Exposure className="casino-book" data={exposureData} id={3} />
                                                 </div>
                                                 <div className="casino-min-max text-right">
                                                     R:<span>{getMarketBySid(3)?.min || 100}</span>-<span>{formatBetLimit(getMarketBySid(3)?.max) || "25K"}</span>
@@ -250,8 +254,7 @@ const Lucky7A = ({ onBetSelection, lastBetTime }) => {
                                                 <div className={`lucky7-extra-bets-item ${getIsSuspended(getMarketBySid(4)) ? "suspended" : ""}`}>
                                                     <div className="casino-odds">{getIsSuspended(getMarketBySid(4)) ? "0" : getOdds(getMarketBySid(4))}</div>
                                                     <BetBox sid={4} marketName="Odd" label="Odd" />
-                                                    {/* <div className="casino-book book-black">{getExposure(4)}</div> */}
-                                                    <div className="casino-book book-black">0</div>
+                                                    <Exposure className="casino-book" data={exposureData} id={4} />
                                                 </div>
                                                 <div className="casino-min-max text-right">
                                                     R:<span>{getMarketBySid(4)?.min || 100}</span>-<span>{formatBetLimit(getMarketBySid(4)?.max) || "25K"}</span>
@@ -264,8 +267,7 @@ const Lucky7A = ({ onBetSelection, lastBetTime }) => {
                                                         <img src={getImage('spade', 'cards_new')} alt="spade" />
                                                         <img src={getImage('club', 'cards_new')} alt="club" />
                                                     </BetBox>
-                                                    {/* <div className="casino-book book-black">{getExposure(5)}</div> */}
-                                                    <div className="casino-book book-black">0</div>
+                                                    <Exposure className="casino-book" data={exposureData} id={5} />
                                                 </div>
                                                 <div className="casino-min-max text-right">
                                                     R:<span>{getMarketBySid(5)?.min || 100}</span>-<span>{formatBetLimit(getMarketBySid(5)?.max) || "25K"}</span>
@@ -278,8 +280,7 @@ const Lucky7A = ({ onBetSelection, lastBetTime }) => {
                                                         <img src={getImage('heart', 'cards_new')} alt="heart" />
                                                         <img src={getImage('diamond', 'cards_new')} alt="diamond" />
                                                     </BetBox>
-                                                    {/* <div className="casino-book book-black">{getExposure(6)}</div> */}
-                                                    <div className="casino-book book-black">0</div>
+                                                    <Exposure className="casino-book" data={exposureData} id={6} />
                                                 </div>
                                                 <div className="casino-min-max text-right">
                                                     R:<span>{getMarketBySid(6)?.min || 100}</span>-<span>{formatBetLimit(getMarketBySid(6)?.max) || "25K"}</span>
@@ -326,7 +327,7 @@ const Lucky7A = ({ onBetSelection, lastBetTime }) => {
                                                                         ))}
                                                                     </div>
                                                                     {/* <div className="w-100 casino-book book-black">{getExposure(group.sid)}</div> */}
-                                                                    <div className="w-100 casino-book book-black">0</div>
+                                                                    <Exposure className="w-100 casino-book" data={exposureData} id={group.sid} />
                                                                 </div>
                                                                 <div className="casino-min-max text-center">
                                                                     R:<span>{market?.min || 100}</span>-<span>{formatBetLimit(market?.max) || "5K"}</span>
@@ -371,7 +372,7 @@ const Lucky7A = ({ onBetSelection, lastBetTime }) => {
                                                                 <img src={getImage(card, 'cards_new/lucky6')} alt={card} />
                                                             </div>
                                                             {/* <div className="casino-book book-black">{getExposure(sid)}</div> */}
-                                                            <div className="casino-book book-black">0</div>
+                                                            <Exposure className="casino-book" data={exposureData} id={sid} />
                                                         </div>
                                                     );
                                                 })}

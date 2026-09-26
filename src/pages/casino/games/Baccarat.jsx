@@ -7,14 +7,21 @@ import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
 import BetLimitInfo from "./components/BetLimitInfo";
+import { Exposure } from "../CasinoCenter";
 
-const Baccarat = ({ onBetSelection, lastBetTime, lastResults }) => {
+const Baccarat = ({ onBetSelection, lastBetTime, exposureData, lastResults: propsLastResults }) => {
     const { game_type, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
-    // const [lastResults, setLastResults] = useState([]);
+    const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
-    const [exposureData, setExposureData] = useState([]);
+    // const [exposureData, setExposureData] = useState([]);
     const [openRanges, setOpenRanges] = useState({});
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const toggleRange = (id) => {
         setOpenRanges((prev) => ({
@@ -77,25 +84,25 @@ const Baccarat = ({ onBetSelection, lastBetTime, lastResults }) => {
         };
     }, [socket, game_type]);
 
-    useEffect(() => {
-        const fetchExposure = async () => {
-            if (!gameData?.t1?.[0]?.mid) return;
-            try {
-                const response = await fetchCasinoExposureApi({
-                    markettype: "BACCARAT",
-                    main_event_id: getValueAfterDot(gameData.t1[0].mid),
-                    curPageName: "live_baccarat.php",
-                });
-                if (Array.isArray(response?.data)) {
-                    setExposureData(response.data);
-                }
-            } catch (error) {
-                console.error("Error fetching Baccarat exposure:", error);
-            }
-        };
-
-        fetchExposure();
-    }, [gameData?.t1?.[0]?.mid, lastBetTime]);
+    // useEffect(() => {
+    //     const fetchExposure = async () => {
+    //         if (!gameData?.t1?.[0]?.mid) return;
+    //         try {
+    //             const response = await fetchCasinoExposureApi({
+    //                 markettype: "BACCARAT",
+    //                 main_event_id: getValueAfterDot(gameData.t1[0].mid),
+    //                 curPageName: "live_baccarat.php",
+    //             });
+    //             if (Array.isArray(response?.data)) {
+    //                 setExposureData(response.data);
+    //             }
+    //         } catch (error) {
+    //             console.error("Error fetching Baccarat exposure:", error);
+    //         }
+    //     };
+    //
+    //     fetchExposure();
+    // }, [gameData?.t1?.[0]?.mid, lastBetTime]);
 
     const currentGame = gameData?.t1?.[0];
     const marketData = gameData?.t2 || [];
@@ -160,7 +167,7 @@ const Baccarat = ({ onBetSelection, lastBetTime, lastResults }) => {
                     )} */}
                     {label} {displayOdds}
                 </div>
-                <div className={`baccarat-odd-val ${getExposureClass(exposure) || "book-black"}`}>{exposure || 0}</div>
+                <Exposure className="baccarat-odd-val" data={exposureData} id={sid} />
                 <div className="casino-min-max">
                     <BetLimitInfo
                         id={`range${rangeId}`}
@@ -226,7 +233,7 @@ const Baccarat = ({ onBetSelection, lastBetTime, lastResults }) => {
                         )}
                     </div>
                 </div>
-                <div className={`baccarat-bets-val ${getExposureClass(exposure) || "book-black"}`}>{exposure || 0}</div>
+                <Exposure className="baccarat-bets-val" data={exposureData} id={sid} />
                 <div className="casino-min-max">
                     <BetLimitInfo
                         id={`range${rangeId}`}

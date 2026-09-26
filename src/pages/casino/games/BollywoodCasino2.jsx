@@ -5,12 +5,19 @@ import { getValueAfterDot, getIsSuspended } from "../../../utilies/helpers";
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import { Exposure } from "../CasinoCenter";
 
-const BollywoodCasino2 = ({ onBetSelection }) => {
+const BollywoodCasino2 = ({ onBetSelection, exposureData, lastResults: propsLastResults }) => {
     const { game_type, game_name, iframe_url } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
 
@@ -189,7 +196,7 @@ const BollywoodCasino2 = ({ onBetSelection }) => {
                                                             {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
                                                         </BetBox>
                                                     </div>
-                                                    <div className="casino-book text-center book-black">0</div>
+                                                    <Exposure className="casino-book text-center" data={exposureData} id={sid} />
                                                 </div>
                                             </div>
                                         );
@@ -210,7 +217,7 @@ const BollywoodCasino2 = ({ onBetSelection }) => {
                                                 <div className="casino-bl-box">
                                                     <div className="casino-bl-box-item casino-odds-name">
                                                         <MainMarketLabel idx={idx} nat={market?.nat} />
-                                                        <span className="float-right book-black">0</span>
+                                                        <Exposure className="float-right" data={exposureData} id={sid} />
                                                     </div>
                                                     <BetBox sid={sid} className="back casino-bl-box-item" type="back">
                                                         {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
@@ -239,7 +246,7 @@ const BollywoodCasino2 = ({ onBetSelection }) => {
                                                     {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
                                                 </BetBox>
                                             </div>
-                                            <div className="casino-book text-center book-black">0</div>
+                                            <Exposure className="casino-book text-center" data={exposureData} id={7} />
                                             <div className="teen1daycasino-container justify-content-end casino-min-max w-100">
                                                 <div>R:<span>100</span> - <span>1L</span></div>
                                             </div>
@@ -256,7 +263,7 @@ const BollywoodCasino2 = ({ onBetSelection }) => {
                                                 <BetBox sid={8} marketName="Dulha Dulhan K-Q" className="back casino-bl-box-item" type="back">
                                                     {() => <span className="casino-box-odd">Dulha Dulhan K-Q</span>}
                                                 </BetBox>
-                                                <span className="casino-book text-center book-black">0</span>
+                                                <Exposure className="casino-book text-center" data={exposureData} id={8} />
                                             </div>
                                         </div>
                                         <div className="teen1daycasino-container justify-content-end casino-min-max w-100">
@@ -274,7 +281,7 @@ const BollywoodCasino2 = ({ onBetSelection }) => {
                                                 <BetBox sid={9} marketName="Barati J-A" className="back casino-bl-box-item" type="back">
                                                     {() => <span className="casino-box-odd">Barati J-A</span>}
                                                 </BetBox>
-                                                <span className="casino-book text-center book-black">0</span>
+                                                <Exposure className="casino-book text-center" data={exposureData} id={9} />
                                             </div>
                                         </div>
                                         <div className="teen1daycasino-container justify-content-end casino-min-max w-100">
@@ -305,7 +312,7 @@ const BollywoodCasino2 = ({ onBetSelection }) => {
                                                         </span>
                                                     )}
                                                 </BetBox>
-                                                <span className="casino-book text-center book-black">0</span>
+                                                <Exposure className="casino-book text-center" data={exposureData} id={11} />
                                             </div>
                                             <div className="casino-bl-box">
                                                 <BetBox sid={10} marketName="Black" className="back casino-bl-box-item casino-card-img" type="back">
@@ -316,7 +323,7 @@ const BollywoodCasino2 = ({ onBetSelection }) => {
                                                         </span>
                                                     )}
                                                 </BetBox>
-                                                <span className="casino-book text-center book-black">0</span>
+                                                <Exposure className="casino-book text-center" data={exposureData} id={10} />
                                             </div>
                                         </div>
                                         <div className="teen1daycasino-container justify-content-end casino-min-max w-100">
@@ -339,7 +346,7 @@ const BollywoodCasino2 = ({ onBetSelection }) => {
                                                     <BetBox sid={12 + idx} marketName={`Card ${card}`} className="card-image" type="back">
                                                         {() => <img src={`/assets/cards_new/lucky6/${card}.png`} alt={card} />}
                                                     </BetBox>
-                                                    <div className="casino-book text-center book-black">0</div>
+                                                    <Exposure className="casino-book text-center" data={exposureData} id={12 + idx} />
                                                 </div>
                                             ))}
                                         </div>

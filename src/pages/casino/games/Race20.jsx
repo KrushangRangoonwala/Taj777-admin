@@ -6,12 +6,22 @@ import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import BetLimitInfo2 from "./components/BetLimitInfo2";
 import Result_parent from "./components/Result_parent";
+import { Exposure } from "../CasinoCenter";
 
-const Race20 = ({ onBetSelection }) => {
+const Race20 = ({ onBetSelection, exposureData, lastResults: propsLastResults }) => {
     const { game_type, phpFile, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     const [resultMid, setResultMid] = useState(null);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setGameData(prev => ({
+                ...prev,
+                last_results: propsLastResults
+            }));
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -163,7 +173,7 @@ const Race20 = ({ onBetSelection }) => {
                     <span>{volume || 0}</span>
                 )}
                 {nat.startsWith("Win with") && (
-                    <span className="book-black">0</span>
+                    <Exposure data={exposureData} id={market?.sid} />
                 )}
             </div>
         );
@@ -207,7 +217,7 @@ const Race20 = ({ onBetSelection }) => {
                                                                 <RenderBetBox nat={marketNat} type="back" />
                                                                 <RenderBetBox nat={marketNat} type="lay" />
                                                             </div>
-                                                            <div className="casino-nation-name book-black">0</div>
+                                                            <Exposure className="casino-nation-name" data={exposureData} id={getMarketByNat(marketNat)?.sid} />
                                                         </div>
                                                     </div>
                                                 );
@@ -238,7 +248,7 @@ const Race20 = ({ onBetSelection }) => {
                                                         <div className="casino-yn">
                                                             <div></div>
                                                             <div className="casino-bl-box">
-                                                                <div className="casino-nation-name book-black">0</div>
+                                                                <Exposure className="casino-nation-name" data={exposureData} id={getMarketByNat(label)?.sid} />
                                                             </div>
                                                         </div>
                                                     </div>
@@ -258,7 +268,7 @@ const Race20 = ({ onBetSelection }) => {
                                                                     <div className="casino-bl-box">
                                                                         <RenderBetBox nat={`Win with ${num}`} type="back" />
                                                                     </div>
-                                                                    <div className="casino-nation-name rf-minheight book-black">0</div>
+                                                                    <Exposure className="casino-nation-name rf-minheight" data={exposureData} id={getMarketByNat(`Win with ${num}`)?.sid} />
                                                                 </div>
                                                             ))}
                                                         </div>
@@ -286,7 +296,7 @@ const Race20 = ({ onBetSelection }) => {
                                                     <div className="casino-bl-box" key={suit}>
                                                         <div data-toggle="modal" className="casino-bl-box-item casino-odds-name">
                                                             <img src={getImage(marketNat, result_image)} alt={suit} />
-                                                            <span className="book-black">0</span>
+                                                            <Exposure data={exposureData} id={getMarketByNat(marketNat)?.sid} />
                                                             <BetLimitInfo2 min={getMarketByNat(marketNat)?.min} max={getMarketByNat(marketNat)?.max} />
                                                         </div>
                                                         <RenderBetBox nat={marketNat} type="back" />
@@ -305,7 +315,7 @@ const Race20 = ({ onBetSelection }) => {
                                                     <div data-toggle="modal" className="casino-bl-box-item casino-odds-name">
                                                         <div>
                                                             <span className="d-block">{label}</span>
-                                                            <div className="book-black">0</div>
+                                                            <Exposure className="d-block" data={exposureData} id={getMarketByNat(label)?.sid} />
                                                         </div>
                                                         <BetLimitInfo2 min={getMarketByNat(label)?.min} max={getMarketByNat(label)?.max} />
                                                     </div>

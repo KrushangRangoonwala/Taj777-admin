@@ -6,7 +6,6 @@ import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
 import BetLimitInfo from "./components/BetLimitInfo";
-import { Exposure } from "../CasinoCenter";
 
 const BetBox = ({ market, marketName, nation, className = "", children, type = "back", handleOddsClick }) => {
     const suspended = getIsSuspended(market);
@@ -56,11 +55,10 @@ const Cards = ({ currentGame, result_image }) => (
     </div>
 );
 
-const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
-    const { game_type: raw_game_type, phpFile, game_name, iframe_url, result_image } = useGetFileData();
-    const game_type = raw_game_type || "teen62";
+const TeenPatti1Day = ({ onBetSelection }) => {
+    const { game_type, phpFile, game_name, iframe_url, result_image } = useGetFileData();
     const [gameData, setGameData] = useState(null);
-    // const [lastResults, setLastResults] = useState([]);
+    const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
     const [openRanges, setOpenRanges] = useState({});
 
@@ -197,7 +195,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                         <div className="casino-container">
                             <div className="casino-table teenpatti1day">
                                 <CasinoVideo
-                                    gameName={"V VIP Teenpatti 1-Day"}
+                                    gameName={game_name || "Teenpatti 1-day"}
                                     roundId={currentGame?.mid}
                                     videoSrc={iframe_url}
                                     results={lastResults}
@@ -226,7 +224,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                                                 <div className="casino-nation-name">
                                                     <b>Main</b>
                                                     <div className="float-right">
-                                                        <Exposure className="mr-2 casino-book" data={exposureData} id={getMarketBySid("1")?.sid} />
+                                                        <span className="mr-2 casino-book book-black">0</span>
                                                         <BetLimitInfo
                                                             id="range1"
                                                             openRanges={openRanges}
@@ -249,7 +247,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                                                 <div className="casino-nation-name casino-card-img">
                                                     <b>Consecutive</b>
                                                     <div className="float-right">
-                                                        <Exposure className="mr-2 casino-book" data={exposureData} id={getMarketBySid("17")?.sid} />
+                                                        <span className="mr-2 casino-book book-black">0</span>
                                                         <BetLimitInfo
                                                             id="range6"
                                                             openRanges={openRanges}
@@ -285,7 +283,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                                                 <div className="casino-nation-name">
                                                     <b>Main</b>
                                                     <div className="float-right">
-                                                        <Exposure className="mr-2 casino-book" data={exposureData} id={getMarketBySid("2")?.sid} />
+                                                        <span className="mr-2 casino-book book-black">0</span>
                                                         <BetLimitInfo
                                                             id="range7"
                                                             openRanges={openRanges}
@@ -308,7 +306,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                                                 <div className="casino-nation-name casino-card-img">
                                                     <b>Consecutive</b>
                                                     <div className="float-right">
-                                                        <Exposure className="mr-2 casino-book" data={exposureData} id={getMarketBySid("18")?.sid} />
+                                                        <span className="mr-2 casino-book book-black">0</span>
                                                         <BetLimitInfo
                                                             id="range12"
                                                             openRanges={openRanges}
@@ -357,7 +355,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                                                         <BetBox market={getMarketBySid(sid)} marketName={`Card ${index + 1} Odd`} nation="Odd" className="back casino-bl-box-item" type="back" handleOddsClick={handleOddsClick}>
                                                             {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
                                                         </BetBox>
-                                                        <Exposure className="casino-book" data={exposureData} id={sid + '_1'} />
+                                                        <div className="casino-book book-black">0</div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -380,7 +378,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                                                         <BetBox market={getMarketBySid(sid)} marketName={`Card ${index + 1} Even`} nation="Even" className="back casino-bl-box-item" type="back" handleOddsClick={handleOddsClick}>
                                                             {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
                                                         </BetBox>
-                                                        <Exposure className="casino-book" data={exposureData} id={sid + '_2'} />
+                                                        <div className="casino-book book-black">0</div>
                                                     </div>
                                                 ))}
                                             </div>
@@ -414,7 +412,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                                                 <div className="casino-bl-box" key={player.sid}>
                                                     <div className="casino-bl-box-item casino-odds-name">
                                                         <span>{player.name}</span>
-                                                        <Exposure className="float-right" data={exposureData} id={player.sid} />
+                                                        <span className="float-right book-black">0</span>
                                                     </div>
                                                     <BetBox market={getMarketBySid(player.sid)} marketName={`${player.name} Main`} className="back casino-bl-box-item" type="back" handleOddsClick={handleOddsClick}>
                                                         {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
@@ -452,7 +450,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                                                 <div className="casino-bl-box" key={player.sid}>
                                                     <div className="casino-bl-box-item casino-odds-name">
                                                         <span>{player.name}</span>
-                                                        <Exposure className="float-right" data={exposureData} id={player.sid} />
+                                                        <span className="float-right book-black">0</span>
                                                     </div>
                                                     <BetBox market={getMarketBySid(player.sid)} marketName={`${player.name} Consecutive`} className="back casino-bl-box-item" type="back" handleOddsClick={handleOddsClick}>
                                                         {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
@@ -490,7 +488,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                                                         {(odds) => (
                                                             <>
                                                                 <span className="casino-box-odd">{odds || 0}</span>
-                                                                <Exposure data={exposureData} id={String(sid) + '_1'} />
+                                                                <span className="book-black">0</span>
                                                             </>
                                                         )}
                                                     </BetBox>
@@ -498,7 +496,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                                                         {(odds) => (
                                                             <>
                                                                 <span className="casino-box-odd">{odds || 0}</span>
-                                                                <Exposure data={exposureData} id={(sid) + '_2'} />
+                                                                <span className="book-black">0</span>
                                                             </>
                                                         )}
                                                     </BetBox>
@@ -507,7 +505,7 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
                                         </div>
                                     </div>
 
-                                    <LastResult results={lastResults} gameName={game_name} resultPath={phpFile} showRawLabel={true} />
+                                    <LastResult results={lastResults} />
                                 </div>
                             </div>
                         </div>
@@ -519,5 +517,5 @@ const VIPTeenPatti1Day = ({ onBetSelection, exposureData, lastResults }) => {
     );
 };
 
-export default VIPTeenPatti1Day;
+export default TeenPatti1Day;
 
