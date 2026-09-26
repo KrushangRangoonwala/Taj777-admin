@@ -1,21 +1,53 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import BetCountMob from './BetCountMob'
 import { Link } from 'react-router-dom';
 import CasinoViewMore from '../../../../components/CasinoViewMore';
-import { useState } from 'react';
+import { useCasinoRound } from '../../CasinoRoundContext';
+import { fetchCasinoDownlineActiveBetsApi } from '../../../../api/API_games';
 
 const CasinoRightSidebar = ({ RulesComponent }) => {
     const [isViewMoreOpen, setIsViewMoreOpen] = useState(false);
+    const [viewMoreRecords, setViewMoreRecords] = useState([]);
+    const { roundId, markettype, activeBets, viewMoreLimit } = useCasinoRound();
 
-    const records = [
-        // {
-        //     nation: "Lionel Messi",
-        //     date: "29/04/2026 22:36:17",
-        //     userName: "Ras44",
-        //     rate: "5.53",
-        //     amount: "100"
-        // }
-    ];
+    const records = (activeBets || []).map((row) => ({
+        nation: row.nation || row.market_name || '',
+        date: row.placeDate || row.date || '',
+        userName: row.userName || row.email || '',
+        rate: row.userRate ?? '',
+        amount: row.amount ?? '',
+    }));
+
+    useEffect(() => {
+        if (!isViewMoreOpen || !roundId || !markettype) return;
+
+        const loadAll = async () => {
+            try {
+                const res = await fetchCasinoDownlineActiveBetsApi({
+                    markettype,
+                    main_event_id: roundId,
+                    limit: viewMoreLimit || 100,
+                });
+                const bets = res?.data ?? res?.open_bet_data ?? [];
+                setViewMoreRecords(
+                    Array.isArray(bets)
+                        ? bets.map((row) => ({
+                            userName: row.userName || row.email || '',
+                            nation: row.nation || row.market_name || '',
+                            amount: row.amount ?? '',
+                            userRate: row.userRate ?? '',
+                            placeDate: row.placeDate || row.date || '',
+                            ip: row.ip || '',
+                        }))
+                        : []
+                );
+            } catch (e) {
+                console.error('View more casino bets:', e);
+                setViewMoreRecords([]);
+            }
+        };
+        loadAll();
+    }, [isViewMoreOpen, roundId, markettype, viewMoreLimit]);
 
     return (
         <div className="right-sidebar">
@@ -93,7 +125,7 @@ const CasinoRightSidebar = ({ RulesComponent }) => {
                                                 ? <div className="card m-b-10"><RulesComponent /></div>
                                                 : null}
 
-                                            <BetCountMob betCount={0} />
+                                            <BetCountMob betCount={records.length} />
                                         </div>
                                     </div>
                                 </div>
@@ -110,7 +142,11 @@ const CasinoRightSidebar = ({ RulesComponent }) => {
                 </div>
             </div>
 
-            <CasinoViewMore show={isViewMoreOpen} onHide={() => setIsViewMoreOpen(false)} />
+            <CasinoViewMore
+                show={isViewMoreOpen}
+                onHide={() => setIsViewMoreOpen(false)}
+                records={viewMoreRecords}
+            />
         </div>
     )
 }

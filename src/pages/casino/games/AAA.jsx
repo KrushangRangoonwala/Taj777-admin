@@ -5,6 +5,7 @@ import { getImage, getCardImage, getMarketByNation, getValueAfterDot, getIsSuspe
 import CasinoVideo from "./components/CasinoVideo";
 import CasinoRightSidebar from "./components/CasinoRightSidebar";
 import LastResult from "./components/LastResult";
+import { Exposure } from "../CasinoCenter";
 
 const AAA_DATA = {
     game_code: "aaa",
@@ -17,7 +18,7 @@ const AAA_DATA = {
     result_image: "cards_new"
 };
 
-const AAA = ({ onBetSelection, lastBetTime }) => {
+const AAA = ({ onBetSelection, exposureData, lastResults: propsLastResults }) => {
     // We use the provided metadata for core settings
     const {
         game_code: CODE,
@@ -30,6 +31,12 @@ const AAA = ({ onBetSelection, lastBetTime }) => {
     const [gameData, setGameData] = useState(null);
     const [lastResults, setLastResults] = useState([]);
     const [isCardDrawerOpen, setIsCardDrawerOpen] = useState(true);
+
+    useEffect(() => {
+        if (propsLastResults && propsLastResults.length > 0) {
+            setLastResults(propsLastResults);
+        }
+    }, [propsLastResults]);
 
     const socket = useSocket("casino");
     useEffect(() => {
@@ -185,7 +192,7 @@ const AAA = ({ onBetSelection, lastBetTime }) => {
                                                         {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
                                                     </BetBox>
                                                 </div>
-                                                <div className="casino-nation-name casino-book book-black">0</div>
+                                                <Exposure className="casino-nation-name casino-book" data={exposureData} id={getMarketBySid(item.sid)?.sid} />
                                             </div>
                                         </div>
                                     ))}
@@ -206,7 +213,7 @@ const AAA = ({ onBetSelection, lastBetTime }) => {
                                         <div className="casino-bl-box" key={item.sid}>
                                             <div className="casino-bl-box-item casino-odds-name">
                                                 <b>{item.name}</b>
-                                                <span className="float-right book-black">0</span>
+                                                <Exposure className="float-right" data={exposureData} id={getMarketBySid(item.sid)?.sid} />
                                             </div>
                                             <BetBox sid={item.sid} marketName={item.name} className="back casino-bl-box-item" type="back">
                                                 {(odds) => <span className="casino-box-odd">{odds || 0}</span>}
@@ -234,13 +241,13 @@ const AAA = ({ onBetSelection, lastBetTime }) => {
                                                 <BetBox sid="4" marketName="Even" className="back casino-bl-box-item" type="back">
                                                     {(odds) => <span className="casino-box-odd">Even</span>}
                                                 </BetBox>
-                                                <div className="casino-book text-center book-black">0</div>
+                                                <Exposure className="casino-book text-center" data={exposureData} id={getMarketBySid("4")?.sid} />
                                             </div>
                                             <div className="casino-bl-box">
                                                 <BetBox sid="5" marketName="Odd" className="back casino-bl-box-item" type="back">
                                                     {(odds) => <span className="casino-box-odd">Odd</span>}
                                                 </BetBox>
-                                                <div className="casino-book text-center book-black">0</div>
+                                                <Exposure className="casino-book text-center" data={exposureData} id={getMarketBySid("5")?.sid} />
                                             </div>
                                         </div>
                                         <div className="teen1daycasino-container justify-content-end casino-min-max w-100">
@@ -264,7 +271,7 @@ const AAA = ({ onBetSelection, lastBetTime }) => {
                                                         </span>
                                                     )}
                                                 </BetBox>
-                                                <div className="casino-book text-center book-black">0</div>
+                                                <Exposure className="casino-book text-center" data={exposureData} id={getMarketBySid("6")?.sid} />
                                             </div>
                                             <div className="casino-bl-box">
                                                 <BetBox sid="7" marketName="Red" className="back casino-bl-box-item casino-card-img" type="back">
@@ -275,7 +282,7 @@ const AAA = ({ onBetSelection, lastBetTime }) => {
                                                         </span>
                                                     )}
                                                 </BetBox>
-                                                <div className="casino-book text-center book-black">0</div>
+                                                <Exposure className="casino-book text-center" data={exposureData} id={getMarketBySid("7")?.sid} />
                                             </div>
                                         </div>
                                         <div className="teen1daycasino-container justify-content-end casino-min-max w-100">
@@ -294,13 +301,13 @@ const AAA = ({ onBetSelection, lastBetTime }) => {
                                                 <BetBox sid="21" marketName="Under 7" className="back casino-bl-box-item" type="back">
                                                     {(odds) => <span className="casino-box-odd">Under 7</span>}
                                                 </BetBox>
-                                                <div className="casino-book text-center book-black">0</div>
+                                                <Exposure className="casino-book text-center" data={exposureData} id={getMarketBySid("21")?.sid} />
                                             </div>
                                             <div className="casino-bl-box">
                                                 <BetBox sid="22" marketName="Over 7" className="back casino-bl-box-item" type="back">
                                                     {(odds) => <span className="casino-box-odd">Over 7</span>}
                                                 </BetBox>
-                                                <div className="casino-book text-center book-black">0</div>
+                                                <Exposure className="casino-book text-center" data={exposureData} id={getMarketBySid("22")?.sid} />
                                             </div>
                                         </div>
                                         <div className="teen1daycasino-container justify-content-end casino-min-max w-100">
@@ -328,7 +335,7 @@ const AAA = ({ onBetSelection, lastBetTime }) => {
                                                 <BetBox sid={card.sid} marketName={card.val} className="card-image" type="back">
                                                     {(odds) => <img src={getImage(card.val, "cards")} alt={card.val} />}
                                                 </BetBox>
-                                                <div className="casino-book text-center book-black">0</div>
+                                                <Exposure className="casino-book text-center" data={exposureData} id={getMarketBySid(card.sid)?.sid} />
                                             </div>
                                         ))}
                                     </div>

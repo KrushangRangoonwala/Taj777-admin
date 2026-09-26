@@ -86,7 +86,7 @@ export async function fetchDashboardData() {
     }
 }
 
-export async function fetchResultById(eventId, gameType, userId="") {
+export async function fetchResultById(eventId, gameType, userId = "") {
     try {
         const requestBody = {
             event_id: eventId || "",
@@ -157,6 +157,52 @@ export async function updateButtonValuesApi(extraPayload = {}) {
         const { data } = await axiosInstance.post("/button_value_change", payload);
         return data;
     } catch (error) {
+        throw error;
+    }
+}
+
+
+/** Downline aggregated exposure for current casino round (ajax_adm). */
+export async function fetchCasinoDownlineExposureApi(payload) {
+    const { markettype, main_event_id, event_id } = payload;
+    const roundId = splitByDot(String(main_event_id ?? event_id ?? "")) || "";
+    const fullPayload = {
+        markettype,
+        event_id: roundId,
+        main_event_id: roundId,
+        ...getDefaultParams(),
+    };
+    try {
+        const { data } = await ajax_adm.post(
+            "get_casino_event_exposure.php",
+            fullPayload
+        );
+        return data;
+    } catch (error) {
+        console.error("Error fetching casino downline exposure:", error);
+        throw error;
+    }
+}
+
+/** Active downline bets for current casino round (ajax_adm). */
+export async function fetchCasinoDownlineActiveBetsApi(payload) {
+    const { markettype, main_event_id, event_id, limit = 10 } = payload;
+    const roundId = splitByDot(String(main_event_id ?? event_id ?? "")) || "";
+    const fullPayload = {
+        markettype,
+        event_id: roundId,
+        eventId: roundId,
+        limit,
+        ...getDefaultParams(),
+    };
+    try {
+        const { data } = await ajax_adm.post(
+            "get_casino_event_active_bets.php",
+            fullPayload
+        );
+        return data;
+    } catch (error) {
+        console.error("Error fetching casino downline active bets:", error);
         throw error;
     }
 }

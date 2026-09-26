@@ -1,6 +1,10 @@
 import React, { lazy, Suspense, useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { fetchCasinoExposureApi } from '../../api/API_games';
+import {
+    fetchCasinoDownlineActiveBetsApi,
+    fetchCasinoDownlineExposureApi,
+} from '../../api/API_games';
+import { CasinoRoundProvider } from './CasinoRoundContext';
 import { useGetFileData } from '../../hooks/useGetFileData';
 import useSocket from '../../api/Socket/useSocket';
 
@@ -165,6 +169,7 @@ const CasinoCenter = () => {
     const Component = gamePath_To_Component[path];
     const [gameData, setGameData] = useState(null);
     const [exposureData, setExposureData] = useState([]);
+    const [activeBets, setActiveBets] = useState([]);
     const [lastResults, setLastResults] = useState([]);
 
     if (!Component) {
@@ -213,28 +218,53 @@ const CasinoCenter = () => {
         };
     }, [socket, game_type]);
 
+    const roundId = gameData?.t1?.[0]?.mid;
+
     useEffect(() => {
-        const fetchExposure = async () => {
-            if (!gameData?.t1?.[0]?.mid) return;
+        const loadRoundData = async () => {
+            if (!roundId || !CODE) return;
             try {
-                const response = await fetchCasinoExposureApi({
-                    markettype: CODE,
-                    main_event_id: gameData.t1[0].mid,
-                    curPageName: phpFile,
-                });
-                if (Array.isArray(response?.data)) {
-                    setExposureData(response.data);
+                const [exposureRes, betsRes] = await Promise.all([
+                    fetchCasinoDownlineExposureApi({
+                        markettype: CODE,
+                        main_event_id: roundId,
+                    }),
+                    fetchCasinoDownlineActiveBetsApi({
+                        markettype: CODE,
+                        main_event_id: roundId,
+                        limit: 10,
+                    }),
+                ]);
+
+                if (Array.isArray(exposureRes?.data)) {
+                    setExposureData(exposureRes.data);
+                } else {
+                    setExposureData([]);
                 }
+
+                const bets = betsRes?.data ?? betsRes?.open_bet_data ?? [];
+                setActiveBets(Array.isArray(bets) ? bets : []);
             } catch (error) {
-                console.error("Error fetching exposure:", error);
+                console.error("Error fetching casino downline round data:", error);
             }
         };
-        fetchExposure();
-    }, [gameData?.t1?.[0]?.mid, CODE, phpFile]);
+        loadRoundData();
+        const interval = setInterval(loadRoundData, 5000);
+        return () => clearInterval(interval);
+    }, [roundId, CODE]);
 
     return (
         <Suspense fallback={<div>Loading...</div>}>
-            <Component gameData={gameData} exposureData={exposureData} lastResults={lastResults} />
+            <CasinoRoundProvider
+                value={{
+                    roundId,
+                    markettype: CODE,
+                    activeBets,
+                    viewMoreLimit: 100,
+                }}
+            >
+                <Component gameData={gameData} exposureData={exposureData} lastResults={lastResults} />
+            </CasinoRoundProvider>
         </Suspense>
     )
 }
@@ -254,14 +284,14 @@ export function getExposure(exposureData, marketId) {
 export function Exposure({ className = "", data, id, isInlineColor = false }) {
     const exposure = getExposure(data, id);
     // if (exposure === 0) return null;
-    const exposureClass = exposure > 0 ? "book-red" : exposure < 0 ? "book-green" : "book-black";
-    const exposureColor = exposure > 0 ? "red" : exposure < 0 ? "green" : "black";
+    const exposureClass = exposure < 0 ? "book-red" : exposure > 0 ? "book-green" : "book-black";
+    const exposureColor = exposure < 0 ? "red" : exposure > 0 ? "green" : "black";
 
     return (
         <>
             <span
                 className={`${className} ${isInlineColor ? '' : exposureClass}`}
-                style={{ color: isInlineColor ? exposureColor : '' }}
+                style={{ color: isInlineColor ? exposureColor : '', zIndex: exposure == 0 ? 'auto' : 9 }}
             >
                 {exposure}
             </span>
