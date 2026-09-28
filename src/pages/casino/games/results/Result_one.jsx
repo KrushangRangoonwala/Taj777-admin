@@ -219,6 +219,19 @@ const getGameResultContent = { // BY GAME_TYPE
             </div>
         )
     },
+    "goal2": (response, cards, win) => {
+        const rawDesc = response?.desc || response?.res_desc || response?.desc_remarks || response?.desc_remakrs || "";
+        const descParts = rawDesc.split('#');
+        const formattedDesc = descParts.length >= 2 ? `${descParts[1]} by ${descParts[0]}` : rawDesc;
+        return (
+            <div className="col-12 my-2 text-center">
+                <div className="cricket20ballpopup cricket20ballresult goalresult">
+                    <img src={`/${import.meta.env.VITE_IMAGE_PATH}/assets/cards/soccer-ball.png`} alt="goal" />
+                    <span>{formattedDesc}</span>
+                </div>
+            </div>
+        )
+    },
     "poker": (response, cards, win) => {
         const descParts = getDescPartsBy("#")(response);
         const data = [
@@ -290,8 +303,8 @@ const getGameResultContent = { // BY GAME_TYPE
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={[cards[0], cards[2], cards[4]]}
+                    cardList2={[cards[1], cards[3], cards[5]]}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}

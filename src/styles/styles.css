@@ -1148,6 +1148,59 @@ li {
     width: calc(100% - 148px);
 }
 
+.detail-page-container.goal.goal2 .market-6 .nation-name,
+.detail-page-container.goal2 .market-6 .nation-name {
+    width: calc(100% - 224px);
+}
+
+.detail-page-container.goal.goal2 .market-comb .nation-name,
+.detail-page-container.goal2 .market-comb .nation-name {
+    width: calc(100% - 148px);
+}
+
+.detail-page-container .market-comb {
+    min-width: calc(100% - 6px);
+    max-width: calc(100% - 6px);
+    margin-left: 3px;
+    margin-right: 3px;
+    flex: 1 1 100%;
+}
+
+.detail-page-container.five-cricket .market-comb {
+    max-width: calc(100% - 6px);
+    min-width: calc(100% - 6px);
+    flex: 1 1 100%;
+}
+
+.detail-page-container .market-comb .bet-table-header .nation-name {
+    width: calc(100% - 140px);
+}
+
+.detail-page-container .market-comb .fancy-tripple .bet-table-row {
+    border-bottom: 0;
+}
+
+.detail-page-container .market-comb .nation-name p {
+    height: auto;
+    width: 100%;
+    white-space: normal;
+    overflow: unset;
+    text-overflow: unset;
+}
+
+.detail-page-container .market-comb .nation-name p:last-child {
+    width: 100%;
+    text-align: left;
+}
+
+.detail-page-container .market-comb .fancy-tripple {
+    border-bottom: 1px solid var(--bg-table-header);
+}
+
+.detail-page-container .market-comb .fancy-tripple:last-child {
+    border-bottom: 0;
+}
+
 .detail-page-container .market-6.ball-by-ball .bet-table-header .nation-name {
     width: calc(100% - 148px);
 }
@@ -7726,6 +7779,8 @@ body[data-sidebar="dark"] #sidebar-menu ul li ul.sub-menu li a {
 .casino-banner-item img {
     border-radius: 4px;
     width: 100%;
+    aspect-ratio: 300 / 169;
+    object-fit: cover;
 }
 
 .casino-banner-item:nth-child(6n) {

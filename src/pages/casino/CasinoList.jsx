@@ -88,6 +88,7 @@ const CasinoList = () => {
                     alt={game.game_name}
                     src={game.game_image}
                     loading="lazy"
+                    style={{ aspectRatio: "300 / 169", objectFit: "cover" }}
                   />
                 </Link>
               </div>

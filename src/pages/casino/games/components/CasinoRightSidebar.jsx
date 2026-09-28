@@ -5,6 +5,16 @@ import CasinoViewMore from '../../../../components/CasinoViewMore';
 import { useCasinoRound } from '../../CasinoRoundContext';
 import { fetchCasinoDownlineActiveBetsApi } from '../../../../api/API_games';
 
+function getBgColorClass(value) {
+    console.log('value', value)
+    if (value?.toUpperCase() == "BACK" || value?.toUpperCase() == "YES") {
+        return "back-border"
+    } else if (value?.toUpperCase() == "LAY" || value?.toUpperCase() == "NO") {
+        return "lay-border"
+    }
+    return ""
+}
+
 const CasinoRightSidebar = ({ RulesComponent }) => {
     const [isViewMoreOpen, setIsViewMoreOpen] = useState(false);
     const [viewMoreRecords, setViewMoreRecords] = useState([]);
@@ -16,6 +26,7 @@ const CasinoRightSidebar = ({ RulesComponent }) => {
         userName: row.userName || row.email || '',
         rate: row.userRate ?? '',
         amount: row.amount ?? '',
+        bet_type: row.bet_type ?? '',
     }));
 
     useEffect(() => {
@@ -91,12 +102,12 @@ const CasinoRightSidebar = ({ RulesComponent }) => {
                                                                         {records && records.length > 0 ? (
                                                                             records.map((record, index) => (
                                                                                 <React.Fragment key={index}>
-                                                                                    <tr className="back-border">
+                                                                                    <tr className={`${getBgColorClass(record.bet_type)}`}>
                                                                                         <td colSpan="4">
                                                                                             <b>{record.nation}</b> <span className="float-right">{record.date}</span>
                                                                                         </td>
                                                                                     </tr>
-                                                                                    <tr className="back-border">
+                                                                                    <tr className={`${getBgColorClass(record.bet_type)}`}>
                                                                                         <td>{record.userName}</td>
                                                                                         <td className="text-right">{record.rate}</td>
                                                                                         <td className="text-right">{record.amount}</td>

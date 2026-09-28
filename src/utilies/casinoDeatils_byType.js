@@ -10,6 +10,7 @@ export const gamePath_MapTo_gametype = {
     "5fivecricket": "cricketv3",
     "cricket-match-2020": "cmatch20",
     "goal": "goal",
+    "goal2": "goal2",
     "cmeter": "cmeter",
     "1cardmeter": "cmeter1",
 
@@ -132,6 +133,11 @@ export const gameType_To_details = {
         CODE: "GOAL",
         phpFile: "live_goal.php",
         placeBetApi: "bet_place_goal.php",
+    },
+    "goal2": {
+        CODE: "GOAL2",
+        phpFile: "live_goal2.php",
+        placeBetApi: "bet_place_goal2.php",
     },
     "cmeter": {
         CODE: "CASINO_METER",

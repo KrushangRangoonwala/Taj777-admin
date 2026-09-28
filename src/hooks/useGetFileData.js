@@ -61,6 +61,16 @@ export const data = {
         iframe_url: "https://casino.diamondcricketid.com/swiftdizire/?id=3087",
         result_image: "/cards/soccer-ball.png"
     },
+    "goal2": {
+        CODE: "GOAL2",
+        game_type: "goal2",
+        phpFile: "live_goal2.php",
+        placeBetApi: "bet_place_goal2.php",
+
+        game_name: "Goal 2",
+        iframe_url: "https://casino.diamondcricketid.com/swiftdizire/?id=3087",
+        result_image: "/cards/soccer-ball.png"
+    },
     "cmeter": {
         CODE: "CASINO_METER",
         game_type: "cmeter",
@@ -182,7 +192,7 @@ export function useGetFileData() { // BY URL PATH
         const isVip = location.includes("/vip/");
         const type = isVip ? gamePath_MapTo_gametype_vip[path] : gamePath_MapTo_gametype[path] ?? path;
         const gg = casino_list[type] ?? default_;
-        console.log("game data", gg);
+        // console.log("game data", gg);
         return gg;
     }
 }

@@ -64,6 +64,7 @@ const Cricket20 = lazy(() => import("./games/Cricket20"));
 const Cmeter1 = lazy(() => import("./games/Cmeter1"));
 const Cmeter_1card = lazy(() => import("./games/Cmeter_1card"));
 const Goal = lazy(() => import("./games/Goal"));
+const Goal2 = lazy(() => import("./games/Goal2"));
 const Dolidana = lazy(() => import("./games/Dolidana"));
 const Dum10 = lazy(() => import("./games/Dum10"));
 const OneCard2020 = lazy(() => import("./games/OneCard2020"));
@@ -131,6 +132,7 @@ const gamePath_To_Component = {
     "cmeter": Cmeter1,
     "1cardmeter": Cmeter_1card,
     "goal": Goal,
+    "goal2": Goal2,
     "ball_by_ball": BallByBall,
     "lucky15": BallByBall,
 
@@ -218,7 +220,7 @@ const CasinoCenter = () => {
         };
     }, [socket, game_type]);
 
-    const roundId = gameData?.t1?.[0]?.mid;
+    const roundId = gameData?.t1?.[0]?.mid ?? gameData?.t1?.mid;
 
     useEffect(() => {
         const loadRoundData = async () => {
