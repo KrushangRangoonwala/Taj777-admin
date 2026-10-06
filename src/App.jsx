@@ -306,3 +306,25 @@ export default App
 // getUserList
 
 // dist,.md,Sidebar copy 2.jsx,sidebarEvents.json,Sidebar copy.jsx
+
+
+
+
+/*
+
+----------------
+/home/taj777c/public_html
+/home/taj777c/public_html/admin
+
+----------------
+cd /home/taj777c/public_html && find . -maxdepth 1 -type f \( -name "*.json" -o -name "*.ico" -o -name "*.html" -o -name "*.png" -o -name "*.txt" \) -delete && rm -rf images assets static
+
+cp -r /home/taj777c/Taj777-User/build/* /home/taj777c/public_html/
+
+
+----------------
+rm -rf /home/taj777c/public_html/admin/*
+
+cp -r /home/taj777c/Taj777-admin/dist/* /home/taj777c/public_html/admin/
+
+*/

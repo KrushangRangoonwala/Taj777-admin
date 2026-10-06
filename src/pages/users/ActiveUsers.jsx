@@ -31,7 +31,7 @@ const ActiveUsers = () => {
   const totalPages = Math.ceil(total / limit);
 
   const userdata = useSelector(store => store.user.userData);
-  
+
   const canDeposit =
     userdata?.user_type != 8 ||
     userdata?.privileges?.includes("Deposit");
@@ -68,7 +68,7 @@ const ActiveUsers = () => {
     setSelectedUser(user);
     setShowCRModal(true);
   };
-  
+
   const handleMoreClick = (user) => {
     setSelectedUser(user);
     setShowModal(true);
@@ -137,7 +137,7 @@ const ActiveUsers = () => {
   }, []);
 
   useEffect(() => {
-      fetchUserList(searchKey, 1);
+    fetchUserList(searchKey, 1);
   }, [limit]);
 
   const exportToExcel = () => {
@@ -214,7 +214,7 @@ const ActiveUsers = () => {
 
     doc.save("Active_Users.pdf");
   };
-  
+
   return (
     <div data-v-5a10e370="">
       <div data-v-5a10e370="">
@@ -387,10 +387,10 @@ const ActiveUsers = () => {
                             </td>
                             <td aria-colindex="2" role="cell">
                               <p className="text-right mb-0 cp text-warning" onClick={
-                                  Number(user.parent_id) === Number(userdata?.user_id)
-                                    ? () => handleCRClick(user)
-                                    : undefined
-                                }>
+                                Number(user.parent_id) === Number(userdata?.user_id)
+                                  ? () => handleCRClick(user)
+                                  : undefined
+                              }>
                                 {user.cr}
                               </p>
                             </td>

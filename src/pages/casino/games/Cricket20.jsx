@@ -35,9 +35,9 @@ const BallBox = ({ market, currentGame, exposureData }) => {
                 </div>
             </div>
             <div className="ball-icon">
-                <img 
-                    src={`https://wver.sprintstaticdata.com/v211/static/admin/img/balls/ball${ball}.png`} 
-                    alt={`Ball ${ball}`} 
+                <img
+                    src={`https://wver.sprintstaticdata.com/v211/static/admin/img/balls/ball${ball}.png`}
+                    alt={`Ball ${ball}`}
                 />
             </div>
             <div className={`blbox ${suspended ? "suspended" : ""}`}>
@@ -94,32 +94,32 @@ const Cricket20 = ({ gameData, exposureData, lastResults }) => {
                                 <div className="teen20casino-container">
                                     <div className="teen20left">
                                         {marketData.slice(0, 5).map((market, index) => (
-                                            <BallBox 
-                                                key={market.sid || index} 
-                                                market={market} 
-                                                currentGame={currentGame} 
+                                            <BallBox
+                                                key={market.sid || index}
+                                                market={market}
+                                                currentGame={currentGame}
                                                 exposureData={exposureData}
                                             />
                                         ))}
                                     </div>
                                     <div className="teen20right">
                                         {marketData.slice(5).map((market, index) => (
-                                            <BallBox 
-                                                key={market.sid || index} 
-                                                market={market} 
-                                                currentGame={currentGame} 
+                                            <BallBox
+                                                key={market.sid || index}
+                                                market={market}
+                                                currentGame={currentGame}
                                                 exposureData={exposureData}
                                             />
                                         ))}
                                     </div>
                                 </div>
-                                
+
                                 <RemarkMarquee remark={currentGame?.remark} />
                             </div>
                         </div>
                     </div>
                 </div>
-                
+
                 <CasinoRightSidebar />
             </div>
         </div>

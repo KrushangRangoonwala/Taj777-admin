@@ -32,7 +32,7 @@ function getGameName(type, casino_list) {
 
 const Result_one = lazy(() => import('../results/Result_one'));
 
-const Result_parent = ({ mid, game_type, setMid, userId="" }) => {
+const Result_parent = ({ mid, game_type, setMid, userId = "" }) => {
     const midToPass = getValueAfterDot(mid);
     const [isLoading, setIsLoading] = useState(false);
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -103,7 +103,7 @@ const Result_parent = ({ mid, game_type, setMid, userId="" }) => {
                         <div>Round-ID: {midToPass}</div>
                         <div>
                             {/* Match Time: <span>{time}</span> */}
-                            Match Time: <span>{formatWithTimezone(time?.slice(0, time?.length - 3))}</span>
+                            Match Time: <span>{formatWithTimezone(time?.slice(0, time?.length - 3), true)}</span>
                         </div>
                     </div>
 

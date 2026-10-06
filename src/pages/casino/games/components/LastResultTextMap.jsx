@@ -1,3 +1,4 @@
+import { getImage } from "../../../../utilies/helpers";
 
 const aaa = ["A", "B", "C", "D"];
 
@@ -14,11 +15,19 @@ const lastResultTextMap = { // BY PATH_NAME
         getColorClass: (w) => (w === "1" ? "resulta" : w === "2" ? "resultb" : "resulttie"),
     },
 
+
+    teenunique: {
+        getResultTxt: () => "R",
+        getColorClass: () => "resulttie",
+    },
     goal: {
         getResultTxt: () => "R",
         getColorClass: () => "resulttie",
     },
-
+    goal2: {
+        getResultTxt: () => "R",
+        getColorClass: () => "resulttie",
+    },
     cmeter: {
         getResultTxt: (win) => (win === "2" ? "H" : win === "1" ? "L" : "T"),
         getColorClass: () => "resultb",
@@ -93,6 +102,17 @@ const lastResultTextMap = { // BY PATH_NAME
         getColorClass: (w) => (w === "1" ? "resulta" : w === "2" ? "resultb" : "resulttie"),
     },
 
+    cmatch20: {
+        getResultTxt: (w) => (
+            <img
+                // src={`/assets/cards_new/balls/ball${w}.png`}
+                src={getImage(`ball${w}`, "cards_new/balls")}
+                alt={`Ball ${w} WW`}
+            // style={{ width: !isMobile ? '28px' : '' }}
+            />
+        ),
+        getColorClass: () => "cricket20lastresult",
+    },
     cricketv3: {
         getResultTxt: (w) => (w === "1" ? "A" : w === "2" ? "I" : "T"),
         getColorClass: (w) => (w === "1" ? "resulta" : w === "2" ? "resultb" : "resulttie"),
@@ -188,8 +208,24 @@ const lastResultTextMap = { // BY PATH_NAME
         getColorClass: (w) => w == 1 ? "resulta" : w == 0 ? "" : "",
     },
     teen9: {
-        getResultTxt: (win) => (win === "11" ? "T" : win === "21" ? "L" : win === "31" ? "D" : "R"),
-        getColorClass: (aaa) => (aaa === "11" ? "resulta" : aaa === "21" ? "resultb" : aaa === "31" ? "resultc" : "resulttie"),
+        getResultTxt: (win) => (
+            win === "11" || win === "1"
+                ? "T"
+                : win === "21" || win === "2"
+                    ? "L"
+                    : win === "31" || win === "3"
+                        ? "D"
+                        : "R"
+        ),
+        getColorClass: (aaa) => (
+            aaa === "11" || aaa === "1"
+                ? "resulta"
+                : aaa === "21" || aaa === "2"
+                    ? "resultb"
+                    : aaa === "31" || aaa === "3"
+                        ? "resultc"
+                        : "resulttie"
+        ),
     },
     teen8: {
         getResultTxt: (win) => "R",

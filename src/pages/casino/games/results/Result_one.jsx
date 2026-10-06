@@ -1,6 +1,7 @@
 import React, { useMemo } from 'react'
 import Result_details from '../components/Result_details';
 import Result_cards from '../components/Result_cards';
+import Result_cards_slider from '../components/Result_cards_slider';
 import Result_poker1day from './Result_poker1day';
 import Result_Poker6 from './Result_Poker6';
 import Result_DTL20 from './Result_DTL20';
@@ -16,8 +17,41 @@ import Result_andarbahar2 from './Result_andarbahar2';
 import Result_superover from './Result_superover';
 import Result_teenunique from './Result_teenunique';
 import Result_Race20 from './Result_Race20';
-import { getCards_Sum } from '../../../../utilies/helpers';
+import { getCardImage, getCards_Sum, getImage, getOddEvenCards } from '../../../../utilies/helpers';
 import Result_cards_winner_up from '../components/Result_cards_winner_up';
+import useIsMobile from '../../../../hooks/useIsMobile';
+
+function UpperCardComponent({ upperCradText = 'Joker', upperCardImg = getImage('joker'), children }) {
+    return (
+        <div style={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "center",
+            width: '100%',
+        }}>
+            <div style={{
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                marginBottom: "10px"
+            }}>
+                <div style={{
+                    color: "#ffc107",
+                    fontSize: "18px",
+                    marginBottom: "10px",
+                    textTransform: "capitalize",
+                }}>
+                    {upperCradText}
+                </div>
+                <div className='casino-result-cards-item'>
+                    <img src={upperCardImg} alt="card" />
+                </div>
+            </div>
+
+            {children}
+        </div>
+    )
+}
 
 function CardComponentNotFound() {
     return (
@@ -164,6 +198,9 @@ const getGameResultContent = { // BY GAME_TYPE
         const descParts = getDescPartsBy("#")(response);
         const data = [
             { label: "Winner", value: descParts[0] || "" },
+            { label: "Suit", value: descParts[1] || "" },
+            { label: "Odd/Even", value: descParts[2] || "" },
+            { label: "Joker", value: descParts[3] || "" },
         ];
         return (
             <>
@@ -172,14 +209,40 @@ const getGameResultContent = { // BY GAME_TYPE
             </>
         )
     },
-    "ab20": (response, cards, win) => {
+    "ab20": (response, cards, win, isMobile) => {
         const descParts = getDescPartsBy("#")(response);
-
+        const data = [
+            { label: "Winner", value: descParts[0] || "" },
+        ];
         return (
-            <>
-                <Result_andarbahar cardList={cards} />
+            <div className="col-12" style={{ width: "100%" }}>
+                {/* Row 1: Slider and single card in 1 row */}
+                <div
+                    className="d-flex align-items-center justify-content-center mb-3"
+                    style={{
+                        gap: isMobile ? "12px" : "10vw",
+                        padding: isMobile ? '0px 5vw' : '',
+                    }}
+                >
+                    <div
+                        style={{
+                            flex: 1,
+                            minWidth: 0,
+                            marginLeft: isMobile ? '10vw' : '5vw',
+                            marginRight: isMobile ? '10vw' : '5vw',
+                        }}>
+                        <h3 style={{ textAlign: "center", marginTop: '20px' }}>Andar</h3>
+                        <Result_cards_slider col={false} cardList1={cards} />
+                        <h3 style={{ textAlign: "center", marginTop: '20px' }}>Bahar</h3>
+                        <Result_cards_slider col={false} cardList1={JSON.parse(response?.b_cards)} />
+                    </div>
+                </div>
 
-            </>
+                {/* Row 2: Details in separate row, horizontally centered */}
+                <div className="row justify-content-center p-2">
+                    <Result_details data={data} col={7} defaultCol={7} />
+                </div>
+            </div>
         )
     },
     "ab3": (response, cards, win) => {
@@ -235,7 +298,7 @@ const getGameResultContent = { // BY GAME_TYPE
     "poker": (response, cards, win) => {
         const descParts = getDescPartsBy("#")(response);
         const data = [
-            { label: "Main", value: descParts[0] || "" },
+            { label: "Winner", value: descParts[0] || "" },
             { label: "2 Card", value: descParts[1] || "" },
             { label: "7 Card", value: descParts[2] || "" }
         ];
@@ -258,7 +321,7 @@ const getGameResultContent = { // BY GAME_TYPE
     "poker20": (response, cards, win) => {
         const descParts = getDescPartsBy("#")(response);
         const data = [
-            { label: "Main", value: descParts[0] || "" },
+            { label: "Winner", value: descParts[0] || "" },
             { label: "Other", value: descParts[1] || "" },
         ];
         return (
@@ -279,7 +342,7 @@ const getGameResultContent = { // BY GAME_TYPE
     "poker6": (response, cards, win) => {
         const descParts = getDescPartsBy("#")(response);
         const data = [
-            { label: "Player", value: descParts[0] || "" },
+            { label: "Winner", value: descParts[0] || "" },
             { label: "Pattern", value: descParts[1] || "" },
         ];
         return (
@@ -298,7 +361,7 @@ const getGameResultContent = { // BY GAME_TYPE
         const data = [
             { label: "Winner", value: descParts[0] || "" },
             { label: "Odd/Even", value: descParts[2] || "" },
-            { label: "Consecutive", value: descParts[2] || "" }
+            { label: "Consecutive", value: descParts[3] || "" }
         ];
         return (
             <>
@@ -345,7 +408,7 @@ const getGameResultContent = { // BY GAME_TYPE
         const descParts = getDescPartsBy("#")(response);
         const data = [
             { label: "Winner", value: descParts[0] || "" },
-            { label: "Total", value: descParts[2] || "" },
+            { label: "Total", value: descParts[1] || "" },
         ];
         return (
             <>
@@ -354,7 +417,7 @@ const getGameResultContent = { // BY GAME_TYPE
                     cardList2={cards?.slice(2, 6)}
                     title1={"Daga / Teja"}
                     title2={"Mogambo"}
-                    winner={win} />
+                    winner={win == 1 ? 2 : win == 2 ? 1 : win} />
                 <Result_details data={data} />
             </>
         )
@@ -363,8 +426,9 @@ const getGameResultContent = { // BY GAME_TYPE
         const descParts = getDescPartsBy("#")(response);
         const data = [
             { label: "Winner", value: descParts[0] || "" },
-            { label: "Odd/Even", value: descParts[2] || "" },
-            { label: "Consecutive", value: descParts[2] || "" }
+            { label: "Pair Plus", value: descParts[1] || "" },
+            { label: "Total", value: descParts[2] || "" },
+            { label: "Dealer", value: descParts[3] || "" },
         ];
         return (
             <>
@@ -379,11 +443,12 @@ const getGameResultContent = { // BY GAME_TYPE
             { label: "Winner", value: descParts[0] || "" },
             { label: "Under/Over", value: descParts[1] || "" },
         ];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}
@@ -398,11 +463,12 @@ const getGameResultContent = { // BY GAME_TYPE
             { label: "Winner", value: descParts[0] || "" },
             { label: "Under/Over", value: descParts[1] || "" },
         ];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}
@@ -438,7 +504,7 @@ const getGameResultContent = { // BY GAME_TYPE
             { label: "3 Baccarat", value: descParts[1] || "" },
             { label: "Total", value: descParts[2] || "" },
             { label: "Pair Plus", value: descParts[3] || "" },
-            { label: "Color", value: descParts[4] || "" }
+            { label: "Red Black", value: descParts[4] || "" }
         ];
         return (
             <>
@@ -490,13 +556,14 @@ const getGameResultContent = { // BY GAME_TYPE
             { label: "3 Baccarat", value: descParts[1] || "" },
             { label: "Total", value: descParts[2] || "" },
             { label: "Pair Plus", value: descParts[3] || "" },
-            { label: "Color", value: descParts[4] || "" }
+            { label: "Red Black", value: descParts[4] || "" }
         ];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}
@@ -514,11 +581,12 @@ const getGameResultContent = { // BY GAME_TYPE
             { label: "Cards", value: descParts[3] || "" },
             { label: "Under/Over", value: descParts[4] || "" }
         ];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}
@@ -534,13 +602,13 @@ const getGameResultContent = { // BY GAME_TYPE
             { label: "3 Baccarat", value: descParts[1] || "" },
             { label: "Total", value: descParts[2] || "" },
             { label: "Pair Plus", value: descParts[3] || "" },
-            { label: "Color", value: descParts[4] || "" }
+            { label: "Red Black", value: descParts[4] || "" }
         ];
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={[cards[0], cards[2], cards[4]]}
+                    cardList2={[cards[1], cards[3], cards[5]]}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}
@@ -580,17 +648,18 @@ const getGameResultContent = { // BY GAME_TYPE
         //     { label: "Color ", value: descParts[3] || "" },
         //     { label: "Card", value: descParts[4] || "" }
         // ];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
-            <>
+            <UpperCardComponent>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
 
                 />
                 {/* <Result_details data={data} /> */}
-            </>
+            </UpperCardComponent>
         )
     },
     "joker1": (response, cards, win) => {
@@ -602,17 +671,18 @@ const getGameResultContent = { // BY GAME_TYPE
         //     { label: "Color ", value: descParts[3] || "" },
         //     { label: "Card", value: descParts[4] || "" }
         // ];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
-            <>
+            <UpperCardComponent>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
 
                 />
                 {/* <Result_details data={data} /> */}
-            </>
+            </UpperCardComponent>
         )
     },
     "teenmuf": (response, cards, win) => {
@@ -622,11 +692,12 @@ const getGameResultContent = { // BY GAME_TYPE
             { label: "Top 9", value: descParts[1] || "" },
             { label: "M Baccarat", value: descParts[2] || "" }
         ];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}
@@ -640,11 +711,12 @@ const getGameResultContent = { // BY GAME_TYPE
         const data = [
             { label: "Winner", value: descParts[0] || "" },
         ];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}
@@ -656,11 +728,12 @@ const getGameResultContent = { // BY GAME_TYPE
     "teen32": (response, cards, win) => {
         const descParts = getDescPartsBy("#")(response);
         const data = [{ label: "Winner", value: descParts[0] || "" },];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}
@@ -672,11 +745,12 @@ const getGameResultContent = { // BY GAME_TYPE
     "teen33": (response, cards, win) => {
         const descParts = getDescPartsBy("#")(response);
         const data = [{ label: "Winner", value: descParts[0] || "" },];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}
@@ -690,15 +764,16 @@ const getGameResultContent = { // BY GAME_TYPE
         const data = [
             { label: "Winner", value: descParts[0] || "" },
             { label: "High Card", value: descParts[1] || "" },
-            { label: "Pair", value: descParts[0] || "" },
-            { label: "Color Plus", value: descParts[1] || "" },
-            { label: "Lucky 9", value: descParts[0] || "" },
+            { label: "Pair", value: descParts[2] || "" },
+            { label: "Color Plus", value: descParts[3] || "" },
+            { label: "Lucky 9", value: descParts[4] || "" },
         ];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 3)}
-                    cardList2={cards?.slice(3, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}
@@ -715,11 +790,12 @@ const getGameResultContent = { // BY GAME_TYPE
             { label: "Total", value: descParts[2] || "" },
             { label: "Color Plus", value: descParts[3] || "" }
         ];
+        const [list1, list2] = getOddEvenCards(cards);
         return (
             <>
                 <Result_cards
-                    cardList1={cards?.slice(0, 2)}
-                    cardList2={cards?.slice(2, 6)}
+                    cardList1={list1}
+                    cardList2={list2}
                     title1={"Player A"}
                     title2={"Player B"}
                     winner={win}
@@ -761,9 +837,18 @@ const getGameResultContent = { // BY GAME_TYPE
         )
     },
     "aaa": (response, cards, win) => {
+        const descParts = getDescPartsBy("#")(response);
+        const data = [
+            { label: "Winner", value: descParts[0] || "" },
+            { label: "Odd/Even", value: descParts[1] || "" },
+            { label: "Color", value: descParts[2] || "" },
+            { label: "Under/Over", value: descParts[3] || "" },
+            { label: "Card", value: descParts[4] || "" }
+        ];
         return (
             <>
                 <Result_cards cardList1={cards?.slice(0, 3)} />
+                <Result_details data={data} />
             </>
         )
     },
@@ -1006,11 +1091,11 @@ const getGameResultContent = { // BY GAME_TYPE
     "trio": (response, cards, win) => {
         const descParts = getDescPartsBy("#")(response);
         const data = [
-            { label: "Odd/Even", value: descParts[0] || "" },
-            { label: "Red/Black", value: descParts[1] || "" },
-            { label: "Low/High", value: descParts[2] || "" },
-            { label: "Cards", value: descParts[3] || "" },
-            { label: "Baccarat", value: descParts[4] || "" },
+            { label: "Session (21)", value: descParts[0] || "" },
+            { label: "1 2 4 / J Q K", value: descParts[1] || "" },
+            { label: "Red/Black", value: descParts[2] || "" },
+            { label: "Odd/Even", value: descParts[3] || "" },
+            { label: "Pattern", value: descParts[4] || "" },
         ];
         return (
             <>
@@ -1036,7 +1121,7 @@ const getGameResultContent = { // BY GAME_TYPE
     "notenum": (response, cards, win) => {
         const descParts = getDescPartsBy("#")(response);
         const data = [
-            { label: "Winner", value: descParts[0] || "" },
+            { label: "Odd/Even", value: descParts[0] || "" },
             { label: "Red/Black", value: descParts[1] || "" },
             { label: "Low/High", value: descParts[2] || "" },
             { label: "Cards", value: descParts[3] || "" },
@@ -1051,15 +1136,54 @@ const getGameResultContent = { // BY GAME_TYPE
             </>
         )
     },
+    "dum10": (response, cards, win, isMobile) => {
+        const descParts = getDescPartsBy("#")(response);
+        const data = [
+            { label: "Card", value: descParts[0] || "" },
+            { label: "Curr. Total", value: descParts[1] || "" },
+            { label: "Total", value: descParts[2] || "" },
+            { label: "Odd/Even", value: descParts[3] || "" },
+            { label: "Red/Black", value: descParts[4] || "" },
+        ];
+        return (
+            <div className="col-12" style={{ width: "100%" }}>
+                {/* Row 1: Slider and single card in 1 row */}
+                <div
+                    className="d-flex align-items-center justify-content-center mb-3"
+                    style={{
+                        gap: isMobile ? "12px" : "10vw",
+                        padding: isMobile ? '0px 5vw' : '',
+                    }}
+                >
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                        <Result_cards_slider
+                            col={false}
+                            cardList1={cards?.slice(0, -1)}
+                        />
+                    </div>
+                    {cards?.slice(-1)?.[0] && (
+                        <div className="casino-result-cards-item flex-shrink-0 mb-0">
+                            <img
+                                src={getCardImage(cards?.slice(-1)?.[0])}
+                                alt="card"
+                                style={{ width: "37px" }}
+                            />
+                        </div>
+                    )}
+                </div>
+
+                {/* Row 2: Details in separate row, horizontally centered */}
+                <div className="row justify-content-center">
+                    <Result_details data={data} col={7} />
+                </div>
+            </div>
+        )
+    },
     "dolidana": (response, cards, win) => {
         const descParts = getDescPartsBy("#")(response);
         const data = [
             { label: "Turn", value: descParts[0] || "" },
-            { label: "Any Pair", value: descParts[1] || "" },
-            { label: "Particulat Pair", value: descParts[2] || "" },
-            { label: "Sum Total", value: descParts[3] || "" },
-            { label: "Odd/Even", value: descParts[4] || "" },
-            { label: "Lucky 7", value: descParts[5] || "" },
+            { label: "Win", value: descParts[1] || "" },
         ];
         // cards are already dice1, dice2, etc from getCardList.dolidana
         return (
@@ -1070,10 +1194,44 @@ const getGameResultContent = { // BY GAME_TYPE
         )
     },
     "sicbo": (response, cards, win) => {
-        return <Result_Image name={cards.map(n => `dice${n}`).join(',')} folder="cards_new" size={50} align="center" col={12} offset={0} />
+        const descParts = getDescPartsBy("#")(response);
+        const data = [
+            { label: "Desc", value: descParts[0] || "" },
+            { label: "Win", value: response?.result_status || "" }
+        ]
+        return (
+            <>
+                <Result_Image
+                    name={cards.map(n => `dice${n}`).join(',')}
+                    folder="cards_new"
+                    size={50}
+                    align="center"
+                    col={7}
+                    offset={0}
+                />
+                <Result_details data={data} />
+            </>
+        )
     },
     "sicbo2": (response, cards, win) => {
-        return <Result_Image name={cards.map(n => `dice${n}`).join(',')} folder="cards_new" size={50} align="center" col={12} offset={0} />
+        const descParts = getDescPartsBy("#")(response);
+        const data = [
+            { label: "Desc", value: descParts[0] || "" },
+            { label: "Win", value: response?.result_status || "" }
+        ]
+        return (
+            <>
+                <Result_Image
+                    name={cards.map(n => `dice${n}`).join(',')}
+                    folder="cards_new"
+                    size={50}
+                    align="center"
+                    col={7}
+                    offset={0}
+                />
+                <Result_details data={data} />
+            </>
+        )
     },
     "3cardj": (response, cards, win) => {
         const descParts = getDescPartsBy("#")(response);
@@ -1132,6 +1290,7 @@ const getGameResultContent = { // BY GAME_TYPE
             { label: "Color", value: descParts[2] || "" },
             { label: "Suit", value: descParts[3] || "" },
         ];
+        const [list1, list2] = getOddEvenCards(cards?.slice(1));
         return (
             <>
                 <Result_Joker
@@ -1139,8 +1298,8 @@ const getGameResultContent = { // BY GAME_TYPE
                     title2="Player A"
                     title3="Player B"
                     cardList1={cards?.slice(0, 1)}
-                    cardList2={cards?.slice(1, 4)}
-                    cardList3={cards?.slice(4, 7)}
+                    cardList2={list1}
+                    cardList3={list2}
                     winner={response?.result_status}
                 />
                 <Result_details data={data} />
@@ -1155,6 +1314,7 @@ const getGameResultContent = { // BY GAME_TYPE
             { label: "Color", value: descParts[2] || "" },
             { label: "Suit", value: descParts[3] || "" },
         ];
+        const [list1, list2] = getOddEvenCards(cards?.slice(1));
         return (
             <>
                 <Result_Joker
@@ -1162,8 +1322,8 @@ const getGameResultContent = { // BY GAME_TYPE
                     title2="Player A"
                     title3="Player B"
                     cardList1={cards?.slice(0, 1)}
-                    cardList2={cards?.slice(1, 4)}
-                    cardList3={cards?.slice(4, 7)}
+                    cardList2={list1}
+                    cardList3={list2}
                     winner={response?.result_status}
                 />
                 <Result_details data={data} />
@@ -1178,6 +1338,7 @@ const getGameResultContent = { // BY GAME_TYPE
             { label: "Color", value: descParts[2] || "" },
             { label: "Suit", value: descParts[3] || "" },
         ];
+        const [list1, list2] = getOddEvenCards(cards?.slice(1));
         return (
             <>
                 <Result_Joker
@@ -1185,8 +1346,8 @@ const getGameResultContent = { // BY GAME_TYPE
                     title2="Player A"
                     title3="Player B"
                     cardList1={cards?.slice(0, 1)}
-                    cardList2={cards?.slice(1, 4)}
-                    cardList3={cards?.slice(4, 7)}
+                    cardList2={list1}
+                    cardList3={list2}
                     winner={response?.result_status}
                 />
                 <Result_details data={data} />
@@ -1198,6 +1359,17 @@ const getGameResultContent = { // BY GAME_TYPE
     "superover3": (response) => <Result_superover response={response} />,
     "cricketv3": (response) => <Result_superover response={response} />,
 
+    "cmatch20": (response, cards, win) => {
+        const descParts = getDescPartsBy("#")(response);
+        const data = [{ label: "Result", value: descParts[0] || "" },];
+        return (
+            <>
+                <Result_cards cardList1={cards} />
+                <Result_details data={data} />
+            </>
+        )
+    },
+
     "trap": (response, cards, win) => {
         const descParts = getDescPartsBy("#")(response);
         const data = [
@@ -1208,7 +1380,7 @@ const getGameResultContent = { // BY GAME_TYPE
         const cardList1 = []
         const cardList2 = []
         cards?.map((val, idx) => {
-            if (idx % 2 === 1) {
+            if (idx % 2 === 0) {
                 cardList1.push(val)
             } else {
                 cardList2.push(val)
@@ -1237,8 +1409,8 @@ const Result_one = ({ resultData }) => {
         const game_type = resultData?.game_type;
         const cardList_ = JSON.parse(resultData?.cards || "[]");
         const cardsList = getCardList[game_type]?.(cardList_) ?? cardList_;
-
-        return getGameResultContent[game_type]?.(resultData, cardsList, resultData?.result_status) ?? <ResultModalNotFound />;
+        const isMobile = useIsMobile();
+        return getGameResultContent[game_type]?.(resultData, cardsList, resultData?.result_status, isMobile) ?? <ResultModalNotFound />;
     }, [resultData])
 
     return (

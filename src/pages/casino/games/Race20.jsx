@@ -87,7 +87,8 @@ const Race20 = ({ onBetSelection, exposureData, lastResults: propsLastResults })
     const suits = ["S", "H", "C", "D"];
     const suitCardsData = useMemo(() => {
         if (!currentGame?.desc) return [[], [], [], []];
-        const allCards = currentGame.desc.split(",").filter(c => c && c !== "1");
+        const ww = Array.isArray(currentGame?.desc) ? currentGame?.desc : currentGame?.desc?.split?.(",");
+        const allCards = ww?.filter(c => c && c !== "1") || [];
 
         return suits.map((suit) => {
             const suitOpenedCards = allCards.filter((card) =>

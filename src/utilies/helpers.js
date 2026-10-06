@@ -351,3 +351,27 @@ export function getUppercase_joined(value) {
 
     return str;
 }
+
+export function getOddEvenCards(cards, n = 2) {
+    if (!cards || cards.length === 0) return [];
+    const result = Array.from({ length: n }, () => []);
+
+    cards.forEach((item, index) => {
+        result[index % n].push(item);
+    });
+
+    return result;
+}
+
+/*
+const qq = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+console.log('getOddEvenCards(qq)', getOddEvenCards(qq)) 
+// output: [[1, 3, 5, 7, 9], [2, 4, 6, 8, 10]]
+
+console.log('getOddEvenCards(qq,3)', getOddEvenCards(qq, 3)) 
+//output: [[1, 4, 7, 10], [2, 5, 8], [3, 6, 9]]
+
+console.log('getOddEvenCards(qq,4)', getOddEvenCards(qq, 4)) 
+// output: [[1, 5, 9], [2, 6, 10], [3, 7], [4, 8]]
+
+*/

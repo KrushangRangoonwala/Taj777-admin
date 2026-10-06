@@ -3,8 +3,10 @@ import lastResultTextMap from "./LastResultTextMap";
 import { useGetFileData } from "../../../../hooks/useGetFileData";
 import Result_parent from "./Result_parent";
 import { Link } from "react-router-dom";
+import useIsMobile from "../../../../hooks/useIsMobile";
 
 const LastResult = ({ results = [], isOpen = true }) => {
+    const isMobile = useIsMobile();
     const [mid, setMid] = useState(false);
     const { game_type, isBgTransparent } = useGetFileData();
     // const { getResultTxt, getColorClass } = lastResultTextMap[game_type] || lastResultTextMap.DEFAULT;
@@ -23,7 +25,7 @@ const LastResult = ({ results = [], isOpen = true }) => {
                         onClick={() => setMid(result?.mid)}
                         style={{ backgroundColor: isBgTransparent ? "transparent" : "", boxShadow: isBgTransparent ? "none" : "" }}
                     >
-                        {String(getResultTxt(resultCode)) || resultCode}
+                        {getResultTxt(resultCode) || resultCode}
                     </span>
                 );
             })}

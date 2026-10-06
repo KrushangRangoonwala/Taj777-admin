@@ -1,15 +1,26 @@
 import React from 'react';
 
-const Result_details = ({ data = [], col = 5 }) => {
+const Result_details = ({ data = [], defaultCol = 12, col = 5 }) => {
     return (
-        <div className={`col-12 col-lg-${col}`}>
+        <div className={`col-${defaultCol} col-lg-${col}`}>
             <div className="casino-result-desc">
-                {data?.map((item, index) => (
-                    <div className="casino-result-desc-item" key={index}>
-                        <div>{item.label}</div>
-                        <div>{item.value}</div>
-                    </div>
-                ))}
+                {data?.map((item, index) => {
+                    const arr = item?.value?.split("~") || [];
+
+                    return (
+                        <>
+                            <div className="casino-result-desc-item" key={index}>
+                                <div>{item.label}</div>
+                                <div>{arr[0] || ""}</div>
+                            </div>
+
+                            {arr[1] && <div className="casino-result-desc-item" key={index}>
+                                <div></div>
+                                <div>{arr[1] || ""}</div>
+                            </div>}
+                        </>
+                    )
+                })}
             </div>
         </div>
     );
